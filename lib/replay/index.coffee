@@ -113,3 +113,4 @@ class ReplayRequest extends Stream
 
 
 replay   = Replay.fromFixtures("#{__dirname}/../../spec/fixtures")
+exports.Replay = Replay

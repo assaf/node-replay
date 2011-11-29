@@ -1,4 +1,4 @@
-{ assert, vows, HTTP } = require("./helpers")
+{ assert, vows, HTTP, Replay } = require("./helpers")
 
 
 vows.describe("Replay").addBatch

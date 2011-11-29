@@ -9,6 +9,7 @@
 
 File = require("fs")
 Path = require("path")
+{ Catalog } = require("./catalog")
 { Matcher } = require("./matcher")
 { Stream } = require("stream")
 
@@ -83,26 +84,10 @@ class Replay
 class FixtureReplay extends Replay
   constructor: (basedir)->
     Replay.apply(this)
-    @basedir = Path.resolve(basedir)
+    @catalog = new Catalog(Replay)
 
   _retrieve: (host)->
-    # We store array of matchers or null if file doesn't exist.
-    matchers = @matchers[host]
-    if matchers || matchers == null
-      return matchers
-
-    try
-      json = File.readFileSync(Path.resolve(@basedir, "#{host}.json"), "utf8")
-      matchers = []
-      for mapping in JSON.parse(json)
-        matchers.push Matcher.fromMapping(mapping)
-      @matchers[host] = matchers
-    catch error
-      if error.code == "ENOENT"
-        @matchers[host] = null
-      else
-        throw error
-    return matchers
+    return @catalog.find(host)
 
 
 clone = (object)->
