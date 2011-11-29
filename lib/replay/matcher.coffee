@@ -1,4 +1,6 @@
-# Request matcher is a function that, given a request, returns a suitable response or nothing.
+# A matcher is a function that, given a request, returns an appropriate response or nothing.
+#
+# The most common use case is to calling `Matcher.fromMapping(mapping)`.
 #
 # The request consists of:
 # url     - URL object
@@ -18,7 +20,9 @@ assert = require("assert")
 URL = require("url")
 
 
-# Simple implementation of request matcher.
+# Simple implementation of a matcher.
+#
+# To create a matcher from request/response mapping use `fromMapping`.
 class Matcher
   constructor: (request, response)->
     # Map requests to object properties.  We do this for quick matching.
@@ -78,10 +82,11 @@ class Matcher
     return true
 
 
-  # Returns new Matcher based on mappings loaded from a file
+  # Returns new matcher function based on the supplied mapping.
+  #
+  # Mapping can contain `request` and `response` object.  As shortcut, mapping can specify `url` and `method` (optional)
+  # directly, and also any of the response properties.
   @fromMapping: (mapping)->
-    # Mapping can contain request and response objects, but as shortcut, can also contain url and (optional) method
-    # properties mapped to request, and any response properties
     assert !!mapping.url ^ !!mapping.request, "Mapping must specify url value or request object"
     if mapping.url
       request =

@@ -4,8 +4,8 @@ File = require("fs")
 URL = require("url")
 
 
-{ CaptureResponse, ReplayResponse } = require("./response")
-{ Replayer } = require("./replayer")
+{ CaptureResponse } = require("./capture")
+{ Replay } = require("./replay")
 
 
 # True if network access allowed.
@@ -87,12 +87,12 @@ class ReplayRequest extends HTTP.ClientRequest
     capture = capture.capture.bind(capture)
     request =
       url:  URL.parse("#{@options.protocol || "http"}://#{@options.host}#{@options.path}")
-    replayer.process request, capture, (error, response)=>
+    replay.process request, capture, (error, response)=>
       if error
         @emit "error", error
         return
       if response
-        @emit "response", new ReplayResponse(response)
+        @emit "response", response
       else
         @emit "error", new Error("Not able to access #{request}")
     return
@@ -100,5 +100,4 @@ class ReplayRequest extends HTTP.ClientRequest
   abort: ->
 
 
-replayer   = Replayer.fromFixtures("#{__dirname}/../../spec/fixtures")
-
+replay   = Replay.fromFixtures("#{__dirname}/../../spec/fixtures")
