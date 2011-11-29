@@ -1,6 +1,8 @@
+assert = require("assert")
 { EventEmitter } = require("events")
 HTTP = require("http")
 File = require("fs")
+{ Stream } = require("stream")
 URL = require("url")
 
 
@@ -36,8 +38,8 @@ HTTP.request = (options, callback)->
 
 
 # HTTP client request that allows us to capture the request
-class ReplayRequest extends HTTP.ClientRequest
-  constructor: (options = {}, @callback)->
+class ReplayRequest extends Stream
+  constructor: (options = {}, callback)->
     # Duplicate headers and options.
     @headers = {}
     if options.headers
@@ -49,18 +51,22 @@ class ReplayRequest extends HTTP.ClientRequest
       if value
         @options[name] = value
 
+    if callback
+      @once "response", (response)->
+        callback response
+
   setHeader: (name, value)->
-    unless @parts
-      @headers[name] = value
-    return value
+    assert !@ended, "Already called end"
+    assert !@parts, "Already wrote body parts"
+    @headers[name] = value
 
   getHeader: (name)->
     return @headers[name]
 
   removeHeader: (name)->
-    unless @parts
-      delete @headers[name]
-    return
+    assert !@ended, "Already called end"
+    assert !@parts, "Already wrote body parts"
+    delete @headers[name]
 
   setTimeout: (timeout, callback)->
     @timeout = [timeout, callback]
@@ -75,27 +81,33 @@ class ReplayRequest extends HTTP.ClientRequest
     return
 
   write: (chunk, encoding)->
+    assert !@ended, "Already called end"
     @parts ||= []
     @parts.push [chunk, encoding]
     return
 
   end: (data, encoding)->
+    assert !@ended, "Already called end"
     if data
       @write data, encoding
+    @ended = true
 
-    capture = new CaptureResponse(httpRequest.call(HTTP, @options), @parts)
-    capture = capture.capture.bind(capture)
-    request =
-      url:  URL.parse("#{@options.protocol || "http"}://#{@options.host}#{@options.path}")
-    replay.process request, capture, (error, response)=>
-      if error
-        @emit "error", error
-        return
-      if response
-        @emit "response", response
-      else
-        @emit "error", new Error("Not able to access #{request}")
-    return
+    # Requests are handled asynchronously, it's possible to call end and then register response listener.
+    process.nextTick =>
+      #capture = new CaptureResponse(httpRequest.call(HTTP, @options), @parts)
+      #capture = capture.capture.bind(capture)
+      capture = null
+      request =
+        url:  URL.parse("#{@options.protocol || "http"}://#{@options.host}#{@options.path}")
+      replay.process request, capture, (error, response)=>
+        if error
+          @emit "error", error
+          return
+        if response
+          @emit "response", response
+        else
+          @emit "error", new Error("Unable to reach #{URL.format(request.url)}")
+      return
 
   abort: ->
 

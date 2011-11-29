@@ -115,11 +115,12 @@ clone = (object)->
 # Replay returns this object, an implementation of `http.ClientResponse` that is able to stream back a replayed
 # response.
 class ReplayResponse extends Stream
-  constructor: (@_captured)->
-    @httpVersion = @_captured.version
-    @statusCode  = @_captured.status
-    @headers     = clone(@_captured.headers)
-    @_index      = 0
+  constructor: (captured)->
+    @httpVersion = captured.version
+    @statusCode  = captured.status
+    @headers     = clone(captured.headers)
+    @trailers    = clone(captured.trailers)
+    @body        = captured.body.slice(0)
     @readable    = true
     @resume()
 
@@ -129,18 +130,20 @@ class ReplayResponse extends Stream
   resume: ->
     @_paused = false
     process.nextTick =>
-      return if @_paused || @_done
-      chunk = @_captured.chunks && @_captured.chunks[@_index]
-      if chunk
-        if @_encoding != @_captured.encoding
-          chunk = new Buffer(chunk, @_captured.encoding).toString(@_encoding)
+      return if @_paused || !@body
+      part = @body.shift()
+      if part
+        if @_encoding
+          chunk = new Buffer(part[0], part[1]).toString(@_encoding)
+        else
+          chunk = part[0]
         @emit "data", chunk
         ++@_index
         @resume()
       else
+        @body = null
         @readable = false
         @_done = true
-        @trailers = clone(@_captured.trailers)
         @emit "end"
 
   setEncoding: (@_encoding)->
