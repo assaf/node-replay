@@ -1,0 +1,11 @@
+[
+  { "comment": "Minimalistic mapping",
+    "url": "http://example.com/weather?c=94606",
+    "status":  "200",
+    "headers": {
+      "Content-Type": "text/html",
+      "Date":          "Tue, 29 Nov 2011 03:12:15 GMT"
+    },
+    "body": "Nice and warm"
+  }
+]
