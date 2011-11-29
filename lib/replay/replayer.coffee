@@ -1,92 +1,85 @@
-# Replayer is able to record and  reply responses.  Can be chained.
-
-
-assert = require("assert")
 File = require("fs")
 Path = require("path")
-URL = require("url")
+{ Matcher } = require("./matcher")
 
 
 class Replayer
-  constructor: (basedir)->
-    @basedir = Path.resolve(basedir)
-    @hosts = {}
+  constructor: ->
+    @matchers = {}
 
+  process: (request, capture, callback)->
+    { url } = request
+    host = if !url.port || url.port.toString() == "80" then url.hostname else "#{url.hostname}:#{url.port}"
+    try
+      matchers = @_retrieve(host)
+    catch error
+      callback error
+      return
+    if matchers
+      for matcher in matchers
+        response = matcher(request)
+        if response
+          callback null, response
 
-  # Retrieve response structure matching the request structure.
-  # 
-  # Request specifies:
-  # url     - Request url
-  # method  - Request method
-  # headers - Request headers
-  # body    - Request body
-  retrieve: (request)->
-    return unless request.url
-    url = URL.parse(request.url)
-    filename = if !url.port || url.port.toString() == "80" then url.hostname else "#{url.hostname}:#{url.port}"
-    # Retrieve mapping for that resource
-    matchers = @hosts[filename]
-    unless matchers
-      try
-        json = File.readFileSync(Path.resolve(@basedir, "#{filename}.json"), "utf8")
-        matchers = []
-        for mapping in JSON.parse(json)
-          matchers.push new RequestMatcher(mapping)
-      catch error
-        if error.code == "ENOENT"
-          if @fallback
-            return @callback.retrieve(request)
-          matchers = []
-        else
-          throw error
-      @hosts[filename] = matchers
-
-    for matcher in matchers
-      if matcher.match(url)
-        return matcher.response
-
-    if @fallback
-      return @callback.retrieve(request)
+    if @_fallback
+      @_fallback.retrieve request, capture, callback
+      return
+    if @_recording
+      capture (error, response)->
+        unless error
+          @_store host, request, response
+        callback error, response
     return
 
-
-class RequestMatcher
-  constructor: (mapping)->
-    if mapping.url
-      url = URL.parse(mapping.url)
-      @hostname = url.hostname
-      @port     = url.port
-      @pathname = url.pathname
-      @query    = url.query
+  chain: (fallback)->
+    if @_fallback
+      @_fallback.chain(fallback)
     else
-      @hostname = request.hostname
-      @port     = request.port
-      @pathname = request.pathname
-      @query    = request.query
-    assert @hostname, "Mapping must specify at least hostname to match"
+      @_fallback = fallback
+    return this
 
-    response = mapping.response || mapping
-    @response =
-      version:  "1.1"
-      status:   mapping.status && parseInt(mapping.status, 10)
-      headers:  mapping.headers || {}
-      body:     @chunk(mapping.body)
-      trailers: mapping.trailers || {}
-    assert @response.status, "Mapping must specify at least response status code"
+  recording: (recording = true)->
+    @_recording = recording
+    return this
 
-  match: (url, headers, body)->
-    return false if @hostname && @hostname != url.hostname
-    return false if @port && @port != url.port
-    return false if @pathname && @pathname != url.pathname
-    return false if @query && @query != url.query
-    return true
+  _retrieve: (host)->
+    return @matchers[host]
 
-  chunk: (body)->
-    unless body
-      return []
-    if Array.isArray(body)
-      return body
-    return [[body.toString(), "utf8"]]
+  _store: (request, response)->
+    { url } = request
+    matcher = Matcher.fromMapping(request, response)
+    host = if !url.port || url.port.toString() == "80" then url.hostname else "#{url.hostname}:#{url.port}"
+    @matchers[host] ||= []
+    @matchers[host].push matcher
+
+  @fromFixtures = (basedir)->
+    return new FixtureReplayer(basedir)
+
+
+class FixtureReplayer extends Replayer
+  constructor: (basedir)->
+    Replayer.apply(this)
+    @basedir = Path.resolve(basedir)
+
+  _retrieve: (host)->
+    # We store array of matchers or null if file doesn't exist.
+    matchers = @matchers[host]
+    if matchers || matchers == null
+      return matchers
+
+    try
+      json = File.readFileSync(Path.resolve(@basedir, "#{host}.json"), "utf8")
+      matchers = []
+      for mapping in JSON.parse(json)
+        matchers.push Matcher.fromMapping(mapping)
+      @matchers[host] = matchers
+    catch error
+      if error.code == "ENOENT"
+        @matchers[host] = null
+      else
+        throw error
+    return matchers
+
 
 
 exports.Replayer = Replayer
