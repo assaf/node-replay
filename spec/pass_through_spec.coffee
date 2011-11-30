@@ -6,6 +6,7 @@
 # Second batch is testing requests with no replay and no network access.
 vows.describe("Pass through").addBatch
 
+  # Send request to the live server on port 3001 and check the responses.
   "live server":
     topic: ->
       Replay.networkAccess = true
@@ -32,6 +33,7 @@ vows.describe("Pass through").addBatch
         assert.equal response.headers["content-type"], "text/html; charset=utf-8"
       "should return response body": (response)->
         assert.deepEqual response.body, "Success!"
+
     "callback":
       topic: ->
         request = HTTP.get(hostname: "pass-through", port: 3001, (response)=>
@@ -57,6 +59,7 @@ vows.describe("Pass through").addBatch
 
 .addBatch
 
+  # Send request to the live server on port 3001, but this time network connection disabled.
   "live server":
     topic: ->
       Replay.networkAccess = false

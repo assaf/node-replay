@@ -4,6 +4,7 @@
 # Test replaying results from fixtures in spec/fixtures.
 vows.describe("Replay").addBatch
 
+  # Send responses to non-existent server on port 3002, expect replayed responses from fixtures.
   "matching URL":
     topic: ->
       Replay.networkAccess = false
@@ -25,6 +26,7 @@ vows.describe("Replay").addBatch
         assert.deepEqual response.headers, { "content-type": "text/html", "date": "Tue, 29 Nov 2011 03:12:15 GMT" }
       "should return response trailers": (response)->
         assert.deepEqual response.trailers, { }
+
     "callback":
       topic: ->
         request = HTTP.get(hostname: "example.com", port: 3002, path: "/weather?c=94606", (response)=>
@@ -42,6 +44,8 @@ vows.describe("Replay").addBatch
       "should return response trailers": (response)->
         assert.deepEqual response.trailers, { }
 
+
+  # Send responses to non-existent server on port 3002. No matching fixture for that path, expect a 404.
   "undefined path":
     topic: ->
       Replay.networkAccess = false
@@ -60,6 +64,8 @@ vows.describe("Replay").addBatch
       assert.equal response.body, "No recorded request/response that matches http://example.com:3002/weather?c=14003"
 
 
+  
+  # Send responses to non-existent server on port 3002. No matching fixture for that host, expect refused connection.
   "undefined host":
     topic: ->
       Replay.networkAccess = false
