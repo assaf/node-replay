@@ -1,11 +1,12 @@
 { assert, vows, HTTP, Replay } = require("./helpers")
 
 
+# Test replaying results from fixtures in spec/fixtures.
 vows.describe("Replay").addBatch
 
   "matching URL":
     topic: ->
-      Replay.networkAccess = true
+      Replay.networkAccess = false
       Replay.record = false
       @callback null
     "listeners":
@@ -41,10 +42,28 @@ vows.describe("Replay").addBatch
       "should return response trailers": (response)->
         assert.deepEqual response.trailers, { }
 
-
-  "unreachable URL":
+  "undefined path":
     topic: ->
-      request = HTTP.get(hostname: "example.com", port: 3002, path: "/weather?c=14003", (response)=>
+      Replay.networkAccess = false
+      HTTP.get hostname: "example.com", port: 3002, path: "/weather?c=14003", (response)=>
+        response.body = ""
+        response.on "data", (chunk)->
+          response.body += chunk
+        response.on "end", =>
+          @callback null, response
+      return
+    "should return HTTP version": (response)->
+      assert.equal response.httpVersion, "1.1"
+    "should return status code 404": (response)->
+      assert.equal response.statusCode, "404"
+    "should return body with error message": (response)->
+      assert.equal response.body, "No recorded request/response that matches http://example.com:3002/weather?c=14003"
+
+
+  "undefined host":
+    topic: ->
+      Replay.networkAccess = false
+      request = HTTP.get(hostname: "no-such", port: 3002, path: "/weather?c=14003", (response)=>
         @callback null, "callback"
       )
       request.on "response", (response)=>

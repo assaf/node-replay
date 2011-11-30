@@ -17,8 +17,6 @@ class Catalog
     # We need a base directory to load files from.
     unless @settings.fixtures
       return
-    # Create entry in cache.  Even if empty, saves us from looking next time.
-    matchers = @matchers[host] ||= []
     @basedir ||= Path.resolve(@settings.fixtures)
 
     # Start by looking for directory and loading each of the files.
@@ -26,6 +24,7 @@ class Catalog
     if Path.existsSync(pathname)
       files = File.readdirSync(pathname)
       for file in files
+        matchers = @matchers[host] ||= []
         json = File.readFileSync("#{pathname}/#{file}", "utf8")
         for mapping in JSON.parse(json)
           matchers.push Matcher.fromMapping(mapping)
@@ -33,6 +32,7 @@ class Catalog
     # Load individual JSON file.
     filename = "#{@basedir}/#{host}.json"
     if Path.existsSync(filename)
+      matchers = @matchers[host] ||= []
       json = File.readFileSync(filename, "utf8")
       for mapping in JSON.parse(json)
         matchers.push Matcher.fromMapping(mapping)

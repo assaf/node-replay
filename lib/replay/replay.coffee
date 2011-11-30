@@ -9,6 +9,7 @@
 
 File = require("fs")
 Path = require("path")
+URL = require("url")
 { Catalog } = require("./catalog")
 { Matcher } = require("./matcher")
 { Stream } = require("stream")
@@ -43,14 +44,17 @@ class Replay
       @fallback.process request, capture, callback
       return
 
-    # Last replay in the chain.  If capturing enabled, ask to capture the response and return it.  Otherwise, callback
-    # with no response.
+    # Last replay in the chain.  If capturing enabled, ask to capture the response and return it.  Otherwise, if we have
+    # matchers for the host, we return 404 (nothing matching path).  If we have no matching for host, we simulate
+    # connection error.
     if capture
       capture (error, response)->
         # In recording mode, store a mapping from request to response.  Otherwise, just pass the request through.
         if response && @record
           @_store request, response
         callback error, response && new ReplayResponse(response)
+    else if matchers
+      callback null, ReplayResponse.notFound(url)
     else
       callback null
 
@@ -101,11 +105,11 @@ clone = (object)->
 # response.
 class ReplayResponse extends Stream
   constructor: (captured)->
-    @httpVersion = captured.version
-    @statusCode  = captured.status
+    @httpVersion = captured.version || "1.1"
+    @statusCode  = captured.status || "200"
     @headers     = clone(captured.headers)
     @trailers    = clone(captured.trailers)
-    @_body        = captured.body.slice(0) || []
+    @_body       = captured.body.slice(0)
     @readable    = true
 
   pause: ->
@@ -118,9 +122,9 @@ class ReplayResponse extends Stream
       part = @_body.shift()
       if part
         if @_encoding
-          chunk = new Buffer(part[0], part[1]).toString(@_encoding)
+          chunk = new Buffer(part).toString(@_encoding)
         else
-          chunk = part[0]
+          chunk = part
         @emit "data", chunk
         @resume()
       else
@@ -130,6 +134,10 @@ class ReplayResponse extends Stream
         @emit "end"
 
   setEncoding: (@_encoding)->
+
+  @notFound: (url)->
+    return new ReplayResponse(status: 404, body: ["No recorded request/response that matches #{URL.format(url)}"])
+
 
 
 exports.Replay = Replay

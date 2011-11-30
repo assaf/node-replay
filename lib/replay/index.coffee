@@ -97,8 +97,9 @@ class ReplayRequest extends Stream
       if Replay.networkAccess
         capture = new CaptureResponse(httpRequest.call(HTTP, @options), @parts)
         capture = capture.capture.bind(capture)
+      host = @options.host || [@options.hostname || "localhost", @options.port || 80].join(":")
       request =
-        url:  URL.parse("#{@options.protocol || "http"}://#{@options.host}:#{@options.port || 80}#{@options.path}")
+        url:  URL.parse("#{@options.protocol || "http"}://#{host}#{@options.path || "/"}")
       replay.process request, capture, (error, response)=>
         if error
           @emit "error", error

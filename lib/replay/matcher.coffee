@@ -12,7 +12,7 @@
 # version   - HTTP version
 # status    - Status code
 # headers   - Headers object (names are lower case)
-# body      - Array of body parts, each one a pair of content and optional encoding
+# body      - Array of body parts
 # trailers  - Trailers object (names are lower case)
 
 
@@ -54,14 +54,9 @@ class Matcher
         headers[name.toLowerCase()] = value
     # Copy over body (string) or multiple body parts (strings or content/encoding pairs)
     if Array.isArray(response.body)
-      body = @response.body
-      for part in response.body
-        if Array.isArray(part)
-          response.body.push [part[0], part[1]]
-        else
-          response.body.push [part]
+      @response.body = response.body.slice(0)
     else if response.body
-      @response.body.push [response.body]
+      @response.body = [response.body]
     # Copy over trailers to response, downcase trailers names.
     if response.trailers
       trailers = @response.trailers
