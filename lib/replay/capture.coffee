@@ -3,7 +3,6 @@ class CaptureResponse
   constructor: (@request, @parts)->
 
   capture: (callback)->
-    console.log "Capturing ..."
     @request.on "response", (response)=>
       captured =
         version:  response.httpVersion

@@ -105,9 +105,8 @@ class ReplayResponse extends Stream
     @statusCode  = captured.status
     @headers     = clone(captured.headers)
     @trailers    = clone(captured.trailers)
-    @body        = captured.body.slice(0)
+    @_body        = captured.body.slice(0) || []
     @readable    = true
-    @resume()
 
   pause: ->
     @_paused = true
@@ -115,18 +114,17 @@ class ReplayResponse extends Stream
   resume: ->
     @_paused = false
     process.nextTick =>
-      return if @_paused || !@body
-      part = @body.shift()
+      return if @_paused || !@_body
+      part = @_body.shift()
       if part
         if @_encoding
           chunk = new Buffer(part[0], part[1]).toString(@_encoding)
         else
           chunk = part[0]
         @emit "data", chunk
-        ++@_index
         @resume()
       else
-        @body = null
+        @_body = null
         @readable = false
         @_done = true
         @emit "end"

@@ -4,9 +4,13 @@
 vows.describe("Replay").addBatch
 
   "matching URL":
+    topic: ->
+      Replay.networkAccess = true
+      Replay.record = false
+      @callback null
     "listeners":
       topic: ->
-        request = HTTP.get(host: "example.com", path: "/weather?c=94606")
+        request = HTTP.get(hostname: "example.com", port: 3002, path: "/weather?c=94606")
         request.on "response", (response)=>
           response.on "end", =>
             @callback null, response
@@ -22,7 +26,7 @@ vows.describe("Replay").addBatch
         assert.deepEqual response.trailers, { }
     "callback":
       topic: ->
-        request = HTTP.get(host: "example.com", path: "/weather?c=94606", (response)=>
+        request = HTTP.get(hostname: "example.com", port: 3002, path: "/weather?c=94606", (response)=>
           response.on "end", =>
             @callback null, response
         )
@@ -40,7 +44,7 @@ vows.describe("Replay").addBatch
 
   "unreachable URL":
     topic: ->
-      request = HTTP.get(host: "example.com", path: "/weather?c=14003", (response)=>
+      request = HTTP.get(hostname: "example.com", port: 3002, path: "/weather?c=14003", (response)=>
         @callback null, "callback"
       )
       request.on "response", (response)=>
@@ -50,7 +54,7 @@ vows.describe("Replay").addBatch
       return
     "should callback with error": (error)->
       assert.instanceOf error, Error
-      assert.equal error.message, "Unable to reach http://example.com/weather?c=14003"
+      assert.equal error.code, "ECONNREFUSED"
 
 
 .export(module)

@@ -23,11 +23,12 @@ class Catalog
 
     # Start by looking for directory and loading each of the files.
     pathname = "#{@basedir}/#{host}"
-    files = File.readdirSync(pathname)
-    for file in files
-      json = File.readFileSync("#{pathname}/#{file}", "utf8")
-      for mapping in JSON.parse(json)
-        matchers.push Matcher.fromMapping(mapping)
+    if Path.existsSync(pathname)
+      files = File.readdirSync(pathname)
+      for file in files
+        json = File.readFileSync("#{pathname}/#{file}", "utf8")
+        for mapping in JSON.parse(json)
+          matchers.push Matcher.fromMapping(mapping)
 
     # Load individual JSON file.
     filename = "#{@basedir}/#{host}.json"

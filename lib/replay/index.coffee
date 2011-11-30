@@ -94,19 +94,23 @@ class ReplayRequest extends Stream
 
     # Requests are handled asynchronously, it's possible to call end and then register response listener.
     process.nextTick =>
-      #capture = new CaptureResponse(httpRequest.call(HTTP, @options), @parts)
-      #capture = capture.capture.bind(capture)
-      capture = null
+      if Replay.networkAccess
+        capture = new CaptureResponse(httpRequest.call(HTTP, @options), @parts)
+        capture = capture.capture.bind(capture)
       request =
-        url:  URL.parse("#{@options.protocol || "http"}://#{@options.host}#{@options.path}")
+        url:  URL.parse("#{@options.protocol || "http"}://#{@options.host}:#{@options.port || 80}#{@options.path}")
       replay.process request, capture, (error, response)=>
         if error
           @emit "error", error
           return
         if response
           @emit "response", response
+          response.resume()
         else
-          @emit "error", new Error("Unable to reach #{URL.format(request.url)}")
+          error = new Error("Connection refused: Replay.networkAccess is false")
+          error.code = "ECONNREFUSED"
+          error.errno = "ECONNREFUSED"
+          @emit "error", error
       return
 
   abort: ->
