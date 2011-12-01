@@ -1,6 +1,6 @@
 { "name": "replay",
   "description": "When API testing slows you down: mock, record and replay HTTP requests/responses like a boss",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": "Assaf Arkin <assaf@labnotes.org> (http://labnotes.org/)",
   "keywords": [ "test", "mock", "stub", "http", "replay", "vcr", "api" ],
   "main": "./lib/replay",
