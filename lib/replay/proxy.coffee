@@ -33,7 +33,8 @@ URL = require("url")
 class ProxyRequest extends HTTP.ClientRequest
   constructor: (options = {}, @proxy)->
     @method = (options.method || "get").toLowerCase()
-    @url = URL.parse("http://#{options.host || [options.hostname || "localhost", options.port || 80].join(":")}#{options.path || "/"}")
+    [host, port] = (options.host || options.hostname).split(":")
+    @url = URL.parse("http://#{host || "localhost"}:#{options.port || port || 80}#{options.path || "/"}")
     @headers = {}
     if options.headers
       for n,v of options.headers

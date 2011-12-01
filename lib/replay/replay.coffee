@@ -4,7 +4,10 @@
 exports.replay = (settings)->
   catalog = new Catalog(settings)
   return (request, callback)->
-    matchers = catalog.find(request.url.host)
+    host = request.url.hostname
+    if request.url.port && request.url.port != "80"
+      host += ":#{request.url.port}"
+    matchers = catalog.find(host)
     if matchers
       for matcher in matchers
         response = matcher(request)

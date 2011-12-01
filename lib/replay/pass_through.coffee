@@ -12,15 +12,24 @@ exports.passThrough = (allow)->
     [boolean, allow] = [allow, (request)-> !!boolean]
   return (request, callback)->
     if allow(request)
-      http = httpRequest(request.url)
+      options =
+        hostname: request.url.hostname
+        port:     request.url.port
+        path:     request.url.path
+      http = httpRequest(options)
       http.on "error", (error)->
         callback error
       http.on "response", (response)->
-        body = []
+        captured =
+          version: response.httpVersion
+          status:  response.statusCode
+          headers: response.headers
+          body:    []
         response.on "data", (chunk)->
-          body.push chunk
+          captured.body.push chunk
         response.on "end", ->
-          callback null, { status: response.statusCode, headers: response.headers, body: body }
+          captured.trailers = response.trailers
+          callback null, captured
       http.end()
     else
       callback null
