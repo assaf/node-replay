@@ -27,7 +27,7 @@ class Catalog
         matchers = @matchers[host] ||= []
         json = File.readFileSync("#{pathname}/#{file}", "utf8")
         for mapping in JSON.parse(json)
-          matchers.push Matcher.fromMapping(mapping)
+          matchers.push Matcher.fromMapping(host, mapping)
 
     # Load individual JSON file.
     filename = "#{@basedir}/#{host}.json"
@@ -35,7 +35,7 @@ class Catalog
       matchers = @matchers[host] ||= []
       json = File.readFileSync(filename, "utf8")
       for mapping in JSON.parse(json)
-        matchers.push Matcher.fromMapping(mapping)
+        matchers.push Matcher.fromMapping(host, mapping)
     
     return matchers
 

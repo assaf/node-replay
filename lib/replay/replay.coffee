@@ -75,7 +75,7 @@ class Replay
 
   _store: (request, response)->
     { url } = request
-    matcher = Matcher.fromMapping(request, response)
+    matcher = Matcher.fromMapping(url, request: request, response: response)
     host = if !url.port || url.port.toString() == "80" then url.hostname else "#{url.hostname}:#{url.port}"
     @matchers[host] ||= []
     @matchers[host].push matcher

@@ -1,6 +1,6 @@
 [
   { "comment": "Minimalistic mapping",
-    "url": "http://example.com/weather?c=94606",
+    "path": "/weather?c=94606",
     "status":  "200",
     "headers": {
       "Content-Type": "text/html",
@@ -9,4 +9,3 @@
     "body": "Nice and warm"
   }
 ]
-

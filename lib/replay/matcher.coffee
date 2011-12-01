@@ -79,16 +79,20 @@ class Matcher
 
   # Returns new matcher function based on the supplied mapping.
   #
-  # Mapping can contain `request` and `response` object.  As shortcut, mapping can specify `url` and `method` (optional)
+  # Mapping can contain `request` and `response` object.  As shortcut, mapping can specify `path` and `method` (optional)
   # directly, and also any of the response properties.
-  @fromMapping: (mapping)->
-    assert !!mapping.url ^ !!mapping.request, "Mapping must specify url value or request object"
-    if mapping.url
+  @fromMapping: (host, mapping)->
+    assert !!mapping.path ^ !!mapping.request, "Mapping must specify path or request object"
+    if mapping.path
       request =
-        url:    mapping.url
+        url:    URL.resolve("http://#{host}", mapping.path)
         method: mapping.method
     else
-      request = mapping.request
+      request =
+        url:      URL.resolve("http://#{host}", URL.format(mapping.request))
+        method:   mapping.request.method
+        headers:  mapping.request.headers
+        body:     mapping.request.body
     matcher = new Matcher(request, mapping.response || mapping)
     return (request)->
       if matcher.match(request)
