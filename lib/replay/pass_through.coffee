@@ -32,6 +32,9 @@ exports.passThrough = (allow)->
         response.on "end", ->
           captured.trailers = response.trailers
           callback null, captured
+      if request.body
+        for part in request.body
+          http.write part[0], part[1]
       http.end()
     else
       callback null

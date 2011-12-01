@@ -7,7 +7,7 @@
 # url     - URL object
 # method  - Request method (lower case)
 # headers - Headers object (names are lower case)
-# body    - Request body (for some requests)
+# body    - Request body, an array of body part/encoding pairs
 #
 # The response consists of:
 # version   - HTTP version
@@ -42,7 +42,7 @@ class ProxyRequest extends HTTP.ClientRequest
 
   setHeader: (name, value)->
     assert !@ended, "Already called end"
-    assert !@parts, "Already wrote body parts"
+    assert !@body, "Already wrote body parts"
     @headers[name.toLowerCase()] = value
 
   getHeader: (name)->
@@ -50,7 +50,7 @@ class ProxyRequest extends HTTP.ClientRequest
 
   removeHeader: (name)->
     assert !@ended, "Already called end"
-    assert !@parts, "Already wrote body parts"
+    assert !@body, "Already wrote body parts"
     delete @headers[name.toLowerCase()]
 
   setTimeout: (timeout, callback)->
@@ -67,8 +67,8 @@ class ProxyRequest extends HTTP.ClientRequest
 
   write: (chunk, encoding)->
     assert !@ended, "Already called end"
-    @parts ||= []
-    @parts.push [chunk, encoding]
+    @body ||= []
+    @body.push [chunk, encoding]
     return
 
   end: (data, encoding)->
