@@ -1,3 +1,4 @@
+assert = require("assert")
 File = require("fs")
 Path = require("path")
 { Matcher } = require("./matcher")
@@ -21,23 +22,44 @@ class Catalog
 
     # Start by looking for directory and loading each of the files.
     pathname = "#{@basedir}/#{host}"
-    if Path.existsSync(pathname)
+    unless Path.existsSync(pathname)
+      return
+    stat = File.statSync(pathname)
+    if stat.isDirectory()
       files = File.readdirSync(pathname)
       for file in files
         matchers = @matchers[host] ||= []
-        json = File.readFileSync("#{pathname}/#{file}", "utf8")
-        for mapping in JSON.parse(json)
-          matchers.push Matcher.fromMapping(host, mapping)
-
-    # Load individual JSON file.
-    filename = "#{@basedir}/#{host}.json"
-    if Path.existsSync(filename)
-      matchers = @matchers[host] ||= []
-      json = File.readFileSync(filename, "utf8")
-      for mapping in JSON.parse(json)
+        mapping = @read("#{pathname}/#{file}")
         matchers.push Matcher.fromMapping(host, mapping)
+    else
+      matchers = @matchers[host] ||= []
+      mapping = @read(pathname)
+      matchers.push Matcher.fromMapping(host, mapping)
     
     return matchers
+
+  read: (filename)->
+    [request, response, body...] = File.readFileSync(filename, "utf-8").split(/\n\n/)
+    assert request, "#{filename} missing request section"
+    request =
+      pathname: request.split(/\n/)[0]
+
+    assert response, "#{filename} missing response section"
+    [status_line, header_lines...] = response.split(/\n/)
+    status = status_line.split()[0]
+    version = status_line.match(/\d.\d$/)
+    headers = {}
+    for line in header_lines
+      [_, name, value] = line.match(/^(.*?)\:\s+(.*)$/)
+      assert name && value, "#{filename}: can't make sense of header line #{line}"
+      headers[name] = value
+    response =
+      status:   status
+      version:  version
+      headers:  headers
+      body:     body
+
+    return { request: request, response: response }
 
 
 exports.Catalog = Catalog
