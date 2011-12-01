@@ -46,7 +46,7 @@ HTTP.request = (options, callback)->
 # - Log request to console is `deubg` is true
 # - Replay recorded responses
 # - Pass through requests if `networkAccess` is true
+exports.chain.append logger(exports)
 exports.chain.append passThrough((request)-> request.url.hostname == "localhost")
 exports.chain.append replay(exports)
-exports.chain.append logger(exports)
 exports.chain.append passThrough(-> exports.networkAccess)

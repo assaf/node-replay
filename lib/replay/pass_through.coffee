@@ -16,6 +16,8 @@ exports.passThrough = (allow)->
         hostname: request.url.hostname
         port:     request.url.port
         path:     request.url.path
+        method:   request.method
+        headers:  request.headers
       http = httpRequest(options)
       http.on "error", (error)->
         callback error
