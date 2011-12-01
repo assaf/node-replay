@@ -1,121 +1,52 @@
-assert = require("assert")
-{ EventEmitter } = require("events")
 HTTP = require("http")
-File = require("fs")
-{ Stream } = require("stream")
-URL = require("url")
+{ Chain } = require("./chain")
+{ ProxyRequest } = require("./proxy")
+{ logger } = require("./logger")
+{ passThrough } = require("./pass_through")
+{ replay } = require("./replay")
 
 
-{ CaptureResponse } = require("./capture")
-{ Replay } = require("./replay")
+# The proxy chain.  Essentially an array of proxies through which each request goes, from first to last.  You generally
+# don't need to use this unless you decide to reconstruct your own chain.
+#
+# When adding new proxies, you probably want those executing ahead of any existing proxies (certainly the pass-through
+# proxy), so you'll want to prepend them.  The `use` method will prepend a proxy to the chain.
+exports.chain = new Chain
 
+# Set this to true to dump more information to the console, or run with DEBUG=true
+exports.debug = process.env.DEBUG == "true"
 
-# True if network access allowed.
+# Main directory for replay fixtures.
+exports.fixtures = ""
+
+# Set to true to enable network access.
 exports.networkAccess = false
-# True to record requests for playback later on.
-exports.record = true
+
+# Set to true to enable recording responses, or run with RECORD=true
+exports.record = process.env.RECORD == "true"
+
+# Addes a proxy to the beginning of the processing chain, so it executes ahead of any existing proxy.
+#
+# Example
+#     replay.use replay.logger()
+exports.use = (proxy)->
+  exports.chain.prepend proxy
 
 
-# Capture original HTTP request before we replace with replay code.
-httpRequest = HTTP.request
-# And there it comes ...
 HTTP.request = (options, callback)->
-  # No special handling for localhost request.
-  if options.host == "localhost"
-    return httpRequest.apply(HTTP, arguments)
-  if exports.record
-    return new ReplayRequest(options, callback)
-  if exports.networkAccess
-    return httpRequest.apply(HTTP, arguments)
+  request = new ProxyRequest(options, exports.chain.start)
   if callback
-    process.nextTick ->
-      callback new Error("VCR: network access disabled. To enable, set VCR.networkAccess = true")
-  request = new EventEmitter
-  request.write = request.end = request.abort = request.setTimeout = request.setNoDelay =
-    request.setSocketKeepAlive = request.setHeader = request.getHeader = request.removeHeader = ->
+    request.once "response", (response)->
+      callback response
   return request
 
 
-
-# HTTP client request that allows us to capture the request
-class ReplayRequest extends Stream
-  constructor: (options = {}, callback)->
-    # Duplicate headers and options.
-    @headers = {}
-    if options.headers
-      for n,v of options.headers
-        @headers[n] = v
-    @options = { headers: @headers }
-    for name in ["host", "hostname", "port", "socketPath", "method", "path", "auth"]
-      value = options[name]
-      if value
-        @options[name] = value
-
-    if callback
-      @once "response", (response)->
-        callback response
-
-  setHeader: (name, value)->
-    assert !@ended, "Already called end"
-    assert !@parts, "Already wrote body parts"
-    @headers[name] = value
-
-  getHeader: (name)->
-    return @headers[name]
-
-  removeHeader: (name)->
-    assert !@ended, "Already called end"
-    assert !@parts, "Already wrote body parts"
-    delete @headers[name]
-
-  setTimeout: (timeout, callback)->
-    @timeout = [timeout, callback]
-    return
-
-  setNoDelay: (nodelay = true)->
-    @nodelay = [nodelay]
-    return
-
-  setSocketKeepAlive: (enable = false, initial)->
-    @keepAlive = [enable, initial]
-    return
-
-  write: (chunk, encoding)->
-    assert !@ended, "Already called end"
-    @parts ||= []
-    @parts.push [chunk, encoding]
-    return
-
-  end: (data, encoding)->
-    assert !@ended, "Already called end"
-    if data
-      @write data, encoding
-    @ended = true
-
-    # Requests are handled asynchronously, it's possible to call end and then register response listener.
-    process.nextTick =>
-      if Replay.networkAccess
-        capture = new CaptureResponse(httpRequest.call(HTTP, @options), @parts)
-        capture = capture.capture.bind(capture)
-      host = @options.host || [@options.hostname || "localhost", @options.port || 80].join(":")
-      request =
-        url:  URL.parse("#{@options.protocol || "http"}://#{host}#{@options.path || "/"}")
-      replay.process request, capture, (error, response)=>
-        if error
-          @emit "error", error
-          return
-        if response
-          @emit "response", response
-          response.resume()
-        else
-          error = new Error("Connection refused: Replay.networkAccess is false")
-          error.code = "ECONNREFUSED"
-          error.errno = "ECONNREFUSED"
-          @emit "error", error
-      return
-
-  abort: ->
-
-
-replay   = Replay.fromFixtures("#{__dirname}/../../spec/fixtures")
-exports.Replay = Replay
+# The default processing chain (from first to last):
+# - Pass through requests to localhost
+# - Log request to console is `deubg` is true
+# - Replay recorded responses
+# - Pass through requests if `networkAccess` is true
+exports.chain.append passThrough((request)-> request.url.hostname == "localhost")
+exports.chain.append replay(exports)
+exports.chain.append logger(exports)
+exports.chain.append passThrough(-> exports.networkAccess)

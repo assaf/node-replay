@@ -67,7 +67,7 @@ vows.describe("Pass through").addBatch
       setup @callback
     "listeners":
       topic: ->
-        request = HTTP.get(hostname: "pass-through", port: 3001, (response)->
+        request = HTTP.get(hostname: "pass-through", port: 3001, (response)=>
           @callback null, "callback"
         )
         request.on "response", (response)=>

@@ -49,27 +49,24 @@ vows.describe("Replay").addBatch
   "undefined path":
     topic: ->
       Replay.networkAccess = false
-      HTTP.get hostname: "example.com", port: 3002, path: "/weather?c=14003", (response)=>
-        response.body = ""
-        response.on "data", (chunk)->
-          response.body += chunk
-        response.on "end", =>
-          @callback null, response
+      request = HTTP.get(hostname: "example.com", port: 3002, path: "/weather?c=14003", (response)=>
+        @callback null, "callback"
+      )
+      request.on "response", (response)=>
+        @callback null, "listener"
+      request.on "error", (error)=>
+        @callback null, error
       return
-    "should return HTTP version": (response)->
-      assert.equal response.httpVersion, "1.1"
-    "should return status code 404": (response)->
-      assert.equal response.statusCode, "404"
-    "should return body with error message": (response)->
-      assert.equal response.body, "No recorded request/response that matches http://example.com:3002/weather?c=14003"
-
+    "should callback with error": (error)->
+      assert.instanceOf error, Error
+      assert.equal error.code, "ECONNREFUSED"
 
   
   # Send responses to non-existent server on port 3002. No matching fixture for that host, expect refused connection.
   "undefined host":
     topic: ->
       Replay.networkAccess = false
-      request = HTTP.get(hostname: "no-such", port: 3002, path: "/weather?c=14003", (response)=>
+      request = HTTP.get(hostname: "no-such", port: 3002, (response)=>
         @callback null, "callback"
       )
       request.on "response", (response)=>

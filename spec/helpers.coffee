@@ -6,7 +6,7 @@
 
 DNS = require("dns")
 Express = require("express")
-{ Replay } = require("../lib/replay")
+Replay = require("../lib/replay")
 
 
 # Directory to load fixtures from.
