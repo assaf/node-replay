@@ -20,12 +20,9 @@ exports.replay = (settings)->
     # In recording mode capture the response and store it.
     if settings.record
       passThrough request, (error, response)->
+    if settings.mode == "record"
+      capture request, (error, response)->
         return callback error if error
-        if response
-          catalog.save host, request, response, (error)->
-            callback error, response
-        else
-          callback null
         catalog.save host, request, response, (error)->
           callback error, response
       return

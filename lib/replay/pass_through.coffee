@@ -10,6 +10,7 @@ exports.passThrough = (allow)->
     [hostname, allow] = [allow, (request)-> request.hostname == hostname]
   else unless typeof allow == "function"
     [boolean, allow] = [allow, (request)-> !!boolean]
+
   return (request, callback)->
     if allow(request)
       options =

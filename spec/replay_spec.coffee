@@ -7,8 +7,7 @@ vows.describe("Replay").addBatch
   # Send responses to non-existent server on port 3002, expect replayed responses from fixtures.
   "matching URL":
     topic: ->
-      Replay.networkAccess = false
-      Replay.record = false
+      Replay.mode = "replay"
       @callback null
     "listeners":
       topic: ->
@@ -48,7 +47,7 @@ vows.describe("Replay").addBatch
   # Send responses to non-existent server on port 3002. No matching fixture for that path, expect a 404.
   "undefined path":
     topic: ->
-      Replay.networkAccess = false
+      Replay.mode = "replay"
       request = HTTP.get(hostname: "example.com", port: 3002, path: "/weather?c=14003", (response)=>
         @callback null, "callback"
       )
@@ -65,7 +64,7 @@ vows.describe("Replay").addBatch
   # Send responses to non-existent server on port 3002. No matching fixture for that host, expect refused connection.
   "undefined host":
     topic: ->
-      Replay.networkAccess = false
+      Replay.mode = "default"
       request = HTTP.get(hostname: "no-such", port: 3002, (response)=>
         @callback null, "callback"
       )

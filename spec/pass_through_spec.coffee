@@ -9,8 +9,7 @@ vows.describe("Pass through").addBatch
   # Send request to the live server on port 3001 and check the responses.
   "live server":
     topic: ->
-      Replay.networkAccess = true
-      Replay.record = false
+      Replay.mode = "bloody"
       setup @callback
     "listeners":
       topic: ->
@@ -62,8 +61,7 @@ vows.describe("Pass through").addBatch
   # Send request to the live server on port 3001, but this time network connection disabled.
   "live server":
     topic: ->
-      Replay.networkAccess = false
-      Replay.record = false
+      Replay.mode = "replay"
       setup @callback
     "listeners":
       topic: ->

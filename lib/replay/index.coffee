@@ -17,13 +17,18 @@ exports.chain = new Chain
 exports.debug = process.env.DEBUG == "true"
 
 # Main directory for replay fixtures.
-exports.fixtures = ""
+exports.fixtures = null
 
-# Set to true to enable network access.
-exports.networkAccess = false
-
-# Set to true to enable recording responses, or run with RECORD=true
-exports.record = process.env.RECORD == "true"
+# The mode we're running in, one of:
+# bloody  - Allow outbound HTTP requests, don't replay anything.  Use this to test your code against changes to 3rd
+#           party API.
+# cheat   - Allow outbound HTTP requests, replay captured responses.  This mode is particularly useful when new code
+#           makes new requests, but unstable yet and you don't want these requests saved.
+# record  - Allow outbound HTTP requests, capture responses for future replay.  This mode allows you to capture and
+#           record new requests, e.g. when adding tests or making code changes.
+# replay  - Do not allow outbound HTTP requests, replay captured responses.  This is the default mode and the one most
+#           useful for running tests
+exports.mode = process.env.REPLAY || "replay"
 
 # Addes a proxy to the beginning of the processing chain, so it executes ahead of any existing proxy.
 #
@@ -45,8 +50,9 @@ HTTP.request = (options, callback)->
 # - Pass through requests to localhost
 # - Log request to console is `deubg` is true
 # - Replay recorded responses
-# - Pass through requests if `networkAccess` is true
-exports.chain.append logger(exports)
-exports.chain.append passThrough((request)-> request.url.hostname == "localhost")
-exports.chain.append replay(exports)
-exports.chain.append passThrough(-> exports.networkAccess)
+# - Pass through requests in bloody and cheat modes
+exports.use passThrough(-> exports.mode == "cheat")
+exports.use replay(exports)
+exports.use passThrough((request)-> request.url.hostname == "localhost" || exports.mode == "bloody")
+exports.use logger(exports)
+
