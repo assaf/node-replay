@@ -1,7 +1,7 @@
 # Node Replay
    
 
-### When API testing slows you down: mock, record and replay HTTP requests/responses like a boss
+### When API testing slows you down: record and replay HTTP responses like a boss
 
 Things that will ruin your day when tests make HTTP requests to other services:
 
