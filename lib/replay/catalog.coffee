@@ -4,6 +4,20 @@ Path = require("path")
 { Matcher } = require("./matcher")
 
 
+mkdir = (pathname, callback)->
+  Path.exists pathname, (exists)->
+    if exists
+      callback null
+      return
+    parent = Path.dirname(pathname)
+    Path.exists parent, (exists)->
+      if exists
+        File.mkdir pathname, callback
+      else
+        mkdir parent, ->
+          File.mkdir pathname, callback
+
+
 class Catalog
   constructor: (@settings)->
     # We use this to cache host/host:port mapped to array of matchers.
@@ -14,11 +28,6 @@ class Catalog
     matchers = @matchers[host]
     if matchers
       return matchers
-
-    # We need a base directory to load files from.
-    unless @settings.fixtures
-      return
-    @basedir ||= Path.resolve(@settings.fixtures)
 
     # Start by looking for directory and loading each of the files.
     pathname = "#{@basedir}/#{host}"
@@ -43,31 +52,39 @@ class Catalog
     matchers = @matchers[host] ||= []
     matchers.push matcher
  
-    uid = +new Date + Math.random()
+    uid = +new Date
     tmpfile = "/tmp/node-replay.#{uid}"
-    filename = "#{@basedir}/#{host}/#{uid}"
+    pathname = "#{@basedir}/#{host}"
+    console.log "Creating  #{pathname}"
+    mkdir pathname, (error)->
+      return callback error if error
+      filename = "#{pathname}/#{uid}"
 
-    try
-      file = File.createWriteStream(tmpfile, encoding: "utf-8")
-      file.write request.url.path || "/"
-      file.write "\n"
-      for name, value of request.headers
-        # TODO: quote me
-        file.write "#{name}: #{value}\n"
-      file.write "\n"
-      # Response part
-      file.write "#{response.status || 200} HTTP/#{response.version || "1.1"}\n"
-      for name, value of response.headers
-        # TODO: quote me
-        file.write "#{name}: #{value}\n"
-      file.write "\n"
-      for part in response.body
-        file.write part
-      file.end ->
-        File.rename tmpfile, filename, callback
-        callback null
-    catch error
-      callback error
+      try
+        file = File.createWriteStream(tmpfile, encoding: "utf-8")
+        file.write request.url.path || "/"
+        file.write "\n"
+        for name, value of request.headers
+          # TODO: quote me
+          file.write "#{name}: #{value}\n"
+        file.write "\n"
+        # Response part
+        file.write "#{response.status || 200} HTTP/#{response.version || "1.1"}\n"
+        for name, value of response.headers
+          # TODO: quote me
+          file.write "#{name}: #{value}\n"
+        file.write "\n"
+        for part in response.body
+          file.write part
+        file.end ->
+          File.rename tmpfile, filename, callback
+          callback null
+      catch error
+        callback error
+
+  @prototype.__defineGetter__ "basedir", ->
+    @_basedir ?= Path.resolve(@settings.fixtures || "fixtures")
+    return @_basedir
 
 
   _read: (filename)->
