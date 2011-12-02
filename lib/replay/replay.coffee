@@ -1,9 +1,9 @@
-{ Catalog } = require("./catalog")
-passThrough = require("./pass_through").passThrough(true)
+{ passThrough } = require("./pass_through")
 
 
 exports.replay = (settings)->
-  catalog = new Catalog(settings)
+  catalog = settings.catalog
+  capture = passThrough(true)
   return (request, callback)->
     host = request.url.hostname
     if request.url.port && request.url.port != "80"
@@ -18,8 +18,6 @@ exports.replay = (settings)->
           return
 
     # In recording mode capture the response and store it.
-    if settings.record
-      passThrough request, (error, response)->
     if settings.mode == "record"
       capture request, (error, response)->
         return callback error if error

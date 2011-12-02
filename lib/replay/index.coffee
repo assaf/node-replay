@@ -1,4 +1,5 @@
 HTTP = require("http")
+{ Catalog } = require("./catalog")
 { Chain } = require("./chain")
 { ProxyRequest } = require("./proxy")
 { logger } = require("./logger")
@@ -6,8 +7,8 @@ HTTP = require("http")
 { replay } = require("./replay")
 
 
-# The proxy chain.  Essentially an array of proxies through which each request goes, from first to last.  You generally
-# don't need to use this unless you decide to reconstruct your own chain.
+# The proxy chain.  Essentially an array of proxies through which each request goes, from first to last.  You
+# generally don't need to use this unless you decide to reconstruct your own chain.
 #
 # When adding new proxies, you probably want those executing ahead of any existing proxies (certainly the pass-through
 # proxy), so you'll want to prepend them.  The `use` method will prepend a proxy to the chain.
@@ -36,6 +37,10 @@ exports.mode = process.env.REPLAY || "replay"
 #     replay.use replay.logger()
 exports.use = (proxy)->
   exports.chain.prepend proxy
+
+# The catalog is responsible for loading pre-recorded responses into memory, from where they can be replayed, and
+# storing captured responses.
+exports.catalog = new Catalog(exports)
 
 
 HTTP.request = (options, callback)->
