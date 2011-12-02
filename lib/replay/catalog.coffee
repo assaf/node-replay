@@ -29,16 +29,48 @@ class Catalog
       files = File.readdirSync(pathname)
       for file in files
         matchers = @matchers[host] ||= []
-        mapping = @read("#{pathname}/#{file}")
+        mapping = @_read("#{pathname}/#{file}")
         matchers.push Matcher.fromMapping(host, mapping)
     else
       matchers = @matchers[host] ||= []
-      mapping = @read(pathname)
+      mapping = @_read(pathname)
       matchers.push Matcher.fromMapping(host, mapping)
     
     return matchers
 
-  read: (filename)->
+  save: (host, request, response, callback)->
+    matcher = Matcher.fromMapping(host, request: request, response: response)
+    matchers = @matchers[host] ||= []
+    matchers.push matcher
+ 
+    uid = +new Date + Math.random()
+    tmpfile = "/tmp/node-replay.#{uid}"
+    filename = "#{@basedir}/#{host}/#{uid}"
+
+    try
+      file = File.createWriteStream(tmpfile, encoding: "utf-8")
+      file.write request.url.path || "/"
+      file.write "\n"
+      for name, value of request.headers
+        # TODO: quote me
+        file.write "#{name}: #{value}\n"
+      file.write "\n"
+      # Response part
+      file.write "#{response.status || 200} HTTP/#{response.version || "1.1"}\n"
+      for name, value of response.headers
+        # TODO: quote me
+        file.write "#{name}: #{value}\n"
+      file.write "\n"
+      for part in response.body
+        file.write part
+      file.end ->
+        File.rename tmpfile, filename, callback
+        callback null
+    catch error
+      callback error
+
+
+  _read: (filename)->
     [request, response, body...] = File.readFileSync(filename, "utf-8").split(/\n\n/)
     assert request, "#{filename} missing request section"
     request =

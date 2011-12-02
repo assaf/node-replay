@@ -1,4 +1,5 @@
 { Catalog } = require("./catalog")
+passThrough = require("./pass_through").passThrough(true)
 
 
 exports.replay = (settings)->
@@ -7,6 +8,7 @@ exports.replay = (settings)->
     host = request.url.hostname
     if request.url.port && request.url.port != "80"
       host += ":#{request.url.port}"
+    # Look for a matching response and replay it.
     matchers = catalog.find(host)
     if matchers
       for matcher in matchers
@@ -14,5 +16,18 @@ exports.replay = (settings)->
         if response
           callback null, response
           return
+
+    # In recording mode capture the response and store it.
+    if settings.record
+      passThrough request, (error, response)->
+        return callback error if error
+        if response
+          catalog.save host, request, response, (error)->
+            callback error, response
+        else
+          callback null
+      return
+   
+    # Not in recording mode, pass control to the next proxy.
     callback null
 
