@@ -3,29 +3,29 @@
 
 ### When API testing slows you down: mock, record and replay HTTP requests/responses like a boss
 
-Things that will ruin your day if your tests make HTTP requests to other services:
+Things that will ruin your day when tests make HTTP requests to other services:
 
-- Other service is as or less reliable than Twitter's API
+- That other service has the uptime of Twitter's API
 - Network late ............ ncy
-- Being-rate limited and having to wait an hour between tests
-- Same request returns different result on each run
+- Being-rate limited and having to wait an hour for the next test run
+- Same request returns different result each time
 - Everyone else on the network is deep in BitTorrent terittory
 
 Things **node-replay** can do to make these problems go away:
 
 - Record API response once, replay as often as necessary
-- Stub HTTP request (TBD)
-- Replay different responses to given request to test error handling
+- Stub HTTP requests (TBD)
+- Replay different responses to same request (great for testing error handling)
 - Not suck
 
 
 ## How to use node-replay
 
-Install (or add to your `package.json`):
+Like this:
 
     $ npm install replay
 
-Like this:
+Now write some simple test case:
 
     assert = require("assert")
     http = require("http")
@@ -46,45 +46,60 @@ Like this:
       })
     })
 
-This, of course, will fail the first time you run.  You'll see:
+This, of course, will fail the first time you run it.  You'll see:
 
     Error: Connection to http://www.iheartquotes.com:80/api/v1/random refused: not recording and no network access
         at Array.0 (/Users/assaf/projects/node-replay/lib/replay/proxy.coffee:87:21)
         at EventEmitter._tickCallback (node.js:192:40)
 
-The default mode is called `replay`, and in that mode *node-replay* will replay any previously captured HTTP responses,
-but will not allow any outgoing network connection.  That's the default mode for running tests.  Why?  It guarantees all
-tests will run against recorded responses, in other words: repeatable.
+Unless you tell it otherwise, **node-replay** runs in `replay` mode.  In this mode it will replay any previously captured
+HTTP response, but it will not allow any outgoing network connection.
 
-Repeatable tests are a Good Thing.
+That's the default mode for running tests.  "Why?" you ask.  Good question.  Running in `replay` mode forces any test
+you run to use recorded reponses, and so it will run (and fail or pass) the same way for anyone else, any other day of
+the week, on whatever hardware they use.  Even if they're on the AT&T network.
 
-So the first thing you want to do is get *node-replay* to record that HTTP request and response, so it can replay it
-later.  Let's put it in record mode:
+Running in `replay` mode helps you write repeatable tests.  Repeatable tests are a Good Thing.
+
+So the first thing you want to do to get that test to pass, is to run **node-replay** in `record` mode.  In this mode it
+will replay any recorded response, but if no response was recorded, it will make a request to the server and capture the
+response.
+
+Let's do that:
 
     $ REPLAY=record node test.js
 
-This test will also fail, but for a slightly different reason.  You see, requesting a random quotes returns a different
-quote each time.  We're testing for a very particular quote.  So now we have two choices.
+That wasn't too hard, but the test is still failing.  "How?" you must be wondering and scratching your head in total
+disbelief.  It's actually quite simple.
 
-First, fix the test.  The error message will show you the actual quote recorded, change the assertion test to reflect
-that.  Now run the test again:
+Every request you make to 'I 3> Quotes' returns a different quote, and that test is looking for a very specific quote.
+So the test will fail, and each time fail with a different error.
+
+So one way we can fix this test is to change the assertion.  Look at the error message, get the actual quote and make
+the assertion look for that value.
+
+Now run the test:
 
     $ node test.js
     Woot!
 
-Did the tests pass?  Of course they did.  Run it again.  Did they pass the second time?  Why, yes.
+Did the test pass?  Of course it did.  Run it again.  Still passing?  Why, yes.
 
-Your tests are now run by replaying the same recorded response.  You can see all the recorded responses for *I <3
-Quotes* here:
+So let's have a look at that captured response.  All the respones recorded for 'I <3 Quotes>' will be listed here:
 
     $ ls fixtures/www.iheartquotes.com/
 
-There should be only one file to begin with, we only recorded one response.  Feel free to rename the file to something
-more descriptive.  Try editing it and running the tests again.
+There should be only one file there, since we only recorded one response.  The file name is a timestamp, but feel free
+to rename it to something more rescriptive.
 
-You see, the second option, which is quite useful some times, e.g. if you need to simulate a response you can't easily
-generate, is to record a response and then edit it.  So instead of changing the test, let's change the recorded response
-to look like this:
+The name of a response file doesn't matter, it can be whatever you want.  The name of the directory does, though, it
+matches the service hostname (and port when not 80).
+
+So that was one way to fix the failing test.  Another one is to change the recorded response to match the assertion.
+Being able to edit (and create new) responses is quite important.  Sometimes it's the easiest way to create mock
+responses for testing, e.g. if you're trying to test failure conditions that are hard to come by.
+
+So let's edit the response file and change the body part, so the entire response reads like this:
 
     /api/v1/random
 
@@ -107,46 +122,44 @@ to look like this:
     [codehappy] http://iheartquotes.com/fortune/show/38021
 
 All responses are stored as text files using the simplest format ever, so you can edit them in Vim, or any of the many
-other non-Vim text editors in existence:
+non-Vim text editors in existence:
 
-- First come the request path (including query string).
-- Next headers sent as part of the request (e.g. `Accept`, `Authorization`)
+- First comes the request path (including query string)
+- Followed by any headers sent as part of the request (like `Accept` and `Authorization`)
 - Then an empty line
 - Next the response status code and (optional) HTTP version number
 - Followed by any headers sent as part of the response
 - Then another empty line
-- The rest is the response body
+- And the rest taken by the response body
 
 
 ## Settings
 
-We've got them.
+We've got them.  Just enough to make you happy and not enough to take all day to explain.
 
-The first and most obvious is the mode you run *node-reply* in, which can be one of:
+The first and most obvious is the mode you run **node-reply** in:
 
-**bloody** -- Allows outbound HTTP requests and doesn't replay anything.  Use this if you want to remember what life was
-before you started using `node-replay`.  Also, to test your code against changes to 3rd party API, because these do
-happen.  All too often.
+**bloody** -- All requests go out, none get replayed.  Use this if you want to remember what life was before you started
+using **node-replay**.  Also, to test your code against changes to 3rd party API, because these do
+happen.  Too often.
 
-**cheat** -- Allows outbound HTTP requests, but replays recorded responses.  This is mighty convenient when you're
-working on new tests or code changes that make new, unrecorded HTTP requests, but you've not quite settled on the code
-and you don't want to record any responses yet.
+**cheat** -- Replays recorded responses, and allow HTTP outbound requests.  This is mighty convenient when you're
+writing new tests or changing code to make new, un-recorded HTTP requests, but you haven't quite settled on which
+requets to make, so you don't want any responses recorded quite yet.
 
-**record** -- Replays recorded responses, or captures responses for future replay.  Use this whenever you're working on
-a test or code change that makes a new HTTP request, to capture and record that request.
+**record** -- Replays recorded responses, or captures responses for future replay.  Use this whenever you're writing new
+tests or code that makes new HTTP requests.
 
-**replay** -- Does not allow outbound HTTP requests, replays recorded responses.  This is the default mode.  That's
-another way of saying, "you'll be using this mode most often".
+**replay** -- Replays recorded responses, does not allow outbound requests.  This is the default node.  That's another
+way of saying, "you'll be running in this mode most of the time".
 
-Of course, *node-reply* needs to store all those captured responses somewhere, and by default it will put them in the
-directory `fixtures`.  You'll probably want to find a more suitable home that matches the directory structure of your
-application.
+Of course, **node-reply** needs to store all those captured responses somewhere, and by default it will put them in the
+directory `fixtures`.  Bet you have an idea for a better directory name.  Easy to change.
 
 Like this:
 
     var replay = require("replay");
     replay.fixtures = __dirname + "/fixtures/replay"
-
 
 If you're running into trouble, try turning debugging mode on.  It helps.  Sometimes.
 
@@ -157,33 +170,27 @@ If you're running into trouble, try turning debugging mode on.  It helps.  Somet
 
 ## Geeking
 
-To make all that magic possible, *node-replay* replaces `require('http').request` with its own method.  The replacement
-method returns a `ProxyRequest` object that captures the request options, headers and body.
+To make all that magic possible, **node-replay** replaces `require('http').request` with its own method.  That method
+returns a `ProxyRequest` object that captures the request URL, headers and body.
 
-When it's time to fire the request, it gets sent through a chain of proxies.  The first proxy to have a response and
-return it (via callback) terminates the chain.  If a proxy doesn't have a response, it will still call that callback,
-with no arguments.  The request will then pass to the next proxy in the chain.
+When it's time to fire the request, it gets sent through a chain of proxies.  The first proxy to have a response,
+returns it (via callback, this is Node.js after all).  That terminates the chain.  A proxy that doesn't have a response
+still has to call the callback, but with no arguments.  The request will then pass to the next proxy down the chain.
 
 The proxy chain looks something like this:
 
-- Logger dumps the request URL when `DEBUG=true`
-- The pass-through proxy will pass the request to the actual endpoint in `bloody` mode, or when talking to `localhost`
-- The recorder proxy will either replay a captured request or talk to the actual endpoint and record the response,
-  depending on the mode
-- The pass-through proxy will pass the request to the actual endpoint in `cheat` mode
-
-The pass-through proxy uses Node's HTTP client to send a request and capture the response, so it can be stored and
-replayed.
-
-The recorder proxy either replays a response from memory, or uses pass-through to get a response, store it, and replay
-it on the spot.
+- Logger dumps the request URL when running with `DEBUG=true`
+- The pass-through proxy will pass the request directly to the server in `bloody` mode, or when talking to `localhost`
+- The recorder proxy will either replay a captured request (if it has one), talk to the server and capture the response
+  (in `record` mode), or pass to the next proxy
+- The pass-through proxy (2nd one) will pass the request to the server in `cheat` mode, return nothing in all other
+  modes
 
 Loading pre-recorded responses to memory, from where they can be replayed, and storing new ones on disk, is handled by
-the `Catalog`.
+... cue big band ... the `Catalog`.
 
 
 ## Final words
 
-*node-replay* is released under the MIT license.  Pull requests are welcome.
-
+**node-replay** is released under the MIT license.  Pull requests are welcome.
 
