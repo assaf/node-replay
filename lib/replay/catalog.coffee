@@ -106,7 +106,7 @@ class Catalog
       status:   status
       version:  version
       headers:  headers
-      body:     body
+      body:     body.join("\n\n")
 
     return { request: request, response: response }
 
