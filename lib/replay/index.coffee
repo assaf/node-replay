@@ -58,6 +58,6 @@ HTTP.request = (options, callback)->
 # - Pass through requests in bloody and cheat modes
 exports.use passThrough(-> exports.mode == "cheat")
 exports.use replay(exports)
-exports.use passThrough((request)-> request.url.hostname == "localhost" || exports.mode == "bloody")
 exports.use logger(exports)
+exports.use passThrough((request)-> request.url.hostname == "localhost" || exports.mode == "bloody")
 
