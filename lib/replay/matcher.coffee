@@ -30,10 +30,10 @@ class Matcher
     url = URL.parse(request.url)
     @hostname = url.hostname
     @port     = url.port
-    @pathname = url.pathname
+    @path     = url.path
     @query    = url.query
-    @method = (request.method && request.method.toLowerCase()) || "get"
-    @headers = {}
+    @method   = (request.method && request.method.toLowerCase()) || "get"
+    @headers  = {}
     if request.headers
       for name, value of request.headers
         @headers[name.toLowerCase()] = value
@@ -68,7 +68,7 @@ class Matcher
     { url, method, headers, body } = request
     return false if @hostname && @hostname != url.hostname
     return false if @port && @port != url.port
-    return false if @pathname && @pathname != url.pathname
+    return false if @path && @path != url.path
     return false if @query && @query != url.query
     return false unless @method == method || "get"
     for name, value of @headers
@@ -85,11 +85,11 @@ class Matcher
     assert !!mapping.path ^ !!mapping.request, "Mapping must specify path or request object"
     if mapping.path
       request =
-        url:    URL.resolve("http://#{host}", mapping.path)
+        url:    URL.resolve("http://#{host}/", mapping.path)
         method: mapping.method
     else
       request =
-        url:      URL.resolve("http://#{host}", URL.format(mapping.request))
+        url:      URL.resolve("http://#{host}/", mapping.request.url)
         method:   mapping.request.method
         headers:  mapping.request.headers
         body:     mapping.request.body

@@ -88,27 +88,32 @@ class Catalog
 
 
   _read: (filename)->
+    parse_request = (request)->
+      assert request, "#{filename} missing request section"
+      [path, header_lines...] = request.split(/\n/)
+      headers = parseHeaders(filename, header_lines)
+      return { url: path, headers: headers }
+
+
+    parse_response = (response, body)->
+      assert response, "#{filename} missing response section"
+      [status_line, header_lines...] = response.split(/\n/)
+      status = status_line.split()[0]
+      version = status_line.match(/\d.\d$/)
+      headers = parseHeaders(filename, header_lines)
+      return { status: status, version: version, headers: headers, body: body.join("\n\n") }
+
     [request, response, body...] = File.readFileSync(filename, "utf-8").split(/\n\n/)
-    assert request, "#{filename} missing request section"
-    request =
-      pathname: request.split(/\n/)[0]
+    return { request: parse_request(request), response: parse_response(response, body) }
 
-    assert response, "#{filename} missing response section"
-    [status_line, header_lines...] = response.split(/\n/)
-    status = status_line.split()[0]
-    version = status_line.match(/\d.\d$/)
-    headers = {}
-    for line in header_lines
-      [_, name, value] = line.match(/^(.*?)\:\s+(.*)$/)
-      assert name && value, "#{filename}: can't make sense of header line #{line}"
-      headers[name] = value
-    response =
-      status:   status
-      version:  version
-      headers:  headers
-      body:     body.join("\n\n")
 
-    return { request: request, response: response }
+parseHeaders = (filename, header_lines)->
+  headers = {}
+  for line in header_lines
+    [_, name, value] = line.match(/^(.*?)\:\s+(.*)$/)
+    assert name && value, "#{filename}: can't make sense of header line #{line}"
+    headers[name.toLowerCase()] = value.trim().replace(/^"(.*)"$/, "$1")
+  return headers
 
 
 exports.Catalog = Catalog

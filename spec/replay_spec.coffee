@@ -78,4 +78,36 @@ vows.describe("Replay").addBatch
       assert.equal error.code, "ECONNREFUSED"
 
 
+  "header":
+    topic: ->
+      Replay.mode = "replay"
+      @callback null
+    "matching":
+      topic: ->
+        request = HTTP.request(hostname: "example.com", port: 3002, path: "/weather.json")
+        request.setHeader "Accept", "application/json"
+        request.on "response", (response)=>
+          response.on "end", =>
+            @callback null, response
+        request.on "error", @callback
+        request.end()
+        return
+      "should return status code": (response)->
+        assert.equal response.statusCode, "200"
+
+    "no match":
+      topic: ->
+        request = HTTP.request(hostname: "example.com", port: 3002, path: "/weather.json")
+        request.setHeader "Accept", "text/xml"
+        request.on "response", (response)=>
+          response.on "end", =>
+            @callback null, response
+        request.on "error", (error)=>
+          @callback null, error
+        request.end()
+        return
+      "should fail to connnect": (response)->
+        assert.instanceOf response, Error
+
+
 .export(module)
