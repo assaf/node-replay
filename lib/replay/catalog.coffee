@@ -18,6 +18,10 @@ mkdir = (pathname, callback)->
           File.mkdir pathname, callback
 
 
+# Only these request headers are stored in the catalog.
+REQUEST_HEADERS = [/^accept/, /^content-/, /^host/, /^if-/, /^x-/]
+
+
 class Catalog
   constructor: (@settings)->
     # We use this to cache host/host:port mapped to array of matchers.
@@ -90,7 +94,7 @@ class Catalog
       [method_and_path, header_lines...] = request.split(/\n/)
       [method, path] = method_and_path.split(/\s/)
       assert method && path, "#{filename}: first line must be <method> <path>"
-      headers = parseHeaders(filename, header_lines)
+      headers = parseHeaders(filename, header_lines, REQUEST_HEADERS)
       return { url: path, method: method, headers: headers }
 
 
@@ -106,11 +110,15 @@ class Catalog
     return { request: parse_request(request), response: parse_response(response, body) }
 
 
-parseHeaders = (filename, header_lines)->
+parseHeaders = (filename, header_lines, restrict = null)->
   headers = {}
   for line in header_lines
     [_, name, value] = line.match(/^(.*?)\:\s+(.*)$/)
     assert name && value, "#{filename}: can't make sense of header line #{line}"
+    if restrict
+      for regexp in restrict
+        if regexp.test(name)
+          continue
     headers[name.toLowerCase()] = value.trim().replace(/^"(.*)"$/, "$1")
   return headers
 

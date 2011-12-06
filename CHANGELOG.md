@@ -1,3 +1,8 @@
+## Version 1.1.1 2011-12-06
+
+Only store specific request headers (e.g. `Accept` but not `User-Agent`).
+
+
 ## Version 1.1.0 2011-12-05
 
 Recorded response now starts with <method> <path>.
