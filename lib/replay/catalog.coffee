@@ -62,16 +62,13 @@ class Catalog
 
       try
         file = File.createWriteStream(tmpfile, encoding: "utf-8")
-        file.write request.url.path || "/"
-        file.write "\n"
+        file.write "#{request.method.toUpperCase()} #{request.url.path || "/"}\n"
         for name, value of request.headers
-          # TODO: quote me
           file.write "#{name}: #{value}\n"
         file.write "\n"
         # Response part
         file.write "#{response.status || 200} HTTP/#{response.version || "1.1"}\n"
         for name, value of response.headers
-          # TODO: quote me
           file.write "#{name}: #{value}\n"
         file.write "\n"
         for part in response.body
@@ -90,9 +87,10 @@ class Catalog
   _read: (filename)->
     parse_request = (request)->
       assert request, "#{filename} missing request section"
-      [path, header_lines...] = request.split(/\n/)
+      [method_and_path, header_lines...] = request.split(/\n/)
+      [method, path] = method_and_path.split(/\s/)
       headers = parseHeaders(filename, header_lines)
-      return { url: path, headers: headers }
+      return { url: path, method: method, headers: headers }
 
 
     parse_response = (response, body)->

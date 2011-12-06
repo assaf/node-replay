@@ -70,7 +70,7 @@ class Matcher
     return false if @port && @port != url.port
     return false if @path && @path != url.path
     return false if @query && @query != url.query
-    return false unless @method == method || "get"
+    return false unless @method == method
     for name, value of @headers
       return false if value != headers[name]
     return false if @body && @body != body

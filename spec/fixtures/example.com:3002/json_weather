@@ -1,4 +1,4 @@
-/weather.json
+GET /weather.json
 accept: "application/json"
 
 200 HTTP/1.1

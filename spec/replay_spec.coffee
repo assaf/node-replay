@@ -78,6 +78,7 @@ vows.describe("Replay").addBatch
       assert.equal error.code, "ECONNREFUSED"
 
 
+  # Mapping specifies a header, make sure we only match requests that have that header value.
   "header":
     topic: ->
       Replay.mode = "replay"
@@ -98,6 +99,40 @@ vows.describe("Replay").addBatch
     "no match":
       topic: ->
         request = HTTP.request(hostname: "example.com", port: 3002, path: "/weather.json")
+        request.setHeader "Accept", "text/xml"
+        request.on "response", (response)=>
+          response.on "end", =>
+            @callback null, response
+        request.on "error", (error)=>
+          @callback null, error
+        request.end()
+        return
+      "should fail to connnect": (response)->
+        assert.instanceOf response, Error
+
+
+  "method":
+    topic: ->
+      Replay.mode = "replay"
+      @callback null
+    "matching":
+      topic: ->
+        request = HTTP.request(hostname: "example.com", port: 3002, method: "post", path: "/posts")
+        request.setHeader "Accept", "application/json"
+        request.on "response", (response)=>
+          response.on "end", =>
+            @callback null, response
+        request.on "error", @callback
+        request.end()
+        return
+      "should return status code": (response)->
+        assert.equal response.statusCode, "201"
+      "should return headers": (response)->
+        assert.equal response.headers.location, "/posts/1"
+
+    "no match":
+      topic: ->
+        request = HTTP.request(hostname: "example.com", port: 3002, method: "put", path: "/posts")
         request.setHeader "Accept", "text/xml"
         request.on "response", (response)=>
           response.on "end", =>
