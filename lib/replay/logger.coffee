@@ -8,5 +8,5 @@ URL = require("url")
 exports.logger = (settings)->
   return (request, callback)->
     if settings.debug
-      console.log "Replay: Requesting #{URL.format(request.url)}"
+      console.log "Replay: Requesting #{request.method} #{URL.format(request.url)}"
     callback()

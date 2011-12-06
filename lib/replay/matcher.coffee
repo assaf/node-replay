@@ -32,7 +32,7 @@ class Matcher
     @port     = url.port
     @path     = url.path
     @query    = url.query
-    @method   = (request.method && request.method.toLowerCase()) || "get"
+    @method   = (request.method && request.method.toUpperCase()) || "GET"
     @headers  = {}
     if request.headers
       for name, value of request.headers

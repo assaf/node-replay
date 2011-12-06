@@ -89,6 +89,7 @@ class Catalog
       assert request, "#{filename} missing request section"
       [method_and_path, header_lines...] = request.split(/\n/)
       [method, path] = method_and_path.split(/\s/)
+      assert method && path, "#{filename}: first line must be <method> <path>"
       headers = parseHeaders(filename, header_lines)
       return { url: path, method: method, headers: headers }
 

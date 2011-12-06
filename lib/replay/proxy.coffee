@@ -32,7 +32,7 @@ URL = require("url")
 # HTTP client request that captures the request and sends it down the processing chain.
 class ProxyRequest extends HTTP.ClientRequest
   constructor: (options = {}, @proxy)->
-    @method = (options.method || "get").toLowerCase()
+    @method = (options.method || "GET").toUpperCase()
     [host, port] = (options.host || options.hostname).split(":")
     @url = URL.parse("http://#{host || "localhost"}:#{options.port || port || 80}#{options.path || "/"}")
     @headers = {}
@@ -87,7 +87,7 @@ class ProxyRequest extends HTTP.ClientRequest
           process.nextTick ->
             response.resume()
         else
-          error = new Error("Connection to #{URL.format(@url)} refused: not recording and no network access")
+          error = new Error("#{@method} #{URL.format(@url)} refused: not recording and no network access")
           error.code = "ECONNREFUSED"
           error.errno = "ECONNREFUSED"
           @emit "error", error
