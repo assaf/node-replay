@@ -161,6 +161,19 @@ Like this:
     var replay = require("replay");
     replay.fixtures = __dirname + "/fixtures/replay"
 
+You can tell **node-replay** what hosts to treat as "localhost".  Requests to these hosts will be routed to 127.0.0.1,
+without capturing or replay.  This is particularly useful if you're making request to a test server and want to use the
+same URL as production.
+
+For example:
+
+    Replay.localhost "www.example.com"
+
+Likewise, you can tell **node-reply** to allow network access to specific hosts.  These requests can still be recorded
+and replayed, but will otherwise pass through to the specified host:
+
+    Replay.allow "logger.example.com"
+
 If you're running into trouble, try turning debugging mode on.  It helps.  Sometimes.
 
     $ DEBUG=true node test.js
