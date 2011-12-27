@@ -1,7 +1,7 @@
 passThrough = require("./pass_through")
 
 
-replay = (settings)->
+recorded = (settings)->
   catalog = settings.catalog
   capture = passThrough(true)
   return (request, callback)->
@@ -28,4 +28,4 @@ replay = (settings)->
     # Not in recording mode, pass control to the next proxy.
     callback null
 
-module.exports = replay
+module.exports = recorded

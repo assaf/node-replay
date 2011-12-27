@@ -5,10 +5,13 @@ Chain         = require("./chain")
 ProxyRequest  = require("./proxy")
 logger        = require("./logger")
 passThrough   = require("./pass_through")
-replay        = require("./replay")
+recorder      = require("./recorder")
 
 
+# Localhost servers. Pass requests directly to host, and route to 127.0.0.1.
 localhosts = { localhost: true }
+# Allowed servers. Allow network access to any servers listed here.
+allowed = { }
 
 
 Replay =
@@ -50,6 +53,12 @@ Replay =
   #     replay.localhost "www.example.com"
   localhost: (host)->
     localhosts[host] = true
+    delete allowed[host]
+
+  # Allow network access to this host.
+  allow: (host)->
+    delete localhosts[host]
+    allowed[host] = true
 
 
 # The catalog is responsible for loading pre-recorded responses into memory, from where they can be replayed, and
@@ -62,9 +71,9 @@ Replay.catalog = new Catalog(Replay)
 # - Log request to console is `deubg` is true
 # - Replay recorded responses
 # - Pass through requests in bloody and cheat modes
-Replay.use passThrough ->
-  return Replay.mode == "cheat"
-Replay.use replay(Replay)
+Replay.use passThrough (request)->
+  return allowed[request.url.hostname] || Replay.mode == "cheat"
+Replay.use recorder(Replay)
 Replay.use logger(Replay)
 Replay.use passThrough (request)->
   return localhosts[request.url.hostname] || Replay.mode == "bloody"
