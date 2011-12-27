@@ -17,6 +17,11 @@ recorded = (settings)->
           callback null, response
           return
 
+    # Do not record this host.
+    if settings.isIgnored(request.url.hostname)
+      callback null
+      return
+
     # In recording mode capture the response and store it.
     if settings.mode == "record"
       capture request, (error, response)->

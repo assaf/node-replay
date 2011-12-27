@@ -16,6 +16,8 @@ MODES = ["bloody", "cheat", "record", "replay"]
 localhosts = { localhost: true }
 # Allowed servers. Allow network access to any servers listed here.
 allowed = { }
+# Ignored servers. Do not contact or record.
+ignored = { }
 
 
 Replay =
@@ -50,27 +52,42 @@ Replay =
   use: (proxy)->
     Replay.chain.prepend proxy
 
+  # Allow network access to this host.
+  allow: (hosts...)->
+    for host in hosts
+      allowed[host] = true
+      delete ignored[host]
+      delete localhosts[host]
+
+  # True if this host is allowed network access.
+  isAllowed: (host)->
+    return !!allowed[host]
+
+  # Ignore network access to this host.
+  ignore: (hosts...)->
+    for host in hosts
+      ignored[host] = true
+      delete allowed[host]
+      delete localhosts[host]
+
+  # True if this host is on the ignored list.
+  isIgnored: (host)->
+    return !!ignored[host]
+
   # Treats this host as localhost: requests are routed directory to 127.0.0.1, no replay.  Useful when you want to send
   # requests to the test server using its production host name.
   #
   # Example
   #     replay.localhost "www.example.com"
-  localhost: (host)->
-    localhosts[host] = true
-    delete allowed[host]
+  localhost: (hosts...)->
+    for host in hosts
+      localhosts[host] = true
+      delete allowed[host]
+      delete ignored[host]
 
   # True if this host should be treated as localhost.
   isLocalhost: (host)->
     return !!localhosts[host]
-
-  # Allow network access to this host.
-  allow: (host)->
-    delete localhosts[host]
-    allowed[host] = true
-
-  # True if this host is allowed network access.
-  isAllowed: (host)->
-    return !!allowed[host]
 
 
 # The catalog is responsible for loading pre-recorded responses into memory, from where they can be replayed, and
@@ -84,7 +101,7 @@ Replay.catalog = new Catalog(Replay)
 # - Replay recorded responses
 # - Pass through requests in bloody and cheat modes
 Replay.use passThrough (request)->
-  return Replay.isAllowed(request.url.hostname) || Replay.mode == "cheat"
+  return Replay.isAllowed(request.url.hostname) || (Replay.mode == "cheat" && !Replay.isIgnored(request.url.hostname))
 Replay.use recorder(Replay)
 Replay.use logger(Replay)
 Replay.use passThrough (request)->

@@ -15,13 +15,16 @@ HTTP.request = (options, callback)->
 
 # Redirect HTTP requests to 127.0.0.1 for all hosts defined as localhost
 original_lookup = DNS.lookup
-DNS.lookup = (domain, callback)->
+DNS.lookup = (domain, family, callback)->
   unless callback
     [family, callback] = [null, family]
   if Replay.isLocalhost[domain]
-    callback null, "127.0.0.1", 4
+    if family == 6
+      callback null, "::1", 6
+    else
+      callback null, "127.0.0.1", 4
   else
-    original_lookup domain, callback
+    original_lookup domain, family, callback
 
 
 module.exports = Replay

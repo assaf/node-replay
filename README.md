@@ -169,10 +169,17 @@ For example:
 
     Replay.localhost "www.example.com"
 
-Likewise, you can tell **node-reply** to allow network access to specific hosts.  These requests can still be recorded
-and replayed, but will otherwise pass through to the specified host:
+There may be hosts you don't care to record/replay: it doesn't matter if requests to these hosts succeed or not, and you
+don't care to manage their recorded file.  You can just add those to the ignore list:
+
+    Replay.ignore "www.google-analytics.com", "airbrake.io"
+
+Likewise, you can tell **node-reply** to allow network access to specific hosts:
 
     Replay.allow "logger.example.com"
+
+Requests to allowed and ignored hosts will still replay any previously recorded responses, but if there is no recorded
+response, they will either fail (ignored) or pass through to the actual server (allowed).
 
 If you're running into trouble, try turning debugging mode on.  It helps.  Sometimes.
 

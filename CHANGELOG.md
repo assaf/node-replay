@@ -1,3 +1,13 @@
+## Version 1.2.2 2011-12-27
+
+There may be hosts you don't care to record/replay: it doesn't matter if requests to these hosts succeed or not, and you
+don't care to manage their recorded file.  You can just add those to the ignore list:
+
+    Replay.ignore "www.google-analytics.com", "airbrake.io"
+
+The `allow`, `ignore` and `localhost` methods now accept multiple arguments. 
+
+
 ## Version 1.2.1 2011-12-27
 
 Bug fix to DNS hack.
