@@ -1,10 +1,10 @@
-HTTP = require("http")
-{ Catalog } = require("./catalog")
-{ Chain } = require("./chain")
-{ ProxyRequest } = require("./proxy")
-{ logger } = require("./logger")
-{ passThrough } = require("./pass_through")
-{ replay } = require("./replay")
+HTTP          = require("http")
+Catalog       = require("./catalog")
+Chain         = require("./chain")
+ProxyRequest  = require("./proxy")
+logger        = require("./logger")
+passThrough   = require("./pass_through")
+replay        = require("./replay")
 
 
 Replay =
@@ -61,5 +61,6 @@ HTTP.request = (options, callback)->
     request.once "response", (response)->
       callback response
   return request
+
 
 module.exports = Replay

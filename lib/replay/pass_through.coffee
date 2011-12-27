@@ -3,7 +3,7 @@ HTTP = require("http")
 # Capture original HTTP request. PassThrough proxy uses that.
 httpRequest = HTTP.request
 
-exports.passThrough = (allow)->
+passThrough = (allow)->
   if arguments.length == 0
     allow = -> true
   else if typeof allow == "string"
@@ -39,3 +39,6 @@ exports.passThrough = (allow)->
       http.end()
     else
       callback null
+
+
+module.exports = passThrough

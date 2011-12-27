@@ -16,8 +16,8 @@
 # trailers  - Trailers object (names are lower case)
 
 
-assert = require("assert")
-URL = require("url")
+assert  = require("assert")
+URL     = require("url")
 
 
 # Simple implementation of a matcher.
@@ -99,4 +99,4 @@ class Matcher
         return matcher.response
 
 
-exports.Matcher = Matcher
+module.exports = Matcher

@@ -5,8 +5,10 @@ URL = require("url")
 # Example
 #     replay.use replay.logger(exports)
 #     replay.debug = true
-exports.logger = (settings)->
+logger = (settings)->
   return (request, callback)->
     if settings.debug
       console.log "Replay: Requesting #{request.method} #{URL.format(request.url)}"
     callback()
+
+module.exports = logger

@@ -32,4 +32,4 @@ class Chain
   @prototype.__defineGetter__ "start", ->
     return @first
 
-exports.Chain = Chain
+module.exports = Chain

@@ -1,7 +1,7 @@
-assert = require("assert")
-File = require("fs")
-Path = require("path")
-{ Matcher } = require("./matcher")
+assert  = require("assert")
+File    = require("fs")
+Path    = require("path")
+Matcher = require("./matcher")
 
 
 mkdir = (pathname, callback)->
@@ -123,4 +123,4 @@ parseHeaders = (filename, header_lines, restrict = null)->
   return headers
 
 
-exports.Catalog = Catalog
+module.exports = Catalog

@@ -23,10 +23,10 @@
 # No actual proxies defined here.
 
 
-assert = require("assert")
-HTTP = require("http")
-Stream = require("stream")
-URL = require("url")
+assert  = require("assert")
+HTTP    = require("http")
+Stream  = require("stream")
+URL     = require("url")
 
 
 # HTTP client request that captures the request and sends it down the processing chain.
@@ -140,4 +140,4 @@ class ProxyResponse extends Stream
     return new ProxyResponse(status: 404, body: ["No recorded request/response that matches #{URL.format(url)}"])
 
 
-exports.ProxyRequest = ProxyRequest
+module.exports = ProxyRequest
