@@ -13,9 +13,13 @@ Replay = require("../lib/replay")
 Replay.fixtures = "#{__dirname}/fixtures"
 
 
-# Redirect all HTTP requests to localhost
+# Redirect HTTP requests to pass-through domain
+original_lookup = DNS.lookup
 DNS.lookup = (domain, callback)->
-  callback null, "127.0.0.1", 4
+  if domain == "pass-through"
+    callback null, "127.0.0.1", 4
+  else
+    original_lookup domain, callback
 
 # Serve pages from localhost.
 server = Express.createServer()

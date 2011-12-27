@@ -1,3 +1,4 @@
+DNS           = require("dns")
 HTTP          = require("http")
 Catalog       = require("./catalog")
 Chain         = require("./chain")
@@ -5,6 +6,9 @@ ProxyRequest  = require("./proxy")
 logger        = require("./logger")
 passThrough   = require("./pass_through")
 replay        = require("./replay")
+
+
+localhosts = { localhost: true }
 
 
 Replay =
@@ -39,6 +43,15 @@ Replay =
   use: (proxy)->
     Replay.chain.prepend proxy
 
+  # Treats this host as localhost: requests are routed directory to 127.0.0.1, no replay.  Useful when you want to send
+  # requests to the test server using its production host name.
+  #
+  # Example
+  #     replay.localhost "www.example.com"
+  localhost: (host)->
+    localhosts[host] = true
+
+
 # The catalog is responsible for loading pre-recorded responses into memory, from where they can be replayed, and
 # storing captured responses.
 Replay.catalog = new Catalog(Replay)
@@ -49,18 +62,30 @@ Replay.catalog = new Catalog(Replay)
 # - Log request to console is `deubg` is true
 # - Replay recorded responses
 # - Pass through requests in bloody and cheat modes
-Replay.use passThrough(-> Replay.mode == "cheat")
+Replay.use passThrough ->
+  return Replay.mode == "cheat"
 Replay.use replay(Replay)
 Replay.use logger(Replay)
-Replay.use passThrough((request)-> request.url.hostname == "localhost" || Replay.mode == "bloody")
+Replay.use passThrough (request)->
+  return localhosts[request.url.hostname] || Replay.mode == "bloody"
 
 
+# Route HTTP requests to our little helper.
 HTTP.request = (options, callback)->
   request = new ProxyRequest(options, Replay.chain.start)
   if callback
     request.once "response", (response)->
       callback response
   return request
+
+
+# Redirect HTTP requests to 127.0.0.1 for all hosts defined as localhost
+original_lookup = DNS.lookup
+DNS.lookup = (domain, callback)->
+  if localhosts[domain]
+    callback null, "127.0.0.1", 4
+  else
+    original_lookup domain, callback
 
 
 module.exports = Replay
