@@ -1,3 +1,8 @@
+## Version 1.2.1 2011-12-27
+
+Bug fix to DNS hack.
+
+
 ## Version 1.2.0 2011-12-27
 
 You can tell **node-replay** what hosts to treat as "localhost".  Requests to these hosts will be routed to 127.0.0.1,
