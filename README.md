@@ -153,13 +153,22 @@ tests or code that makes new HTTP requests.
 **replay** -- Replays recorded responses, does not allow outbound requests.  This is the default node.  That's another
 way of saying, "you'll be running in this mode most of the time".
 
+You can set the mode by setting the environment variable `REPLAY` to one of these values:
+
+   $ REPLAY=record node test.js
+
+Of from your code by setting `replay.mode`:
+
+   var Replay = require("replay")
+   Replay.mode = "record"
+
+
 Of course, **node-reply** needs to store all those captured responses somewhere, and by default it will put them in the
 directory `fixtures`.  Bet you have an idea for a better directory name.  Easy to change.
 
 Like this:
 
-    var replay = require("replay");
-    replay.fixtures = __dirname + "/fixtures/replay"
+    Replay.fixtures = __dirname + "/fixtures/replay"
 
 You can tell **node-replay** what hosts to treat as "localhost".  Requests to these hosts will be routed to 127.0.0.1,
 without capturing or replay.  This is particularly useful if you're making request to a test server and want to use the
