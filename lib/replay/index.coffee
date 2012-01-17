@@ -18,7 +18,7 @@ original_lookup = DNS.lookup
 DNS.lookup = (domain, family, callback)->
   unless callback
     [family, callback] = [null, family]
-  if Replay.isLocalhost[domain]
+  if Replay.isLocalhost(domain)
     if family == 6
       callback null, "::1", 6
     else
