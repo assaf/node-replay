@@ -1,3 +1,10 @@
+## Version 1.2.3 2012-01-16
+
+Support (or don't fail on) Web Sockets.
+
+Fix non-working `Replay.localhost`.
+
+
 ## Version 1.2.2 2011-12-27
 
 There may be hosts you don't care to record/replay: it doesn't matter if requests to these hosts succeed or not, and you
