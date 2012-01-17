@@ -4,8 +4,15 @@ ProxyRequest  = require("./proxy")
 Replay        = require("./replay")
 
 
+httpRequest = HTTP.request
+
+
 # Route HTTP requests to our little helper.
 HTTP.request = (options, callback)->
+  # WebSocket request: pass through to Node.js library
+  if options && options.headers && options.headers["Upgrade"] == "websocket"
+    return httpRequest(options, callback)
+  # Proxy request
   request = new ProxyRequest(options, Replay.chain.start)
   if callback
     request.once "response", (response)->
