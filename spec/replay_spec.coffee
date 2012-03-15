@@ -145,4 +145,32 @@ vows.describe("Replay").addBatch
         assert.instanceOf response, Error
 
 
+  "minimal response":
+    topic: ->
+      Replay.mode = "replay"
+      @callback null
+    "listeners":
+      topic: ->
+        request = HTTP.get(hostname: "example.com", port: 3002, path: "/minimal")
+        request.on "response", (response)=>
+          response.body = null
+          response.on "data", (chunk)->
+            # This will fail, no response.body
+            response.body += chunk
+          response.on "end", =>
+            @callback null, response
+        request.on "error", @callback
+        return
+      "should return HTTP version": (response)->
+        assert.equal response.httpVersion, "1.1"
+      "should return status code": (response)->
+        assert.equal response.statusCode, 200
+      "should return no response headers": (response)->
+        assert.deepEqual response.headers, { }
+      "should return no response trailers": (response)->
+        assert.deepEqual response.trailers, { }
+      "should return no response body": (response)->
+        assert.isNull response.body
+
+
 .export(module)

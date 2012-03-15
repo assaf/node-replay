@@ -1,3 +1,8 @@
+## Version 1.3.1 2012-03-15
+
+Accept replay documents with nothing but method and path.
+
+
 ## Version 1.3.0 2012-03-15
 
 Fix status code being string instead of integer.

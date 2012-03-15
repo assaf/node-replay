@@ -40,10 +40,9 @@ class Matcher
     @body = request.body
     
     # Create a normalized response object that we return.
-    assert response.status, "I need at least status code to define response"
     @response =
       version:  response.version || "1.1"
-      status:   response.status && parseInt(response.status, 10)
+      status:   response.status && parseInt(response.status, 10) || 200
       headers:  {}
       body:     []
       trailers: {}

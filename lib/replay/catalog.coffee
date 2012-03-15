@@ -99,11 +99,11 @@ class Catalog
 
 
     parse_response = (response, body)->
-      assert response, "#{filename} missing response section"
-      [status_line, header_lines...] = response.split(/\n/)
-      status = parseInt(status_line.split()[0], 10)
-      version = status_line.match(/\d.\d$/)
-      headers = parseHeaders(filename, header_lines)
+      if response
+        [status_line, header_lines...] = response.split(/\n/)
+        status = parseInt(status_line.split()[0], 10)
+        version = status_line.match(/\d.\d$/)
+        headers = parseHeaders(filename, header_lines)
       return { status: status, version: version, headers: headers, body: body.join("\n\n") }
 
     [request, response, body...] = File.readFileSync(filename, "utf-8").split(/\n\n/)
