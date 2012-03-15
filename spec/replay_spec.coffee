@@ -20,7 +20,7 @@ vows.describe("Replay").addBatch
       "should return HTTP version": (response)->
         assert.equal response.httpVersion, "1.1"
       "should return status code": (response)->
-        assert.equal response.statusCode, "200"
+        assert.equal response.statusCode, 200
       "should return response headers": (response)->
         assert.deepEqual response.headers, { "content-type": "text/html", "date": "Tue, 29 Nov 2011 03:12:15 GMT" }
       "should return response trailers": (response)->
@@ -37,7 +37,7 @@ vows.describe("Replay").addBatch
       "should return HTTP version": (response)->
         assert.equal response.httpVersion, "1.1"
       "should return status code": (response)->
-        assert.equal response.statusCode, "200"
+        assert.equal response.statusCode, 200
       "should return response headers": (response)->
         assert.deepEqual response.headers, { "content-type": "text/html", "date": "Tue, 29 Nov 2011 03:12:15 GMT" }
       "should return response trailers": (response)->
@@ -94,7 +94,7 @@ vows.describe("Replay").addBatch
         request.end()
         return
       "should return status code": (response)->
-        assert.equal response.statusCode, "200"
+        assert.equal response.statusCode, 200
 
     "no match":
       topic: ->
@@ -126,7 +126,7 @@ vows.describe("Replay").addBatch
         request.end()
         return
       "should return status code": (response)->
-        assert.equal response.statusCode, "201"
+        assert.equal response.statusCode, 201
       "should return headers": (response)->
         assert.equal response.headers.location, "/posts/1"
 

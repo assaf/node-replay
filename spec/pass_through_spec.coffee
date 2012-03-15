@@ -25,7 +25,7 @@ vows.describe("Pass through").addBatch
       "should return HTTP version": (response)->
         assert.equal response.httpVersion, "1.1"
       "should return status code": (response)->
-        assert.equal response.statusCode, "200"
+        assert.equal response.statusCode, 200
       "should return response trailers": (response)->
         assert.deepEqual response.trailers, { }
       "should return response headers": (response)->
@@ -47,7 +47,7 @@ vows.describe("Pass through").addBatch
       "should return HTTP version": (response)->
         assert.equal response.httpVersion, "1.1"
       "should return status code": (response)->
-        assert.equal response.statusCode, "200"
+        assert.equal response.statusCode, 200
       "should return response headers": (response)->
         assert.equal response.headers["content-type"], "text/html; charset=utf-8"
       "should return response trailers": (response)->

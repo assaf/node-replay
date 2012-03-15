@@ -107,7 +107,7 @@ clone = (object)->
 class ProxyResponse extends Stream
   constructor: (captured)->
     @httpVersion = captured.version || "1.1"
-    @statusCode  = captured.status || "200"
+    @statusCode  = captured.status || 200
     @headers     = clone(captured.headers)
     @trailers    = clone(captured.trailers)
     @_body       = captured.body.slice(0)

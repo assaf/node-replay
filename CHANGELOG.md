@@ -1,3 +1,10 @@
+## Version 1.3.0 2012-03-15
+
+Fix status code being string instead of integer.
+
+Fix handling of fixtures with empty body.
+
+
 ## Version 1.2.3 2012-01-16
 
 Support (or don't fail on) Web Sockets.

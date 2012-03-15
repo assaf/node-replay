@@ -101,7 +101,7 @@ class Catalog
     parse_response = (response, body)->
       assert response, "#{filename} missing response section"
       [status_line, header_lines...] = response.split(/\n/)
-      status = status_line.split()[0]
+      status = parseInt(status_line.split()[0], 10)
       version = status_line.match(/\d.\d$/)
       headers = parseHeaders(filename, header_lines)
       return { status: status, version: version, headers: headers, body: body.join("\n\n") }
@@ -113,6 +113,7 @@ class Catalog
 parseHeaders = (filename, header_lines, restrict = null)->
   headers = {}
   for line in header_lines
+    continue if line == ""
     [_, name, value] = line.match(/^(.*?)\:\s+(.*)$/)
     assert name && value, "#{filename}: can't make sense of header line #{line}"
     if restrict
