@@ -44,6 +44,38 @@ vows.describe("Replay").addBatch
         assert.deepEqual response.trailers, { }
 
 
+  "matching a regexp url":
+    topic: ->
+      Replay.mode = "replay"
+      request = HTTP.get(hostname: "example.com", port: 3002, method: "post", path: "/regexp", (response)=>
+        response.body = ""
+        response.on "data", (chunk)->
+          response.body += chunk
+        response.on "end", =>
+          @callback null, response
+        request.on "error", @callback
+      )
+      return
+    "should match the right fixture": (error, response)->
+      assert.equal response.body, "regexp"
+
+
+  "matching a regexp url with flags":
+    topic: ->
+      Replay.mode = "replay"
+      request = HTTP.get(hostname: "example.com", port: 3002, method: "post", path: "/aregexp2", (response)=>
+        response.body = ""
+        response.on "data", (chunk)->
+          response.body += chunk
+        response.on "end", =>
+          @callback null, response
+        request.on "error", @callback
+      )
+      return
+    "should match a fixture": (error, response)->
+      assert.equal response.body, "Aregexp2"
+
+
   # Send responses to non-existent server on port 3002. No matching fixture for that path, expect a 404.
   "undefined path":
     topic: ->
