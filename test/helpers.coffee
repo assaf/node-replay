@@ -52,6 +52,5 @@ setup = (callback)->
 
 exports.assert = require("assert")
 exports.setup  = setup
-exports.vows   = require("vows")
 exports.HTTP   = require("http")
 exports.Replay = Replay
