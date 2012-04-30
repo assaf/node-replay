@@ -26,12 +26,17 @@ URL     = require("url")
 class Matcher
   constructor: (request, response)->
     # Map requests to object properties.  We do this for quick matching.
-    assert request.url, "I need at least a URL to match request to response"
-    url = URL.parse(request.url)
-    @hostname = url.hostname
-    @port     = url.port
-    @path     = url.path
-    @query    = url.query
+    assert request.url || request.regexp, "I need at least a URL to match request to response"
+    if request.regexp
+      @hostname = request.hostname
+      @regexp   = request.regexp
+    else
+      url = URL.parse(request.url)
+      @hostname = url.hostname
+      @port     = url.port
+      @path     = url.path
+      @query    = url.query
+    
     @method   = (request.method && request.method.toUpperCase()) || "GET"
     @headers  = {}
     if request.headers
@@ -66,9 +71,12 @@ class Matcher
   match: (request)->
     { url, method, headers, body } = request
     return false if @hostname && @hostname != url.hostname
-    return false if @port && @port != url.port
-    return false if @path && @path != url.path
-    return false if @query && @query != url.query
+    if @regexp
+      return false unless @regexp.test(url.path)
+    else
+      return false if @port && @port != url.port
+      return false if @path && @path != url.path
+      return false if @query && @query != url.query
     return false unless @method == method
     for name, value of @headers
       return false if value != headers[name]
@@ -87,11 +95,19 @@ class Matcher
         url:    URL.resolve("http://#{host}/", mapping.path)
         method: mapping.method
     else
-      request =
-        url:      URL.resolve("http://#{host}/", mapping.request.url)
-        method:   mapping.request.method
-        headers:  mapping.request.headers
-        body:     mapping.request.body
+      if mapping.request.url instanceof RegExp
+        request =
+          host:     host
+          regexp:   mapping.request.url
+          method:   mapping.request.method
+          headers:  mapping.request.headers
+          body:     mapping.request.body
+      else
+        request =
+          url:      URL.resolve("http://#{host}/", mapping.request.url)
+          method:   mapping.request.method
+          headers:  mapping.request.headers
+          body:     mapping.request.body
     matcher = new Matcher(request, mapping.response || mapping)
     return (request)->
       if matcher.match(request)

@@ -92,10 +92,15 @@ class Catalog
     parse_request = (request)->
       assert request, "#{filename} missing request section"
       [method_and_path, header_lines...] = request.split(/\n/)
-      [method, path] = method_and_path.split(/\s/)
-      assert method && path, "#{filename}: first line must be <method> <path>"
+      if /\sREGEXP\s/.test(method_and_path)
+        [method, raw_regexp] = method_and_path.split(" REGEXP ")
+        [_, in_regexp, flags] = raw_regexp.match(/^\/(.+)\/(i|m|g)?$/)
+        regexp = new RegExp(in_regexp, flags || "")
+      else
+        [method, path] = method_and_path.split(/\s/)
+      assert method && (path || regexp), "#{filename}: first line must be <method> <path>"
       headers = parseHeaders(filename, header_lines, REQUEST_HEADERS)
-      return { url: path, method: method, headers: headers }
+      return { url: path || regexp, method: method, headers: headers }
 
 
     parse_response = (response, body)->
