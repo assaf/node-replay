@@ -19,7 +19,7 @@ mkdir = (pathname, callback)->
 
 
 # Only these request headers are stored in the catalog.
-REQUEST_HEADERS = [/^accept/, /^content-/, /^host/, /^if-/, /^x-/]
+REQUEST_HEADERS = [/^accept/, /^content-type/, /^host/, /^if-/, /^x-/]
 
 
 class Catalog
@@ -73,7 +73,8 @@ class Catalog
         # Response part
         file.write "#{response.status || 200} HTTP/#{response.version || "1.1"}\n"
         for name, value of response.headers
-          file.write "#{name}: #{value}\n"
+          if ~REQUEST_HEADERS.indexOf(name)
+            file.write "#{name}: #{value}\n"
         file.write "\n"
         for part in response.body
           file.write part
