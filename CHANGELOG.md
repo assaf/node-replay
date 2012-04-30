@@ -1,3 +1,8 @@
+## Version 1.4.1 2012-04-30
+
+Replay files can now use REGEXP to match request URL (Jerome Gravel-Niquet)
+
+
 ## Version 1.3.1 2012-03-15
 
 Accept replay documents with nothing but method and path.
