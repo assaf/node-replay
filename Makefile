@@ -19,6 +19,6 @@ build : clean
 	coffee -b -c -l -o lib/replay lib/replay/*.coffee
 
 # Publish new release to NPM
-publish : test build
-	git push
+publish : test
 	npm publish
+	git push

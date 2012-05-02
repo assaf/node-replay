@@ -12,7 +12,8 @@
     "node": "~v0.6.0"
   },
   "scripts": {
-    "test":   "./node_modules/.bin/mocha"
+    "prepublish":   "make build",
+    "test":         "./node_modules/.bin/mocha"
   },
   "dependencies": {
   },
