@@ -1,4 +1,4 @@
-{ assert, setup, HTTP, Replay } = require("./helpers")
+{ assert, setup, HTTP, HTTPS, Replay } = require("./helpers")
 
 
 # First batch is testing requests that pass through to the server, no recording/replay.
@@ -62,6 +62,33 @@ describe "Pass through", ->
       it "should return response body", ->
         assert.deepEqual response.body, "Success!"
 
+
+  describe "ssl", ->
+    before ->
+      Replay.mode = "bloody"
+
+    response = null
+
+    before (done)->
+      request = HTTPS.get(hostname: "pass-through", port: 3443, (_)->
+        response = _
+        response.body = ""
+        response.on "data", (chunk)->
+          response.body += chunk
+        response.on "end", done
+      )
+      request.on "error", done
+      
+    it "should return HTTP version", ->
+      assert.equal response.httpVersion, "1.1"
+    it "should return status code", ->
+      assert.equal response.statusCode, 200
+    it "should return response headers", ->
+      assert.equal response.headers["content-type"], "text/html; charset=utf-8"
+    it "should return response trailers", ->
+      assert.deepEqual response.trailers, { }
+    it "should return response body", ->
+      assert.deepEqual response.body, "Success!"
 
   # Send request to the live server on port 3001, but this time network connection disabled.
   describe "replay", ->

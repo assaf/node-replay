@@ -19,7 +19,8 @@
   },
   "devDependencies": {
     "express":        "~2.5.9",
-    "mocha":          "~1.0.2"
+    "mocha":          "~1.0.2",
+    "async":          "~0.1.18"
   },
   "repository": {
     "type": "git",
