@@ -1,7 +1,9 @@
 HTTP = require("http")
+HTTPS = require("https")
 
 # Capture original HTTP request. PassThrough proxy uses that.
-httpRequest = HTTP.request
+httpRequest  = HTTP.request
+httpsRequest = HTTPS.request
 
 passThrough = (allow)->
   if arguments.length == 0
@@ -14,12 +16,17 @@ passThrough = (allow)->
   return (request, callback)->
     if allow(request)
       options =
+        protocol: request.url.protocol
         hostname: request.url.hostname
         port:     request.url.port
         path:     request.url.path
         method:   request.method
         headers:  request.headers
-      http = httpRequest(options)
+
+      if request.url.protocol == "https:"
+        http = httpsRequest(options)
+      else
+        http = httpRequest(options)
       http.on "error", (error)->
         callback error
       http.on "response", (response)->

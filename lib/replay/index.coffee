@@ -1,5 +1,6 @@
 DNS           = require("dns")
 HTTP          = require("http")
+HTTPS         = require("https")
 ProxyRequest  = require("./proxy")
 Replay        = require("./replay")
 
@@ -18,6 +19,12 @@ HTTP.request = (options, callback)->
     request.once "response", (response)->
       callback response
   return request
+
+
+# Route HTTPS requests
+HTTPS.request = (options, callback)->
+  options.protocol = "https:"
+  return HTTP.request(options, callback)
 
 
 # Redirect HTTP requests to 127.0.0.1 for all hosts defined as localhost

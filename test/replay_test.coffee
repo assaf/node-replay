@@ -1,4 +1,4 @@
-{ assert, HTTP, Replay } = require("./helpers")
+{ assert, HTTP, HTTPS, Replay } = require("./helpers")
 
 
 # Test replaying results from fixtures in spec/fixtures.
@@ -48,6 +48,24 @@ describe "Replay", ->
         assert.deepEqual response.headers, { "content-type": "text/html", "date": "Tue, 29 Nov 2011 03:12:15 GMT" }
       it "should return response trailers", ->
         assert.deepEqual response.trailers, { }
+
+
+  describe "matching an https url", ->
+    response = null
+
+    before (done)->
+      Replay.mode = "replay"
+
+      request = HTTPS.get(hostname: "example.com", port: 3443, path: "/minimal")
+      request.on "response", (_)->
+        response = _
+        done()
+      request.on "error", done
+
+    it "should return HTTP version", ->
+      assert.equal response.httpVersion, "1.1"
+    it "should return status code", ->
+      assert.equal response.statusCode, 200
 
 
   describe "matching a regexp", ->
