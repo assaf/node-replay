@@ -1,3 +1,8 @@
+## Version 1.4.2 2012-05-02
+
+Added support for HTTPS (Jerome Gravel-Niquet)
+
+
 ## Version 1.4.1 2012-04-30
 
 Do not store request headers we don't care for.
