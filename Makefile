@@ -1,5 +1,5 @@
 default : test
-.PHONY : clean setup test
+.PHONY : build clean publish setup test
 
 # Setup everything
 setup :
@@ -11,7 +11,6 @@ test : setup clean
 
 # Remove temporary files
 clean :
-	rm -f lib/*.js
 	rm -f lib/replay/*.js
 
 # CoffeeScript to JavaScript

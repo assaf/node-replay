@@ -1,3 +1,8 @@
+## Version 1.4.4 2012-05-02
+
+Filter out request headers *not* response headers.
+
+
 ## Version 1.4.3 2012-05-02
 
 Precompile before publishing, no longer requires Coffee-Script to run.

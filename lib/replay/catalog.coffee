@@ -68,13 +68,13 @@ class Catalog
         file = File.createWriteStream(tmpfile, encoding: "utf-8")
         file.write "#{request.method.toUpperCase()} #{request.url.path || "/"}\n"
         for name, value of request.headers
-          file.write "#{name}: #{value}\n"
+          if ~REQUEST_HEADERS.indexOf(name)
+            file.write "#{name}: #{value}\n"
         file.write "\n"
         # Response part
         file.write "#{response.status || 200} HTTP/#{response.version || "1.1"}\n"
         for name, value of response.headers
-          if ~REQUEST_HEADERS.indexOf(name)
-            file.write "#{name}: #{value}\n"
+          file.write "#{name}: #{value}\n"
         file.write "\n"
         for part in response.body
           file.write part
