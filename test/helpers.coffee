@@ -37,6 +37,11 @@ server.get "/404", (req, res)->
 # Internal error
 server.get "/500", (req, res)->
   res.send 500, "Boom!"
+# Multiple set-cookie headers
+server.get "/set-cookie", (req, res)->
+  res.cookie "c1", "v1"
+  res.cookie "c2", "v2"
+  res.send 200
 
 
 # SSL Server
