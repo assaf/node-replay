@@ -1,3 +1,9 @@
+## Version 1.5.0 2012-05-08
+
+Properly handle repeating headers (e.g. set-cookie) by storing and reading
+multiple entries.
+
+
 ## Version 1.4.4 2012-05-02
 
 Filter out request headers *not* response headers.

@@ -67,14 +67,11 @@ class Catalog
       try
         file = File.createWriteStream(tmpfile, encoding: "utf-8")
         file.write "#{request.method.toUpperCase()} #{request.url.path || "/"}\n"
-        for name, value of request.headers
-          if ~REQUEST_HEADERS.indexOf(name)
-            file.write "#{name}: #{value}\n"
+        writeHeaders file, request.headers, REQUEST_HEADERS
         file.write "\n"
         # Response part
         file.write "#{response.status || 200} HTTP/#{response.version || "1.1"}\n"
-        for name, value of response.headers
-          file.write "#{name}: #{value}\n"
+        writeHeaders file, response.headers
         file.write "\n"
         for part in response.body
           file.write part
@@ -87,7 +84,6 @@ class Catalog
   @prototype.__defineGetter__ "basedir", ->
     @_basedir ?= Path.resolve(@settings.fixtures || "fixtures")
     return @_basedir
-
 
   _read: (filename)->
     parse_request = (request)->
@@ -116,18 +112,47 @@ class Catalog
     return { request: parse_request(request), response: parse_response(response, body) }
 
 
-parseHeaders = (filename, header_lines, restrict = null)->
-  headers = {}
+# Parse headers from header_lines.  Optional argument `only` is an array of
+# regular expressions; only headers matching one of these expressions are
+# parsed.  Returns a object with name/value pairs.
+parseHeaders = (filename, header_lines, only = null)->
+  headers = Object.create(null)
   for line in header_lines
     continue if line == ""
     [_, name, value] = line.match(/^(.*?)\:\s+(.*)$/)
     assert name && value, "#{filename}: can't make sense of header line #{line}"
-    if restrict
-      for regexp in restrict
-        if regexp.test(name)
-          continue
-    headers[name.toLowerCase()] = value.trim().replace(/^"(.*)"$/, "$1")
+    continue if only && !match(name, only)
+    
+    key = name.toLowerCase()
+    value = value.trim().replace(/^"(.*)"$/, "$1")
+    if Array.isArray(headers[key])
+      headers[key].push value
+    else if headers[key]
+      headers[key] = [headers[key], value]
+    else
+      headers[key] = value
   return headers
+
+
+# Write headers to the File object.  Optional argument `only` is an array of
+# regular expressions; only headers matching one of these expressions are
+# written.
+writeHeaders = (file, headers, only = null)->
+  for name, value of headers
+    continue if only && !match(name, only)
+    if Array.isArray(value)
+      for item in value
+        file.write "#{name}: #{item}\n"
+    else
+      file.write "#{name}: #{value}\n"
+
+
+# Returns true if header name matches one of the regular expressions.
+match = (name, regexps)->
+  for regexp in regexps
+    if regexp.test(name)
+      return true
+  return false
 
 
 module.exports = Catalog
