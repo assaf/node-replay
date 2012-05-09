@@ -1,4 +1,6 @@
-{ assert, HTTP, HTTPS, Replay } = require("./helpers")
+{ assert, setup, HTTP, HTTPS, Replay } = require("./helpers")
+File    = require("fs")
+Request = require("request")
 
 
 # Test replaying results from fixtures in spec/fixtures.
@@ -104,6 +106,46 @@ describe "Replay", ->
 
     it "should match a fixture", ->
       assert.equal body, "Aregexp2"
+
+
+  describe "recording multiple of the same header", ->
+
+    fixture_path = null
+
+    before setup
+
+    before ->
+      Replay.mode = "record"
+
+    before (done)->
+      request = HTTP.get(hostname: "127.0.0.1", port: 3001, path: "/set-cookie", (response)->
+        response.on "end", done
+      )
+      request.on "error", done
+
+    it "should create a fixture with multiple set-cookie headers", ->
+      fixture_path = "#{__dirname}/fixtures/127.0.0.1:3001/#{File.readdirSync("#{__dirname}/fixtures/127.0.0.1:3001")[0]}"
+      fixture = File.readFileSync(fixture_path, "utf8")
+      set_cookie_count = 0
+      for line in fixture.split("\n")
+        set_cookie_count++ if /set-cookie: c\d=v\d/.test(line)
+      assert.equal set_cookie_count, 2
+
+    describe "replaying multiple headers", ->
+
+      headers = null
+
+      before (done)->
+        Request.get "http://127.0.0.1:3001/set-cookie", (err, resp)->
+          headers = resp.headers
+          done()
+
+      it "should have both set-cookie headers", ->
+        assert.equal headers["set-cookie"][0], "c1=v1"
+        assert.equal headers["set-cookie"][1], "c2=v2"
+
+    after ->
+      File.unlinkSync(fixture_path)
 
 
   # Send responses to non-existent server on port 3002. No matching fixture for that path, expect a 404.
