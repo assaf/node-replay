@@ -1,3 +1,9 @@
+## Version 1.5.1 2012-05-14
+
+When matching request against headers, also match the Authorization header
+(David John).
+
+
 ## Version 1.5.0 2012-05-08
 
 Properly handle repeating headers (e.g. set-cookie) by storing and reading
