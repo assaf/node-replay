@@ -19,7 +19,7 @@ mkdir = (pathname, callback)->
 
 
 # Only these request headers are stored in the catalog.
-REQUEST_HEADERS = [/^accept/, /^content-type/, /^host/, /^if-/, /^x-/]
+REQUEST_HEADERS = [/^accept/, /^authorization/, /^content-type/, /^host/, /^if-/, /^x-/]
 
 
 class Catalog
