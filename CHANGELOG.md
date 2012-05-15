@@ -1,3 +1,8 @@
+## Version 1.5.2 2012-05-15
+
+Do not fail on headers with empty value.
+
+
 ## Version 1.5.1 2012-05-14
 
 When matching request against headers, also match the Authorization header

@@ -120,11 +120,10 @@ parseHeaders = (filename, header_lines, only = null)->
   for line in header_lines
     continue if line == ""
     [_, name, value] = line.match(/^(.*?)\:\s+(.*)$/)
-    assert name && value, "#{filename}: can't make sense of header line #{line}"
     continue if only && !match(name, only)
     
-    key = name.toLowerCase()
-    value = value.trim().replace(/^"(.*)"$/, "$1")
+    key = (name || "").toLowerCase()
+    value = (value || "").trim().replace(/^"(.*)"$/, "$1")
     if Array.isArray(headers[key])
       headers[key].push value
     else if headers[key]
