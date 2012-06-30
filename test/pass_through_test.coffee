@@ -1,4 +1,4 @@
-{ assert, setup, HTTP, HTTPS, Replay } = require("./helpers")
+{ assert, setup, HTTP, HTTPS, Replay, HTTP_PORT, HTTPS_PORT } = require("./helpers")
 
 
 # First batch is testing requests that pass through to the server, no recording/replay.
@@ -8,7 +8,7 @@ describe "Pass through", ->
 
   before setup
 
-  # Send request to the live server on port 3001 and check the responses.
+  # Send request to the live server and check the responses.
   describe "bloody", ->
     before ->
       Replay.mode = "bloody"
@@ -17,7 +17,7 @@ describe "Pass through", ->
       response = null
 
       before (done)->
-        request = HTTP.get(hostname: "pass-through", port: 3001)
+        request = HTTP.get(hostname: "pass-through", port: HTTP_PORT)
         request.on "response", (_)->
           response = _
           response.body = ""
@@ -42,7 +42,7 @@ describe "Pass through", ->
       response = null
 
       before (done)->
-        request = HTTP.get(hostname: "pass-through", port: 3001, (_)->
+        request = HTTP.get(hostname: "pass-through", port: HTTP_PORT, (_)->
           response = _
           response.body = ""
           response.on "data", (chunk)->
@@ -70,7 +70,7 @@ describe "Pass through", ->
     response = null
 
     before (done)->
-      request = HTTPS.get(hostname: "pass-through", port: 3443, (_)->
+      request = HTTPS.get(hostname: "pass-through", port: HTTPS_PORT, (_)->
         response = _
         response.body = ""
         response.on "data", (chunk)->
@@ -90,7 +90,7 @@ describe "Pass through", ->
     it "should return response body", ->
       assert.deepEqual response.body, "Success!"
 
-  # Send request to the live server on port 3001, but this time network connection disabled.
+  # Send request to the live server, but this time network connection disabled.
   describe "replay", ->
     before ->
       Replay.mode = "replay"
@@ -99,7 +99,7 @@ describe "Pass through", ->
       error = null
 
       before (done)->
-        request = HTTP.get(hostname: "pass-through", port: 3001)
+        request = HTTP.get(hostname: "pass-through", port: HTTP_PORT)
         request.on "error", (_)->
           error = _
           done()

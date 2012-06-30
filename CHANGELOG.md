@@ -1,3 +1,16 @@
+## Version 1.6.0 2012-10-16
+
+Improved logging options:
+- Replay will now emit errors to the console unless otherwise told
+- You can tell Replay to not emit errors to console by setting
+  Replay.silent = true
+- You can also tell Replay to emit errors an logs messages elsewhere by setting
+  Replay.logger (defaults to console)
+- You can listen to all events via Replay.on("error", function(error) { })
+
+No deprecation messages on Node 0.8
+
+
 ## Version 1.5.3 2012-06-30
 
 Removed engine dependency. Works on 0.8.1 now.

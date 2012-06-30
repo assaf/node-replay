@@ -3,15 +3,18 @@ File    = require("fs")
 Path    = require("path")
 Matcher = require("./matcher")
 
+exists = File.exists || Path.exists
+existsSync = File.existsSync || Path.existsSync
+
 
 mkdir = (pathname, callback)->
-  Path.exists pathname, (exists)->
-    if exists
+  exists pathname, (found)->
+    if found
       callback null
       return
     parent = Path.dirname(pathname)
-    Path.exists parent, (exists)->
-      if exists
+    exists parent, (found)->
+      if found
         File.mkdir pathname, callback
       else
         mkdir parent, ->
@@ -35,7 +38,7 @@ class Catalog
 
     # Start by looking for directory and loading each of the files.
     pathname = "#{@basedir}/#{host}"
-    unless Path.existsSync(pathname)
+    unless existsSync(pathname)
       return
     stat = File.statSync(pathname)
     if stat.isDirectory()
@@ -59,7 +62,8 @@ class Catalog
     uid = +new Date
     tmpfile = "/tmp/node-replay.#{uid}"
     pathname = "#{@basedir}/#{host}"
-    console.log "Creating  #{pathname}"
+    logger = request.replay.logger
+    logger.log "Creating #{pathname}"
     mkdir pathname, (error)->
       return callback error if error
       filename = "#{pathname}/#{uid}"

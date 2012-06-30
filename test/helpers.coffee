@@ -1,6 +1,6 @@
 # NOTES:
 # All requests using a hostname are routed to 127.0.0.1
-# Port 3001 has a live server, see below for paths and responses
+# Port 3004 has a live server, see below for paths and responses
 # Port 3002 has no server, connections will be refused
 # Port 3443 has a live https server
 
@@ -12,8 +12,15 @@ File    = require("fs")
 Async   = require("async")
 
 
+HTTP_PORT     = 3004
+HTTPS_PORT    = 3443
+INACTIVE_PORT = 3002
+
+
 # Directory to load fixtures from.
 Replay.fixtures = "#{__dirname}/fixtures"
+
+Replay.silent = true
 
 
 # Redirect HTTP requests to pass-through domain
@@ -65,25 +72,18 @@ ssl_server.get "/500", (req, res)->
 setup = (callback)->
   Async.parallel [
     (done)->
-      server.listen 3001, done
+      server.listen HTTP_PORT, done
     (done)->
-      ssl_server.listen 3443, done
+      ssl_server.listen HTTPS_PORT, done
   ], callback
-    
-  return
-
-  if server._connected
-    callback null
-    return
-  server.on "listening", callback
-  unless server._connecting
-    server._connecting = true
-    server.listen 3001, ->
-      server._connected = true
 
 
-exports.assert = require("assert")
-exports.setup  = setup
-exports.HTTP   = require("http")
-exports.HTTPS  = require("https")
-exports.Replay = Replay
+module.exports =
+  assert:         require("assert")
+  setup:          setup
+  HTTP:           require("http")
+  HTTPS:          require("https")
+  HTTP_PORT:      HTTP_PORT
+  HTTPS_PORT:     HTTPS_PORT
+  INACTIVE_PORT:  INACTIVE_PORT
+  Replay:         Replay

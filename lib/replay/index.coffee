@@ -14,7 +14,7 @@ HTTP.request = (options, callback)->
   if options && options.headers && options.headers["Upgrade"] == "websocket"
     return httpRequest(options, callback)
   # Proxy request
-  request = new ProxyRequest(options, Replay.chain.start)
+  request = new ProxyRequest(options, Replay, Replay.chain.start)
   if callback
     request.once "response", (response)->
       callback response
