@@ -77,7 +77,7 @@ describe "Replay", ->
       Replay.mode = "replay"
 
     before (done)->
-      request = HTTP.get(hostname: "example.com", port: 3002, method: "post", path: "/regexp", (response)->
+      request = HTTP.get(hostname: "example.com", port: 3002, method: "get", path: "/regexp", (response)->
         body = ""
         response.on "data", (chunk)->
           body += chunk
@@ -96,7 +96,7 @@ describe "Replay", ->
       Replay.mode = "replay"
 
     before (done)->
-      request = HTTP.get(hostname: "example.com", port: 3002, method: "post", path: "/aregexp2", (response)->
+      request = HTTP.get(hostname: "example.com", port: 3002, method: "get", path: "/aregexp2", (response)->
         body = ""
         response.on "data", (chunk)->
           body += chunk

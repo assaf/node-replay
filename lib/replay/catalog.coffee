@@ -97,7 +97,9 @@ class Catalog
         [method, path] = method_and_path.split(/\s/)
       assert method && (path || regexp), "#{filename}: first line must be <method> <path>"
       headers = parseHeaders(filename, header_lines, REQUEST_HEADERS)
-      return { url: path || regexp, method: method, headers: headers }
+      body = headers["body"]
+      delete headers["body"]
+      return { url: path || regexp, method: method, headers: headers, body: body }
 
 
     parse_response = (response, body)->

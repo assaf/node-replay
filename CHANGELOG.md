@@ -1,3 +1,8 @@
+## Version 1.5.3 2012-06-30
+
+Removed engine dependency. Works on 0.8.1 now.
+
+
 ## Version 1.5.2 2012-05-15
 
 Do not fail on headers with empty value.
