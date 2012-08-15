@@ -1,4 +1,5 @@
 { assert, setup, HTTP, HTTPS, Replay } = require("./helpers")
+{ puts, inspect } = require("util")
 
 
 # First batch is testing requests that pass through to the server, no recording/replay.
@@ -25,7 +26,7 @@ describe "Pass through", ->
             response.body += chunk
           response.on "end", done
         request.on "error", done
-        
+
       it "should return HTTP version", ->
         assert.equal response.httpVersion, "1.1"
       it "should return status code", ->
@@ -50,7 +51,7 @@ describe "Pass through", ->
           response.on "end", done
         )
         request.on "error", done
-        
+
       it "should return HTTP version", ->
         assert.equal response.httpVersion, "1.1"
       it "should return status code", ->
@@ -78,7 +79,7 @@ describe "Pass through", ->
         response.on "end", done
       )
       request.on "error", done
-      
+
     it "should return HTTP version", ->
       assert.equal response.httpVersion, "1.1"
     it "should return status code", ->
@@ -107,4 +108,24 @@ describe "Pass through", ->
       it "should callback with error", ->
         assert error instanceof Error
         assert.equal error.code, "ECONNREFUSED"
+
+  # Send request to the live server on port 3001, but this time network connection disabled.
+  describe "record", ->
+    before ->
+      Replay.mode = "record"
+
+    describe "listeners", ->
+      response = null
+
+      before (done)->
+        request = HTTP.request {hostname: "pass-through", method: "POST", port: 3001}, (_) ->
+          response = _
+          response.on "data", (chunk)->
+            response.body += chunk
+          response.on "end", done
+        request.write("foo=bar")
+        request.end()
+
+      it "should have a body", ->
+        puts inspect response.body
 

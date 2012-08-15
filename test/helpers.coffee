@@ -31,6 +31,9 @@ server.use Express.bodyParser()
 # Success page.
 server.get "/", (req, res)->
   res.send "Success!"
+# Success POST with json
+server.post "/", (req, res)->
+  res.send "Success!"
 # Not found
 server.get "/404", (req, res)->
   res.send 404, "Not found"
@@ -69,7 +72,7 @@ setup = (callback)->
     (done)->
       ssl_server.listen 3443, done
   ], callback
-    
+
   return
 
   if server._connected
