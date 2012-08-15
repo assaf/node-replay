@@ -1,7 +1,7 @@
 { assert, setup, HTTP, HTTPS, Replay } = require("./helpers")
 File    = require("fs")
 Request = require("request")
-
+querystring = require('querystring')
 
 # Test replaying results from fixtures in spec/fixtures.
 describe "Replay", ->
@@ -11,7 +11,7 @@ describe "Replay", ->
   describe "matching URL", ->
     before ->
       Replay.mode = "replay"
-      
+
     describe "listeners", ->
       response = null
 
@@ -166,7 +166,7 @@ describe "Replay", ->
       assert error instanceof Error
       assert.equal error.code, "ECONNREFUSED"
 
-  
+
   # Send responses to non-existent server on port 3002. No matching fixture for that host, expect refused connection.
   describe "undefined host", ->
     error = null
@@ -291,3 +291,46 @@ describe "Replay", ->
       it "should return no response body", ->
         assert !response.body
 
+  describe "POST body", ->
+    statusCode = headers = null
+
+    before ->
+      Replay.mode = "replay"
+
+    describe "matching", ->
+      before (done)->
+        this.timeout(0)
+        body = querystring.stringify({foo: "bar"})
+        request = HTTP.request(hostname: "example.com", port: 3002, method: "post", path: "/post-body")
+        request.setHeader "Content-Type", 'application/x-www-form-urlencoded'
+        request.setHeader "Content-Length", body.length
+        request.on "response", (response)->
+          { statusCode, headers } = response
+          response.on "end", done
+        request.on "error", done
+        request.write(body)
+        request.end()
+
+      it "should return status code", ->
+        assert.equal statusCode, 201
+      it "should return headers", ->
+        assert.equal headers.location, "/posts/1"
+
+    describe "no match", ->
+      error = null
+
+      before (done)->
+        body = querystring.stringify({foo: "baz"})
+        request = HTTP.request(hostname: "example.com", port: 3002, method: "post", path: "/post-body")
+        request.setHeader "Content-Type", 'application/x-www-form-urlencoded'
+        request.setHeader "Content-Length", body.length
+        request.on "response", (response)->
+          response.on "end", done
+        request.on "error", (_)->
+          error = _
+          done()
+        request.write(body)
+        request.end()
+
+      it "should fail to connnect", ->
+        assert error instanceof Error
