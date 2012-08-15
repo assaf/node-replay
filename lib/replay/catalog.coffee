@@ -19,7 +19,7 @@ mkdir = (pathname, callback)->
 
 
 # Only these request headers are stored in the catalog.
-REQUEST_HEADERS = [/^accept/, /^authorization/, /^content-type/, /^host/, /^if-/, /^x-/]
+REQUEST_HEADERS = [/^accept/, /^authorization/, /^content-type/, /^host/, /^if-/, /^x-/, /^body/]
 
 
 class Catalog
@@ -28,7 +28,7 @@ class Catalog
     @matchers = {}
 
   find: (host)->
-    # Return result from cache.  
+    # Return result from cache.
     matchers = @matchers[host]
     if matchers
       return matchers
@@ -48,14 +48,14 @@ class Catalog
       matchers = @matchers[host] ||= []
       mapping = @_read(pathname)
       matchers.push Matcher.fromMapping(host, mapping)
-    
+
     return matchers
 
   save: (host, request, response, callback)->
     matcher = Matcher.fromMapping(host, request: request, response: response)
     matchers = @matchers[host] ||= []
     matchers.push matcher
- 
+
     uid = +new Date
     tmpfile = "/tmp/node-replay.#{uid}"
     pathname = "#{@basedir}/#{host}"
@@ -123,7 +123,7 @@ parseHeaders = (filename, header_lines, only = null)->
     continue if line == ""
     [_, name, value] = line.match(/^(.*?)\:\s+(.*)$/)
     continue if only && !match(name, only)
-    
+
     key = (name || "").toLowerCase()
     value = (value || "").trim().replace(/^"(.*)"$/, "$1")
     if Array.isArray(headers[key])
