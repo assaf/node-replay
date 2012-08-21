@@ -71,8 +71,7 @@ class Catalog
         writeHeaders file, request.headers, REQUEST_HEADERS
         file.write "\n"
         if request.body
-          bodyAsString = request.body.map(([chunk, encoding]) -> chunk).join("") # TODO not sure about this
-          file.write bodyAsString
+          request.body.map(([chunk, encoding]) -> file.write(chunk))
           file.write "\n\n"
         # Response part
         file.write "#{response.status || 200} HTTP/#{response.version || "1.1"}\n"

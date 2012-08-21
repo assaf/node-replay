@@ -85,7 +85,7 @@ class Matcher
 
     if @body? && !_.isEmpty?(@body)
       bodyAsString = body.map(([chunk, encoding]) -> chunk).join("")
-      return false if @body != bodyAsString
+      return false if @body.toString() != bodyAsString
 
     return true
 
