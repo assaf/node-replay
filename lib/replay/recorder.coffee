@@ -29,7 +29,7 @@ recorded = (settings)->
         catalog.save host, request, response, (error)->
           callback error, response
       return
-   
+
     # Not in recording mode, pass control to the next proxy.
     callback null
 
