@@ -2,7 +2,8 @@ assert  = require("assert")
 File    = require("fs")
 Path    = require("path")
 Matcher = require("./matcher")
-
+_       = require("underscore")
+{puts,inspect} = require("util")
 
 mkdir = (pathname, callback)->
   Path.exists pathname, (exists)->
@@ -19,7 +20,7 @@ mkdir = (pathname, callback)->
 
 
 # Only these request headers are stored in the catalog.
-REQUEST_HEADERS = [/^accept/, /^authorization/, /^content-type/, /^host/, /^if-/, /^x-/, /^body/]
+REQUEST_HEADERS = [/^accept/, /^authorization/, /^content-type/, /^host/, /^if-/, /^x-/]
 
 
 class Catalog
@@ -69,6 +70,9 @@ class Catalog
         file.write "#{request.method.toUpperCase()} #{request.url.path || "/"}\n"
         writeHeaders file, request.headers, REQUEST_HEADERS
         file.write "\n"
+        if request.body
+          file.write request.body
+          file.write "\n"
         # Response part
         file.write "#{response.status || 200} HTTP/#{response.version || "1.1"}\n"
         writeHeaders file, response.headers
@@ -88,7 +92,9 @@ class Catalog
   _read: (filename)->
     parse_request = (request)->
       assert request, "#{filename} missing request section"
-      [method_and_path, header_lines...] = request.split(/\n/)
+      [head, body...] = request.split(/\n\n/)
+      body = body.join("\n\n")
+      [method_and_path, header_lines...] = head.split(/\n/)
       if /\sREGEXP\s/.test(method_and_path)
         [method, raw_regexp] = method_and_path.split(" REGEXP ")
         [_, in_regexp, flags] = raw_regexp.match(/^\/(.+)\/(i|m|g)?$/)
@@ -97,22 +103,21 @@ class Catalog
         [method, path] = method_and_path.split(/\s/)
       assert method && (path || regexp), "#{filename}: first line must be <method> <path>"
       headers = parseHeaders(filename, header_lines, REQUEST_HEADERS)
-      body = headers["body"]
-      delete headers["body"]
       return { url: path || regexp, method: method, headers: headers, body: body }
 
 
-    parse_response = (response, body)->
+    parse_response = (response)->
       if response
-        [status_line, header_lines...] = response.split(/\n/)
+        [head, body...] = response.split(/\n\n/)
+        body = body.join("\n\n")
+        [status_line, header_lines...] = head.split(/\n/)
         status = parseInt(status_line.split()[0], 10)
         version = status_line.match(/\d.\d$/)
         headers = parseHeaders(filename, header_lines)
-      return { status: status, version: version, headers: headers, body: body.join("\n\n") }
+      return { status: status, version: version, headers: headers, body: body }
 
-    [request, response, body...] = File.readFileSync(filename, "utf-8").split(/\n\n/)
-    return { request: parse_request(request), response: parse_response(response, body) }
-
+    [request, responseHeader, response] = File.readFileSync(filename, "utf-8").split(/\n\n(\d{3} HTTP\/.*)/)
+    return { request: parse_request(request), response: parse_response(responseHeader + response) }
 
 # Parse headers from header_lines.  Optional argument `only` is an array of
 # regular expressions; only headers matching one of these expressions are

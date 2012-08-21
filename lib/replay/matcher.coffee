@@ -18,6 +18,8 @@
 
 assert  = require("assert")
 URL     = require("url")
+{puts,inspect} = require("util")
+_       = require("underscore")
 
 
 # Simple implementation of a matcher.
@@ -81,7 +83,7 @@ class Matcher
     for name, value of @headers
       return false if value != headers[name]
 
-    if @body?
+    if @body? && !_.isEmpty?(@body)
       bodyAsString = body.map(([chunk, encoding]) -> chunk).join("")
       return false if @body != bodyAsString
 
