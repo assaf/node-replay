@@ -28,7 +28,6 @@ HTTP    = require("http")
 Stream  = require("stream")
 URL     = require("url")
 
-
 # HTTP client request that captures the request and sends it down the processing chain.
 class ProxyRequest extends HTTP.ClientRequest
   constructor: (options = {}, @proxy)->
@@ -66,6 +65,7 @@ class ProxyRequest extends HTTP.ClientRequest
     return
 
   write: (chunk, encoding)->
+
     assert !@ended, "Already called end"
     @body ||= []
     @body.push [chunk, encoding]
