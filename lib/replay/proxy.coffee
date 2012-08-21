@@ -77,10 +77,6 @@ class ProxyRequest extends HTTP.ClientRequest
       @write data, encoding
     @ended = true
 
-    # convert the body to a string instead of nested array
-    if @body?
-      @body = @body.map(([chunk, encoding]) -> chunk).join("")
-
     @proxy this, (error, captured)=>
       process.nextTick =>
         if error

@@ -36,14 +36,14 @@ class Matcher
       @port     = url.port
       @path     = url.path
       @query    = url.query
-    
+
     @method   = (request.method && request.method.toUpperCase()) || "GET"
     @headers  = {}
     if request.headers
       for name, value of request.headers
         @headers[name.toLowerCase()] = value
     @body = request.body
-    
+
     # Create a normalized response object that we return.
     @response =
       version:  response.version || "1.1"
@@ -67,7 +67,7 @@ class Matcher
       for name, value of response.trailers
         trailers[name.toLowerCase()] = value
 
-  # Quick and effective matching. 
+  # Quick and effective matching.
   match: (request)->
     { url, method, headers, body } = request
     return false if @hostname && @hostname != url.hostname
@@ -80,7 +80,11 @@ class Matcher
     return false unless @method == method
     for name, value of @headers
       return false if value != headers[name]
-    return false if @body && @body != body
+
+    if @body?
+      bodyAsString = body.map(([chunk, encoding]) -> chunk).join("")
+      return false if @body != bodyAsString
+
     return true
 
 
