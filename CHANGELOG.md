@@ -1,4 +1,4 @@
-## Version 1.6.0 2012-10-16
+## Version 1.6.0 2012-10-18
 
 Improved logging options:
 - Replay will now emit errors to the console unless otherwise told
