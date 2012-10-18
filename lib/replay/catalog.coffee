@@ -31,7 +31,7 @@ class Catalog
     @matchers = {}
 
   find: (host)->
-    # Return result from cache.  
+    # Return result from cache.
     matchers = @matchers[host]
     if matchers
       return matchers
@@ -51,14 +51,14 @@ class Catalog
       matchers = @matchers[host] ||= []
       mapping = @_read(pathname)
       matchers.push Matcher.fromMapping(host, mapping)
-    
+
     return matchers
 
   save: (host, request, response, callback)->
     matcher = Matcher.fromMapping(host, request: request, response: response)
     matchers = @matchers[host] ||= []
     matchers.push matcher
- 
+
     uid = +new Date
     tmpfile = "/tmp/node-replay.#{uid}"
     pathname = "#{@basedir}/#{host}"
@@ -73,6 +73,9 @@ class Catalog
         file.write "#{request.method.toUpperCase()} #{request.url.path || "/"}\n"
         writeHeaders file, request.headers, REQUEST_HEADERS
         file.write "\n"
+        if request.body
+          request.body.map(([chunk, encoding]) -> file.write(chunk))
+          file.write "\n\n"
         # Response part
         file.write "#{response.status || 200} HTTP/#{response.version || "1.1"}\n"
         writeHeaders file, response.headers
@@ -92,7 +95,9 @@ class Catalog
   _read: (filename)->
     parse_request = (request)->
       assert request, "#{filename} missing request section"
-      [method_and_path, header_lines...] = request.split(/\n/)
+      [head, body...] = request.split(/\n\n/)
+      body = body.join("\n\n")
+      [method_and_path, header_lines...] = head.split(/\n/)
       if /\sREGEXP\s/.test(method_and_path)
         [method, raw_regexp] = method_and_path.split(" REGEXP ")
         [_, in_regexp, flags] = raw_regexp.match(/^\/(.+)\/(i|m|g)?$/)
@@ -101,22 +106,21 @@ class Catalog
         [method, path] = method_and_path.split(/\s/)
       assert method && (path || regexp), "#{filename}: first line must be <method> <path>"
       headers = parseHeaders(filename, header_lines, REQUEST_HEADERS)
-      body = headers["body"]
-      delete headers["body"]
       return { url: path || regexp, method: method, headers: headers, body: body }
 
 
-    parse_response = (response, body)->
+    parse_response = (response)->
       if response
-        [status_line, header_lines...] = response.split(/\n/)
+        [head, body...] = response.split(/\n\n/)
+        body = body.join("\n\n")
+        [status_line, header_lines...] = head.split(/\n/)
         status = parseInt(status_line.split()[0], 10)
         version = status_line.match(/\d.\d$/)
         headers = parseHeaders(filename, header_lines)
-      return { status: status, version: version, headers: headers, body: body.join("\n\n") }
+      return { status: status, version: version, headers: headers, body: body }
 
-    [request, response, body...] = File.readFileSync(filename, "utf-8").split(/\n\n/)
-    return { request: parse_request(request), response: parse_response(response, body) }
-
+    [request, responseHeader, response] = File.readFileSync(filename, "utf-8").split(/\n\n(\d{3} HTTP\/.*)/)
+    return { request: parse_request(request), response: parse_response(responseHeader + response) }
 
 # Parse headers from header_lines.  Optional argument `only` is an array of
 # regular expressions; only headers matching one of these expressions are
@@ -127,7 +131,7 @@ parseHeaders = (filename, header_lines, only = null)->
     continue if line == ""
     [_, name, value] = line.match(/^(.*?)\:\s+(.*)$/)
     continue if only && !match(name, only)
-    
+
     key = (name || "").toLowerCase()
     value = (value || "").trim().replace(/^"(.*)"$/, "$1")
     if Array.isArray(headers[key])

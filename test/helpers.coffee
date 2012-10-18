@@ -38,6 +38,9 @@ server.use Express.bodyParser()
 # Success page.
 server.get "/", (req, res)->
   res.send "Success!"
+# Success POST with json
+server.post "/", (req, res)->
+  res.send "Success!"
 # Not found
 server.get "/404", (req, res)->
   res.send 404, "Not found"
@@ -77,7 +80,6 @@ setup = (callback)->
       ssl_server.listen HTTPS_PORT, done
   ], callback
 
-
 module.exports =
   assert:         require("assert")
   setup:          setup
@@ -87,3 +89,4 @@ module.exports =
   HTTPS_PORT:     HTTPS_PORT
   INACTIVE_PORT:  INACTIVE_PORT
   Replay:         Replay
+

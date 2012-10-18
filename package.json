@@ -1,16 +1,26 @@
-{ "name": "replay",
+{
+  "name": "replay",
   "description": "When API testing slows you down: record and replay HTTP responses like a boss",
   "version": "1.6.0",
   "author": "Assaf Arkin <assaf@labnotes.org> (http://labnotes.org/)",
-  "keywords": [ "test", "testing", "mock", "stub", "http", "replay", "vcr", "api" ],
+  "keywords": [
+    "test",
+    "testing",
+    "mock",
+    "stub",
+    "http",
+    "replay",
+    "vcr",
+    "api"
+  ],
   "main": "./lib/replay",
   "directories": {
     "doc": "./doc",
     "lib": "./lib"
   },
   "scripts": {
-    "prepublish":   "make build",
-    "test":         "./node_modules/.bin/mocha"
+    "prepublish": "make build",
+    "test": "./node_modules/.bin/mocha"
   },
   "dependencies": {
   },
@@ -29,7 +39,8 @@
     "url": "https://github.com/assaf/node-replay/issues"
   },
   "licenses": [
-    { "type": "MIT",
+    {
+      "type": "MIT",
       "url": "https://github.com/assaf/node-replay/blob/master/MIT-LICENSE"
     }
   ]
