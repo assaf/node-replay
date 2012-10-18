@@ -1,3 +1,8 @@
+## Version 1.7.0 2012-10-18
+
+Replay is now able to match against POST request body (Nate Murray).
+
+
 ## Version 1.6.0 2012-10-18
 
 Improved logging options:
