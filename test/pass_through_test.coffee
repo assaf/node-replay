@@ -114,17 +114,15 @@ describe "Pass through", ->
       Replay.mode = "record"
 
     describe "listeners", ->
-      response = null
-
       before (done)->
-        request = HTTP.request {hostname: "pass-through", method: "POST", port: HTTP_PORT}, (_) ->
-          response = _
-          response.on "data", (chunk)->
-            response.body += chunk
+        request = HTTP.request {hostname: "pass-through", method: "POST", port: HTTP_PORT}, (response)=>
+          @body = ""
+          response.on "data", (chunk)=>
+            @body += chunk
           response.on "end", done
         request.write("foo=bar")
         request.end()
 
       it "should have a body", ->
-        console.dir response.body
+        assert.equal @body, "Success!"
 

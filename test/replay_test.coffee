@@ -250,33 +250,34 @@ describe "Replay", ->
         assert !@response.body
 
   describe "POST body", ->
-    statusCode = headers = null
-
     before ->
       Replay.mode = "replay"
 
     describe "matching", ->
       before (done)->
         this.timeout(0)
-        body = querystring.stringify({foo: "bar"})
+        body = "Multiline\nbody"
         request = HTTP.request(hostname: "example.com", port: 3002, method: "post", path: "/post-body")
         request.setHeader "Content-Type", 'application/x-www-form-urlencoded'
         request.setHeader "Content-Length", body.length
-        request.on "response", (response)->
-          { statusCode, headers } = response
+        request.on "response", (response)=>
+          @body = ""
+          { @statusCode, @headers } = response
+          response.on "data", (chunk)=>
+            @body += chunk
           response.on "end", done
         request.on "error", done
         request.write(body)
         request.end()
 
       it "should return status code", ->
-        assert.equal statusCode, 201
+        assert.equal @statusCode, 200
       it "should return headers", ->
-        assert.equal headers.location, "/posts/1"
+        assert.equal @headers.location, "/posts/1"
+      it "should return body", ->
+        assert.equal @body, "Success!\n"
 
     describe "no match", ->
-      error = null
-
       before (done)->
         body = querystring.stringify({foo: "baz"})
         request = HTTP.request(hostname: "example.com", port: 3002, method: "post", path: "/post-body")
@@ -284,11 +285,11 @@ describe "Replay", ->
         request.setHeader "Content-Length", body.length
         request.on "response", (response)->
           response.on "end", done
-        request.on "error", (_)->
-          error = _
+        request.on "error", (@error)=>
           done()
         request.write(body)
         request.end()
 
       it "should fail to connnect", ->
-        assert error instanceof Error
+        assert @error instanceof Error
+

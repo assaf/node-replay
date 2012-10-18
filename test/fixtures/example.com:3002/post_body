@@ -2,9 +2,12 @@ POST /post-body
 Content-Type: application/x-www-form-urlencoded
 Content-Length: 7
 
-foo=bar
+Multiline
+body
 
-201 HTTP/1.1
+200 HTTP/1.1
 Content-Type: text/html
 Date:         Tue, 29 Nov 2011 03:12:15 GMT
 Location:     /posts/1
+
+Success!
