@@ -108,7 +108,7 @@ describe "Pass through", ->
         assert error instanceof Error
         assert.equal error.code, "ECONNREFUSED"
 
-  # Send request to the live server on port 3001, but this time network connection disabled.
+  # Send request to the live server on active port, but this time network connection disabled.
   describe "record", ->
     before ->
       Replay.mode = "record"
@@ -117,7 +117,7 @@ describe "Pass through", ->
       response = null
 
       before (done)->
-        request = HTTP.request {hostname: "pass-through", method: "POST", port: 3001}, (_) ->
+        request = HTTP.request {hostname: "pass-through", method: "POST", port: HTTP_PORT}, (_) ->
           response = _
           response.on "data", (chunk)->
             response.body += chunk
