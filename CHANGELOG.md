@@ -8,7 +8,10 @@ Improved logging options:
   Replay.logger (defaults to console)
 - You can listen to all events via Replay.on("error", function(error) { })
 
-No deprecation messages on Node 0.8
+No deprecation messages on Node 0.8.
+
+Works with request 2.11 by implementing a do nothing response.connection event
+emitter.
 
 
 ## Version 1.5.3 2012-06-30

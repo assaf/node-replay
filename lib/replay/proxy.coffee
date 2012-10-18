@@ -23,10 +23,11 @@
 # No actual proxies defined here.
 
 
-assert  = require("assert")
-HTTP    = require("http")
-Stream  = require("stream")
-URL     = require("url")
+assert            = require("assert")
+{ EventEmitter }  = require("events")
+HTTP              = require("http")
+Stream            = require("stream")
+URL               = require("url")
 
 
 # HTTP client request that captures the request and sends it down the processing chain.
@@ -112,6 +113,8 @@ class ProxyResponse extends Stream
     @trailers    = clone(captured.trailers)
     @_body       = captured.body.slice(0)
     @readable    = true
+    # Not a documented property, but request seems to use this to look for HTTP parsing errors
+    @connection = new EventEmitter()
 
   pause: ->
     @_paused = true
