@@ -82,6 +82,7 @@ class Matcher
       return false if value != headers[name]
 
     if @body && @body.length > 0
+      return false unless body
       bodyAsString = body.map(([chunk, encoding]) -> chunk).join("")
       return false if @body.toString() != bodyAsString
 
