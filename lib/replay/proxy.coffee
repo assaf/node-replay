@@ -114,7 +114,7 @@ class ProxyResponse extends Stream
     @_body       = captured.body.slice(0)
     @readable    = true
     # Not a documented property, but request seems to use this to look for HTTP parsing errors
-    @connection = new EventEmitter()
+    @connection  = new EventEmitter()
 
   pause: ->
     @_paused = true
