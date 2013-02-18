@@ -60,7 +60,7 @@ class Catalog
     matchers.push matcher
  
     uid = +new Date
-    tmpfile = "/tmp/node-replay.#{uid}"
+    tmpfile = "#{@basedir}/node-replay.#{uid}"
     pathname = "#{@basedir}/#{host}"
     logger = request.replay.logger
     logger.log "Creating #{pathname}"
