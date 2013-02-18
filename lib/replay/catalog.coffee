@@ -7,6 +7,9 @@ exists = File.exists || Path.exists
 existsSync = File.existsSync || Path.existsSync
 
 
+existsSync = File.existsSync || Path.existsSync
+
+
 mkdir = (pathname, callback)->
   exists pathname, (found)->
     if found
