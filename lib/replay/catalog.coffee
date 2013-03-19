@@ -34,7 +34,7 @@ class Catalog
     @matchers = {}
 
   find: (host)->
-    # Return result from cache.  
+    # Return result from cache.
     matchers = @matchers[host]
     if matchers
       return matchers
@@ -54,15 +54,15 @@ class Catalog
       matchers = @matchers[host] ||= []
       mapping = @_read(pathname)
       matchers.push Matcher.fromMapping(host, mapping)
-    
+
     return matchers
 
   save: (host, request, response, callback)->
     matcher = Matcher.fromMapping(host, request: request, response: response)
     matchers = @matchers[host] ||= []
     matchers.push matcher
- 
-    uid = +new Date
+
+    uid = +new Date + "" + Math.floor(Math.random() * 100000)
     tmpfile = "#{@basedir}/node-replay.#{uid}"
     pathname = "#{@basedir}/#{host}"
     logger = request.replay.logger
@@ -130,7 +130,7 @@ parseHeaders = (filename, header_lines, only = null)->
     continue if line == ""
     [_, name, value] = line.match(/^(.*?)\:\s+(.*)$/)
     continue if only && !match(name, only)
-    
+
     key = (name || "").toLowerCase()
     value = (value || "").trim().replace(/^"(.*)"$/, "$1")
     if Array.isArray(headers[key])
