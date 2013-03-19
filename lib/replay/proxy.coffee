@@ -35,7 +35,9 @@ class ProxyRequest extends HTTP.ClientRequest
   constructor: (options = {}, @replay, @proxy)->
     @method = (options.method || "GET").toUpperCase()
     [host, port] = (options.host || options.hostname).split(":")
-    @url = URL.parse("#{options.protocol || "http:"}//#{host || "localhost"}:#{options.port || port || 80}#{options.path || "/"}")
+    protocol = options.protocol || "http:"
+    port = options.port || port || (if protocol == "https:" then 443 else 80)
+    @url = URL.parse("#{protocol}//#{host || "localhost"}:#{port}#{options.path || "/"}")
     @headers = {}
     if options.headers
       for n,v of options.headers
