@@ -1,3 +1,12 @@
+## Version 1.6.2 2013-03-19
+
+Add randomness to uid to deal with fast requests and timekeeper (Nate Murray).
+
+Add support for HTTPS (Nate Murray).
+
+Tested with Node 0.10.0.
+
+
 ## Version 1.6.1 2013-02-18
 
 Improved logging options:
