@@ -40,7 +40,10 @@ class Catalog
       return matchers
 
     # Start by looking for directory and loading each of the files.
-    pathname = "#{@basedir}/#{host}"
+    # Look for host-port (windows friendly) or host:port (legacy)
+    pathname = "#{@basedir}/#{host.replace(":", "-")}"
+    unless existsSync(pathname)
+      pathname = "#{@basedir}/#{host}"
     unless existsSync(pathname)
       return
     stat = File.statSync(pathname)
@@ -64,7 +67,7 @@ class Catalog
 
     uid = +new Date + "" + Math.floor(Math.random() * 100000)
     tmpfile = "#{@basedir}/node-replay.#{uid}"
-    pathname = "#{@basedir}/#{host}"
+    pathname = "#{@basedir}/#{host.replace(":", "-")}"
     logger = request.replay.logger
     logger.log "Creating #{pathname}"
     mkdir pathname, (error)->

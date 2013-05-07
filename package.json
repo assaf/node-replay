@@ -9,8 +9,8 @@
     "lib": "./lib"
   },
   "scripts": {
-    "build":        "coffee --bare --compile --lint --output lib src/*.coffee",
-    "prepublish":   "coffee --bare --compile --lint --output lib src/*.coffee",
+    "build":        "coffee --bare --compile --lint --output lib/replay src/replay/*.coffee",
+    "prepublish":   "coffee --bare --compile --lint --output lib/replay src/replay/*.coffee",
     "postpublish":  "rm -rf lib",
     "test":         "./node_modules/.bin/mocha"
   },

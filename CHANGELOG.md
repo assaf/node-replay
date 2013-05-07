@@ -1,4 +1,7 @@
-## Version 1.6.2 2013-05-06
+## Version 1.7.0 2013-05-06
+
+Support Windows by creating directories of the form host-port instead of
+host:port.
 
 Updated dev dependencies, testing with Express 3.2.
 

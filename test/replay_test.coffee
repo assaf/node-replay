@@ -100,7 +100,7 @@ describe "Replay", ->
 
     before ->
       Replay.mode = "record"
-      @fixturesDir = "#{__dirname}/fixtures/127.0.0.1:#{HTTP_PORT}"
+      @fixturesDir = "#{__dirname}/fixtures/127.0.0.1-#{HTTP_PORT}"
 
     before (done)->
       HTTP.get(hostname: "127.0.0.1", port: HTTP_PORT, path: "/set-cookie", (response)->
