@@ -6,7 +6,9 @@
 
 
 DNS     = require("dns")
-Express = require("express")
+express = require("express")
+HTTP    = require("http")
+HTTPS   = require("https")
 Replay  = require("../lib/replay")
 File    = require("fs")
 Async   = require("async")
@@ -15,6 +17,9 @@ Async   = require("async")
 HTTP_PORT     = 3004
 HTTPS_PORT    = 3443
 INACTIVE_PORT = 3002
+SSL =
+  key:  File.readFileSync("#{__dirname}/ssl/privatekey.pem")
+  cert: File.readFileSync("#{__dirname}/ssl/certificate.pem")
 
 
 # Directory to load fixtures from.
@@ -33,8 +38,8 @@ DNS.lookup = (domain, callback)->
 
 
 # Serve pages from localhost.
-server = Express.createServer()
-server.use Express.bodyParser()
+server = express()
+server.use(express.bodyParser())
 # Success page.
 server.get "/", (req, res)->
   res.send "Success!"
@@ -51,39 +56,26 @@ server.get "/set-cookie", (req, res)->
   res.send 200
 
 
-# SSL Server
-ssl_server = Express.createServer(
-  key:  File.readFileSync("#{__dirname}/ssl/privatekey.pem")
-  cert: File.readFileSync("#{__dirname}/ssl/certificate.pem")
-)
-ssl_server.use Express.bodyParser()
-# Success page.
-ssl_server.get "/", (req, res)->
-  res.send "Success!"
-# Not found
-ssl_server.get "/404", (req, res)->
-  res.send 404, "Not found"
-# Internal error
-ssl_server.get "/500", (req, res)->
-  res.send 500, "Boom!"
-
-
 # Setup environment for running tests.
+running = false
 setup = (callback)->
-  Async.parallel [
-    (done)->
-      server.listen HTTP_PORT, done
-    (done)->
-      ssl_server.listen HTTPS_PORT, done
-  ], callback
+  if running
+    process.nextTick(callback)
+  else
+    Async.parallel [
+      (done)->
+        HTTP.createServer(server)
+          .listen(HTTP_PORT, done)
+      (done)->
+        HTTPS.createServer(SSL, server)
+          .listen(HTTPS_PORT, done)
+    ], (error)->
+      running = true
+      callback(error)
 
 
 module.exports =
-  assert:         require("assert")
   setup:          setup
-  HTTP:           require("http")
-  HTTPS:          require("https")
   HTTP_PORT:      HTTP_PORT
   HTTPS_PORT:     HTTPS_PORT
   INACTIVE_PORT:  INACTIVE_PORT
-  Replay:         Replay

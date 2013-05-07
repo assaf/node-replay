@@ -1,6 +1,10 @@
-{ assert, setup, HTTP, HTTPS, Replay, HTTP_PORT, HTTPS_PORT, INACTIVE_PORT } = require("./helpers")
+{  setup, HTTP_PORT, HTTPS_PORT, INACTIVE_PORT } = require("./helpers")
+assert  = require("assert")
 File    = require("fs")
+HTTP    = require("http")
+HTTPS   = require("https")
 Request = require("request")
+Replay  = require("../lib/replay")
 
 
 # Test replaying results from fixtures in spec/fixtures.
@@ -119,8 +123,8 @@ describe "Replay", ->
           done()
 
       it "should have both set-cookie headers", ->
-        assert.equal @headers["set-cookie"][0], "c1=v1"
-        assert.equal @headers["set-cookie"][1], "c2=v2"
+        assert.equal @headers["set-cookie"][0], "c1=v1; Path=/"
+        assert.equal @headers["set-cookie"][1], "c2=v2; Path=/"
 
     after ->
       for file in File.readdirSync(@fixturesDir)

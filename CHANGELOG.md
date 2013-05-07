@@ -1,3 +1,8 @@
+## Version 1.6.2 2013-05-06
+
+Updated dev dependencies, testing with Express 3.2.
+
+
 ## Version 1.6.2 2013-03-19
 
 Add randomness to uid to deal with fast requests and timekeeper (Nate Murray).

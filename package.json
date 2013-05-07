@@ -16,10 +16,10 @@
   },
   "devDependencies": {
     "coffee-script":  "~1.6.2",
-    "express":        "~2.5.11",
-    "mocha":          "~1.8.2",
-    "async":          "~0.2.6",
-    "request":        "~2.16.6"
+    "express":        "~3.2.2",
+    "mocha":          "~1.9.0",
+    "async":          "~0.2.8",
+    "request":        "~2.21.0"
   },
   "repository": {
     "type": "git",

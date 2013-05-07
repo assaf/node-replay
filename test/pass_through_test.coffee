@@ -1,4 +1,8 @@
-{ assert, setup, HTTP, HTTPS, Replay, HTTP_PORT, HTTPS_PORT } = require("./helpers")
+{ setup, HTTP_PORT, HTTPS_PORT } = require("./helpers")
+assert  = require("assert")
+HTTP    = require("http")
+HTTPS   = require("https")
+Replay  = require("../lib/replay")
 
 
 # First batch is testing requests that pass through to the server, no recording/replay.
@@ -6,7 +10,7 @@
 # Second batch is testing requests with no replay and no network access.
 describe "Pass through", ->
 
-  before setup
+  before(setup)
 
   # Send request to the live server and check the responses.
   describe "bloody", ->
