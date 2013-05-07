@@ -9,7 +9,7 @@ DNS     = require("dns")
 express = require("express")
 HTTP    = require("http")
 HTTPS   = require("https")
-Replay  = require("../lib/replay")
+Replay  = require("../src/replay")
 File    = require("fs")
 Async   = require("async")
 

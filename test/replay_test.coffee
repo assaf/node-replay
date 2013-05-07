@@ -4,7 +4,7 @@ File    = require("fs")
 HTTP    = require("http")
 HTTPS   = require("https")
 Request = require("request")
-Replay  = require("../lib/replay")
+Replay  = require("../src/replay")
 
 
 # Test replaying results from fixtures in spec/fixtures.

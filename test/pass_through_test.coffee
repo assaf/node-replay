@@ -2,7 +2,7 @@
 assert  = require("assert")
 HTTP    = require("http")
 HTTPS   = require("https")
-Replay  = require("../lib/replay")
+Replay  = require("../src/replay")
 
 
 # First batch is testing requests that pass through to the server, no recording/replay.

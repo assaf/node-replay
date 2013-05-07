@@ -9,7 +9,9 @@
     "lib": "./lib"
   },
   "scripts": {
-    "prepublish":   "make build",
+    "build":        "coffee --bare --compile --lint --output lib src/*.coffee",
+    "prepublish":   "coffee --bare --compile --lint --output lib src/*.coffee",
+    "postpublish":  "rm -rf lib",
     "test":         "./node_modules/.bin/mocha"
   },
   "dependencies": {
