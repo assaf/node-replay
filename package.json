@@ -17,7 +17,7 @@
   "dependencies": {
   },
   "devDependencies": {
-    "coffee-script":  "~1.6.2",
+    "coffee-script":  "1.6.2",
     "express":        "~3.2.2",
     "mocha":          "~1.9.0",
     "async":          "~0.2.8",
