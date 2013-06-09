@@ -80,7 +80,10 @@ class Matcher
     return false unless @method == method
     for name, value of @headers
       return false if value != headers[name]
-    return false if @body && @body != body
+    if body
+      data = ""
+      data += chunks[0] for chunks in body
+      return false if @body && @body != data
     return true
 
 

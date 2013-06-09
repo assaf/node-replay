@@ -25,7 +25,7 @@ mkdir = (pathname, callback)->
 
 
 # Only these request headers are stored in the catalog.
-REQUEST_HEADERS = [/^accept/, /^authorization/, /^content-type/, /^host/, /^if-/, /^x-/]
+REQUEST_HEADERS = [/^accept/, /^authorization/, /^content-type/, /^host/, /^if-/, /^x-/, /^body/]
 
 
 class Catalog
@@ -78,6 +78,10 @@ class Catalog
         file = File.createWriteStream(tmpfile, encoding: "utf-8")
         file.write "#{request.method.toUpperCase()} #{request.url.path || "/"}\n"
         writeHeaders file, request.headers, REQUEST_HEADERS
+        if request.body
+          body = ""
+          body += chunks[0] for chunks in request.body
+          writeHeaders file, body: body
         file.write "\n"
         # Response part
         file.write "#{response.status || 200} HTTP/#{response.version || "1.1"}\n"
