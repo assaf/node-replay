@@ -207,7 +207,7 @@ var Replay = require("replay");
 Replay.mode = "record"
 ```
 
-Of course, **node-reply** needs to store all those captured responses somewhere,
+Of course, **node-replay** needs to store all those captured responses somewhere,
 and by default it will put them in the directory `fixtures`.  Bet you have an
 idea for a better directory name.  Easy to change.
 
