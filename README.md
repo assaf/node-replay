@@ -190,7 +190,7 @@ replay.  Use this whenever you're writing new tests or code that makes new HTTP
 requests.
 
 **replay** -- Replays recorded responses, does not allow outbound requests.
-This is the default node.  That's another way of saying, "you'll be running in
+This is the default mode.  That's another way of saying, "you'll be running in
 this mode most of the time".
 
 You can set the mode by setting the environment variable `REPLAY` to one of
