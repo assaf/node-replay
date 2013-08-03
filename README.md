@@ -255,6 +255,29 @@ Requesting http://www.iheartquotes.com:80/api/v1/random
 Woot!
 ```
 
+By default, **node-replay** will record the following headers with each request,
+and use only these headers when matching pre-recorded requests:
+
+- Headers starting with `Accept` (eg `Accept-Encoding`)
+- `Authorization`
+- `Body` (used to match the body of a POST request)
+- `Content-Type`
+- `Host`
+- Headers starting with `If-` (eg `If-Modified-Since`)
+- Headers starting with `X-` (eg `X-Requested-With`)
+
+You can modify the list of matched headers, adding or removing headers, by
+changing the value of `Replay.headers`.  The value is an array of regular
+expressions.
+
+For example, to capture `content-length` (useful with file uploads):
+
+```
+Replay.headers.push(/^content-length/)
+```
+
+Since headers are case insensitive, we always match on the lower case name.
+
 
 ## Geeking
 

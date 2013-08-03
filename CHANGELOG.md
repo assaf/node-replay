@@ -1,3 +1,12 @@
+## Version 1.9.0 2013-11-04
+
+Added support for specifying which headers are stored when recording, and used
+for matching when replaying.  Edit the list of regular expressions in
+`Replay.headers`.
+
+Fixed a bug in capturing and filtering on POST request body.
+
+
 ## Version 1.8.0 2013-10-01
 
 Added support for capturing and filtering on POST request body (Jerome

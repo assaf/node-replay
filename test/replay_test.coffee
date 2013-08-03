@@ -159,6 +159,7 @@ describe "Replay", ->
         File.unlinkSync("#{@fixturesDir}/#{file}")
       File.rmdir(@fixturesDir)
 
+
   describe "recording multi-line POST data", ->
     before setup
 
@@ -183,6 +184,7 @@ describe "Replay", ->
         File.unlinkSync("#{@fixturesDir}/#{file}")
       File.rmdir(@fixturesDir)
 
+
   describe "replaying with POST body", ->
     before ->
       Replay.mode = "replay"
@@ -198,6 +200,7 @@ describe "Replay", ->
 
       it "should return status code", ->
         assert.equal @response.statusCode, 200
+
 
   describe "replaying with multi-line POST body", ->
     before ->
@@ -217,6 +220,33 @@ describe "Replay", ->
       it "should return status code", ->
         assert.equal @response.statusCode, 200
 
+
+  describe "only specified headers", ->
+
+    before setup
+
+    before ->
+      Replay.mode = "record"
+      # Drop the /accept/ header
+      Replay.headers = Replay.headers.filter((header)-> !header.test('accept'))
+      @fixturesDir = "#{__dirname}/fixtures/127.0.0.1-#{HTTP_PORT}"
+
+    before (done)->
+      HTTP.get(hostname: "127.0.0.1", port: HTTP_PORT, path: "/", headers: { accept: "application/json" }, (response)->
+        response.on("end", done)
+      ).on("error", done)
+
+    it "should not store the accept header", ->
+      files = File.readdirSync(@fixturesDir)
+      fixture = File.readFileSync("#{@fixturesDir}/#{files[0]}", "utf8")
+      assert !/accept/.test fixture
+
+    after ->
+      for file in File.readdirSync(@fixturesDir)
+        File.unlinkSync("#{@fixturesDir}/#{file}")
+      File.rmdir(@fixturesDir)
+
+
   # Send responses to non-existent server on inactive port. No matching fixture for that path, expect a 404.
   describe "undefined path", ->
     before ->
@@ -231,7 +261,7 @@ describe "Replay", ->
       assert @error instanceof Error
       assert.equal @error.code, "ECONNREFUSED"
 
-  
+
   # Send responses to non-existent server on inactive port. No matching fixture for that host, expect refused connection.
   describe "undefined host", ->
     before ->

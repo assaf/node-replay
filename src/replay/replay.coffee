@@ -12,6 +12,8 @@ recorder          = require("./recorder")
 # Supported modes.
 MODES = ["bloody", "cheat", "record", "replay"]
 
+# Headers that are recorded/matched during replay.
+MATCH_HEADERS = [/^accept/, /^authorization/, /^body/, /^content-type/, /^host/, /^if-/, /^x-/]
 
 
 # Instance properties:
@@ -30,6 +32,9 @@ MODES = ["bloody", "cheat", "record", "replay"]
 #
 # debug     - Set this to true to dump more information to the console, or run
 #             with DEBUG=true
+#
+# headers   - Only these headers are matched when recording/replaying.  A list
+#             of regular expressions.
 #
 # fixtures  - Main directory for replay fixtures.
 #
@@ -70,6 +75,7 @@ class Replay extends EventEmitter
     # ignored servers. do not contact or record.
     @_ignored = { }
     @catalog = new Catalog(this)
+    @headers = MATCH_HEADERS
 
     # Automatically emit connection errors and such, also prevent process from failing.
     @on "error", (error, url)=>

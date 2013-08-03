@@ -25,10 +25,6 @@ mkdir = (pathname, callback)->
           File.mkdir pathname, callback
 
 
-# Only these request headers are stored in the catalog.
-REQUEST_HEADERS = [/^accept/, /^authorization/, /^content-type/, /^host/, /^if-/, /^x-/, /^body/]
-
-
 class Catalog
   constructor: (@settings)->
     # We use this to cache host/host:port mapped to array of matchers.
@@ -65,6 +61,7 @@ class Catalog
     matcher = Matcher.fromMapping(host, request: request, response: response)
     matchers = @matchers[host] ||= []
     matchers.push matcher
+    request_headers = @settings.headers
 
     uid = +new Date + "" + Math.floor(Math.random() * 100000)
     tmpfile = "#{@basedir}/node-replay.#{uid}"
@@ -78,7 +75,7 @@ class Catalog
       try
         file = File.createWriteStream(tmpfile, encoding: "utf-8")
         file.write "#{request.method.toUpperCase()} #{request.url.path || "/"}\n"
-        writeHeaders file, request.headers, REQUEST_HEADERS
+        writeHeaders file, request.headers, request_headers
         if request.body
           body = ""
           for chunks in request.body
@@ -102,6 +99,7 @@ class Catalog
     return @_basedir
 
   _read: (filename)->
+    request_headers = @settings.headers
     parse_request = (request)->
       assert request, "#{filename} missing request section"
       [method_and_path, header_lines...] = request.split(/\n/)
@@ -112,7 +110,7 @@ class Catalog
       else
         [method, path] = method_and_path.split(/\s/)
       assert method && (path || regexp), "#{filename}: first line must be <method> <path>"
-      headers = parseHeaders(filename, header_lines, REQUEST_HEADERS)
+      headers = parseHeaders(filename, header_lines, request_headers)
       body = headers["body"]
       delete headers["body"]
       return { url: path || regexp, method: method, headers: headers, body: body }
