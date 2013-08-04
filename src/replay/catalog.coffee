@@ -32,6 +32,7 @@ class Catalog
   constructor: (@settings)->
     # We use this to cache host/host:port mapped to array of matchers.
     @matchers = {}
+    @settings.request_headers ?= REQUEST_HEADERS
 
   find: (host)->
     # Return result from cache.
@@ -63,6 +64,7 @@ class Catalog
   save: (host, request, response, callback)->
     matcher = Matcher.fromMapping(host, request: request, response: response)
     matchers = @matchers[host] ||= []
+    request_headers = @settings.request_headers or REQUEST_HEADERS
     matchers.push matcher
 
     uid = +new Date + "" + Math.floor(Math.random() * 100000)
@@ -77,7 +79,7 @@ class Catalog
       try
         file = File.createWriteStream(tmpfile, encoding: "utf-8")
         file.write "#{request.method.toUpperCase()} #{request.url.path || "/"}\n"
-        writeHeaders file, request.headers, REQUEST_HEADERS
+        writeHeaders file, request.headers, request_headers
         file.write "\n"
         # Response part
         file.write "#{response.status || 200} HTTP/#{response.version || "1.1"}\n"
@@ -96,6 +98,7 @@ class Catalog
     return @_basedir
 
   _read: (filename)->
+    request_headers = @settings.request_headers or REQUEST_HEADERS
     parse_request = (request)->
       assert request, "#{filename} missing request section"
       [method_and_path, header_lines...] = request.split(/\n/)
@@ -106,7 +109,7 @@ class Catalog
       else
         [method, path] = method_and_path.split(/\s/)
       assert method && (path || regexp), "#{filename}: first line must be <method> <path>"
-      headers = parseHeaders(filename, header_lines, REQUEST_HEADERS)
+      headers = parseHeaders(filename, header_lines, request_headers)
       body = headers["body"]
       delete headers["body"]
       return { url: path || regexp, method: method, headers: headers, body: body }

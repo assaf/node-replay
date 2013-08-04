@@ -132,6 +132,31 @@ describe "Replay", ->
       File.rmdir(@fixturesDir)
 
 
+
+  describe "only specified headers", ->
+
+    before setup
+
+    before ->
+      Replay.mode = "record"
+      Replay.request_headers = [/^authorization/, /^content-type/, /^host/, /^if-/, /^x-/]
+      @fixturesDir = "#{__dirname}/fixtures/127.0.0.1-#{HTTP_PORT}"
+
+    before (done)->
+      HTTP.get(hostname: "127.0.0.1", port: HTTP_PORT, path: "/", headers: { accept: "application/json" }, (response)->
+        response.on("end", done)
+      ).on("error", done)
+
+    it "should not store the accept header", ->
+      files = File.readdirSync(@fixturesDir)
+      fixture = File.readFileSync("#{@fixturesDir}/#{files[0]}", "utf8")
+      assert !/accept/.test fixture
+
+    after ->
+      for file in File.readdirSync(@fixturesDir)
+        File.unlinkSync("#{@fixturesDir}/#{file}")
+      File.rmdir(@fixturesDir)
+
   # Send responses to non-existent server on inactive port. No matching fixture for that path, expect a 404.
   describe "undefined path", ->
     before ->
