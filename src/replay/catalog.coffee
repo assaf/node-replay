@@ -1,7 +1,8 @@
-assert  = require("assert")
-File    = require("fs")
-Path    = require("path")
-Matcher = require("./matcher")
+assert         = require("assert")
+File           = require("fs")
+Path           = require("path")
+Matcher        = require("./matcher")
+jsStringEscape = require("js-string-escape")
 
 exists = File.exists || Path.exists
 existsSync = File.existsSync || Path.existsSync
@@ -81,8 +82,8 @@ class Catalog
         if request.body
           body = ""
           body += chunks[0] for chunks in request.body
-          writeHeaders file, body: body
-        file.write "\n"
+          writeHeaders file, body: jsStringEscape(body)
+        file.write "\n\n"
         # Response part
         file.write "#{response.status || 200} HTTP/#{response.version || "1.1"}\n"
         writeHeaders file, response.headers
