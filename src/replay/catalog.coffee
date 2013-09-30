@@ -1,7 +1,8 @@
-assert  = require("assert")
-File    = require("fs")
-Path    = require("path")
-Matcher = require("./matcher")
+assert         = require("assert")
+File           = require("fs")
+Path           = require("path")
+Matcher        = require("./matcher")
+jsStringEscape = require("js-string-escape")
 
 exists = File.exists || Path.exists
 existsSync = File.existsSync || Path.existsSync
@@ -25,7 +26,7 @@ mkdir = (pathname, callback)->
 
 
 # Only these request headers are stored in the catalog.
-REQUEST_HEADERS = [/^accept/, /^authorization/, /^content-type/, /^host/, /^if-/, /^x-/]
+REQUEST_HEADERS = [/^accept/, /^authorization/, /^content-type/, /^host/, /^if-/, /^x-/, /^body/]
 
 
 class Catalog
@@ -78,7 +79,12 @@ class Catalog
         file = File.createWriteStream(tmpfile, encoding: "utf-8")
         file.write "#{request.method.toUpperCase()} #{request.url.path || "/"}\n"
         writeHeaders file, request.headers, REQUEST_HEADERS
-        file.write "\n"
+        if request.body
+          body = ""
+          for chunks in request.body
+            body += chunks[0]
+          writeHeaders file, body: jsStringEscape(body)
+        file.write "\n\n"
         # Response part
         file.write "#{response.status || 200} HTTP/#{response.version || "1.1"}\n"
         writeHeaders file, response.headers

@@ -132,6 +132,91 @@ describe "Replay", ->
       File.rmdir(@fixturesDir)
 
 
+  describe "recording POST data", ->
+    before setup
+
+    before ->
+      Replay.mode = "record"
+      @fixturesDir = "#{__dirname}/fixtures/127.0.0.1-#{HTTP_PORT}"
+
+    before (done)->
+      request = HTTP.request(hostname: "127.0.0.1", port: HTTP_PORT, method: "post", path: "/post-data", (response)->
+        response.on("end", done)
+      ).on("error", done)
+      request.write("request data")
+      request.end()
+
+    it "should save POST request data", ->
+      has_data = false
+      files = File.readdirSync(@fixturesDir)
+      fixture = File.readFileSync("#{@fixturesDir}/#{files[0]}", "utf8")
+      for line in fixture.split("\n")
+        has_data = true if line == "body: request data"
+      assert has_data
+
+    after ->
+      for file in File.readdirSync(@fixturesDir)
+        File.unlinkSync("#{@fixturesDir}/#{file}")
+      File.rmdir(@fixturesDir)
+
+  describe "recording multi-line POST data", ->
+    before setup
+
+    before ->
+      Replay.mode = "record"
+      @fixturesDir = "#{__dirname}/fixtures/127.0.0.1-#{HTTP_PORT}"
+
+    before (done)->
+      request = HTTP.request(hostname: "127.0.0.1", port: HTTP_PORT, method: "post", path: "/post-data", (response)->
+        response.on("end", done)
+      ).on("error", done)
+      request.write "line1\nline2\nline3"
+      request.end()
+
+    it "should save POST request data", ->
+      files = File.readdirSync(@fixturesDir)
+      fixture = File.readFileSync("#{@fixturesDir}/#{files[0]}", "utf8")
+      assert fixture.split("\n")[1] == "body: line1\\nline2\\nline3"
+
+    after ->
+      for file in File.readdirSync(@fixturesDir)
+        File.unlinkSync("#{@fixturesDir}/#{file}")
+      File.rmdir(@fixturesDir)
+
+  describe "replaying with POST body", ->
+    before ->
+      Replay.mode = "replay"
+
+    describe "matching", ->
+      before (done)->
+        request = HTTP.request(hostname: "example.com", port: INACTIVE_PORT, path: "/post-body", method: "post")
+        request.on "response", (@response)=>
+          response.on "end", done
+        request.on("error", done)
+        request.write("request body")
+        request.end()
+
+      it "should return status code", ->
+        assert.equal @response.statusCode, 200
+
+  describe "replaying with multi-line POST body", ->
+    before ->
+      Replay.mode = "replay"
+
+    describe "matching", ->
+      before (done)->
+        request = HTTP.request(hostname: "example.com", port: INACTIVE_PORT, path: "/post-body-multi", method: "post")
+        request.on "response", (@response)=>
+          response.on "end", done
+        request.on("error", done)
+        request.write """line1
+        line2
+        line3"""
+        request.end()
+
+      it "should return status code", ->
+        assert.equal @response.statusCode, 200
+
   # Send responses to non-existent server on inactive port. No matching fixture for that path, expect a 404.
   describe "undefined path", ->
     before ->

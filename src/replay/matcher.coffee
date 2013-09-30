@@ -16,9 +16,9 @@
 # trailers  - Trailers object (names are lower case)
 
 
-assert  = require("assert")
-URL     = require("url")
-
+assert         = require("assert")
+URL            = require("url")
+jsStringEscape = require("js-string-escape")
 
 # Simple implementation of a matcher.
 #
@@ -80,7 +80,12 @@ class Matcher
     return false unless @method == method
     for name, value of @headers
       return false if value != headers[name]
-    return false if @body && @body != body
+    if body
+      data = ""
+      for chunks in body
+        data += chunks[0]
+      data = jsStringEscape(data)
+      return false if @body && @body != data
     return true
 
 
