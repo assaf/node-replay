@@ -81,7 +81,8 @@ class Catalog
         writeHeaders file, request.headers, REQUEST_HEADERS
         if request.body
           body = ""
-          body += chunks[0] for chunks in request.body
+          for chunks in request.body
+            body += chunks[0]
           writeHeaders file, body: jsStringEscape(body)
         file.write "\n\n"
         # Response part

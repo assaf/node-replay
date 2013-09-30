@@ -82,7 +82,8 @@ class Matcher
       return false if value != headers[name]
     if body
       data = ""
-      data += chunks[0] for chunks in body
+      for chunks in body
+        data += chunks[0]
       data = jsStringEscape(data)
       return false if @body && @body != data
     return true
