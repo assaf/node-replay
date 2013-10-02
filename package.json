@@ -19,8 +19,8 @@
     "lib": "./lib"
   },
   "scripts": {
-    "build": "coffee --bare --compile --lint --output lib/replay src/replay/*.coffee",
-    "prepublish": "coffee --bare --compile --lint --output lib/replay src/replay/*.coffee",
+    "build": "coffee --bare --compile --output lib/replay src/replay/*.coffee",
+    "prepublish": "coffee --bare --compile --output lib/replay src/replay/*.coffee",
     "postpublish": "rm -rf lib",
     "test": "./node_modules/.bin/mocha"
   },
@@ -28,7 +28,7 @@
     "js-string-escape": "~1.0.0"
   },
   "devDependencies": {
-    "coffee-script":  "~1.6.2",
+    "coffee-script":  "~1.6.3",
     "express":        "~3.4.0",
     "mocha":          "~1.13.0",
     "async":          "~0.2.9",
