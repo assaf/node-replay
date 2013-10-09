@@ -1,3 +1,9 @@
+## Version 1.8.0 2013-10-01
+
+Added support for capturing and filtering on POST request body (Jerome
+Gravel-Niquet)
+
+
 ## Version 1.7.0 2013-05-06
 
 Support Windows by creating directories of the form host-port instead of
