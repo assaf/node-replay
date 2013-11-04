@@ -84,7 +84,7 @@ class Catalog
           for chunks in request.body
             body += chunks[0]
           writeHeaders file, body: jsStringEscape(body)
-        file.write "\n\n"
+        file.write "\n"
         # Response part
         file.write "#{response.status || 200} HTTP/#{response.version || "1.1"}\n"
         writeHeaders file, response.headers
