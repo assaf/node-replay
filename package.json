@@ -29,8 +29,8 @@
   },
   "devDependencies": {
     "coffee-script":  "~1.6.3",
-    "express":        "~3.4.0",
-    "mocha":          "~1.13.0",
+    "express":        "~3.4.4",
+    "mocha":          "~1.14.0",
     "async":          "~0.2.9",
     "request":        "~2.27.0"
   },
