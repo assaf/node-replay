@@ -1,3 +1,8 @@
+## Version 1.9.1 2013-12-05
+
+Fix "Recursive nextTick" warning (Drew Stokes)
+
+
 ## Version 1.9.0 2013-11-04
 
 Added support for specifying which headers are stored when recording, and used
