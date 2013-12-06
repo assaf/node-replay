@@ -19,10 +19,10 @@
     "lib": "./lib"
   },
   "scripts": {
-    "build": "coffee --bare --compile --output lib/replay src/replay/*.coffee",
-    "prepublish": "coffee --bare --compile --output lib/replay src/replay/*.coffee",
-    "postpublish": "rm -rf lib",
-    "test": "./node_modules/.bin/mocha"
+    "build":        "coffee --bare --compile --output lib/replay src/replay/*.coffee",
+    "prepublish":   "coffee --bare --compile --output lib/replay src/replay/*.coffee",
+    "postpublish":  "rm -rf lib",
+    "test":         "./node_modules/.bin/mocha"
   },
   "dependencies": {
     "js-string-escape": "~1.0.0"
