@@ -29,6 +29,10 @@ HTTP              = require("http")
 Stream            = require("stream")
 URL               = require("url")
 
+if typeof setImmediate is 'function'
+  nextTick = setImmediate
+else
+  nextTick = process.nextTick
 
 # HTTP client request that captures the request and sends it down the processing chain.
 class ProxyRequest extends HTTP.ClientRequest
@@ -123,7 +127,7 @@ class ProxyResponse extends Stream
 
   resume: ->
     @_paused = false
-    process.nextTick =>
+    nextTick =>
       return if @_paused || !@_body
       part = @_body.shift()
       if part
