@@ -96,6 +96,10 @@ class Replay extends EventEmitter
       delete @_ignored[host]
       delete @_localhosts[host]
 
+  # Clears loaded fixtures, and updates to new dir
+  setFixturesDir: (dir)->
+    @catalog.setFixturesDir(dir)
+
   # True if this host is allowed network access.
   isAllowed: (host)->
     return !!@_allowed[host]

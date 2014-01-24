@@ -30,6 +30,11 @@ class Catalog
     # We use this to cache host/host:port mapped to array of matchers.
     @matchers = {}
 
+  setFixturesDir: (dir)->
+    @settings.fixtures = dir;
+    @_basedir = null;
+    @matchers = {}
+
   find: (host)->
     # Return result from cache.
     matchers = @matchers[host]
@@ -71,6 +76,9 @@ class Catalog
     mkdir pathname, (error)->
       return callback error if error
       filename = "#{pathname}/#{uid}"
+      filename += "#{request.method.toUpperCase()}"
+      filename += "#{request.url.path.replace(/\//g, "_")}_"
+      filename += "#{response.status}_#{uid}"
 
       try
         file = File.createWriteStream(tmpfile, encoding: "utf-8")
