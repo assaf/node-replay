@@ -13,6 +13,9 @@ HTTP.request = (options, callback)->
   # WebSocket request: pass through to Node.js library
   if options && options.headers && options.headers["Upgrade"] == "websocket"
     return httpRequest(options, callback)
+  hostname = options.hostname || (options.host && options.host.split(":")[0]) || "localhost"
+  if Replay.isLocalhost(hostname)
+    return httpRequest(options, callback)
   # Proxy request
   request = new ProxyRequest(options, Replay, Replay.chain.start)
   if callback
