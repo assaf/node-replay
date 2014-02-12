@@ -1,0 +1,10 @@
+GET /gzip
+
+200 HTTP/1.1
+x-powered-by: Express
+content-encoding: gzip
+date: Wed, 12 Feb 2014 10:27:23 GMT
+connection: keep-alive
+transfer-encoding: chunked
+
+H4sIAAAAAAAAA/NIzcnJBwCCidH3BQAAAA==

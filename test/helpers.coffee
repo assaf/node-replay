@@ -12,6 +12,7 @@ HTTPS   = require("https")
 Replay  = require("../src/replay")
 File    = require("fs")
 Async   = require("async")
+Zlib    = require("zlib")
 
 
 HTTP_PORT     = 3004
@@ -57,6 +58,11 @@ server.get "/set-cookie", (req, res)->
 # POST data
 server.post "/post-data", (req, res)->
   res.send 200
+# Gzipped data
+server.get "/gzip", (req, res)->
+  Zlib.gzip 'Hello', (err, buf)->
+    res.writeHead 200, {'content-encoding': 'gzip'}
+    res.end buf
 
 
 # Setup environment for running tests.

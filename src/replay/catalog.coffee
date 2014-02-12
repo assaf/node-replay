@@ -86,8 +86,11 @@ class Catalog
         file.write "#{response.status || 200} HTTP/#{response.version || "1.1"}\n"
         writeHeaders file, response.headers
         file.write "\n"
-        for part in response.body
-          file.write part
+        if response.headers['content-encoding'] && response.headers['content-encoding'].match(/(gzip|deflate)/)
+          file.write Buffer.concat(response.body).toString('base64')
+        else
+          for part in response.body
+            file.write part
         file.end ->
           File.rename tmpfile, filename, callback
           callback null
@@ -122,7 +125,11 @@ class Catalog
         status = parseInt(status_line.split()[0], 10)
         version = status_line.match(/\d.\d$/)
         headers = parseHeaders(filename, header_lines)
-      return { status: status, version: version, headers: headers, body: body.join("\n\n") }
+        if headers['content-encoding'] && headers['content-encoding'].match(/(gzip|deflate)/)
+          body =  new Buffer body.join(), 'base64'
+        else
+          body = body.join("\n\n")
+      return { status: status, version: version, headers: headers, body: body }
 
     [request, response, body...] = File.readFileSync(filename, "utf-8").split(/\n\n/)
     return { request: parse_request(request), response: parse_response(response, body) }
