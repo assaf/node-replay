@@ -132,11 +132,11 @@ replay = new Replay(process.env.REPLAY || "replay")
 
 # The default processing chain (from first to last):
 # - Pass through requests to localhost
-# - Log request to console is `deubg` is true
+# - Log request to console if `debug` is true
 # - Replay recorded responses
 # - Pass through requests in bloody and cheat modes
 passWhenBloodyOrCheat = (request)->
-  return replay.isAllowed(request.url.hostname) ||
+  return replay.isAllowed(request.url.hostname) || replay.isIgnored(request.url.hostname) ||
          (replay.mode == "cheat" && !replay.isIgnored(request.url.hostname))
 passToLocalhost = (request)->
   return replay.isLocalhost(request.url.hostname) ||

@@ -1,6 +1,7 @@
 {  setup, HTTP_PORT, HTTPS_PORT, INACTIVE_PORT } = require("./helpers")
 assert  = require("assert")
 File    = require("fs")
+Zlib    = require("zlib")
 HTTP    = require("http")
 HTTPS   = require("https")
 Request = require("request")
@@ -185,6 +186,32 @@ describe "Replay", ->
       File.rmdir(@fixturesDir)
 
 
+  describe "recording gzipped data", ->
+    before setup
+
+    before ->
+      Replay.mode = "record"
+      @fixturesDir = "#{__dirname}/fixtures/127.0.0.1-#{HTTP_PORT}"
+
+    before (done)->
+      request = HTTP.get(hostname: "127.0.0.1", port: HTTP_PORT, path: "/gzip", (response)->
+        response.on("end", done)
+      ).on("error", done)
+
+    it "should save gzip data as base64", ->
+      has_base64 = false
+      files = File.readdirSync(@fixturesDir)
+      fixture = File.readFileSync("#{@fixturesDir}/#{files[0]}", "utf8")
+      for line in fixture.split("\n")
+        has_base64 = true if line == "H4sIAAAAAAAAA/NIzcnJBwCCidH3BQAAAA=="
+      assert has_base64
+
+    after ->
+      for file in File.readdirSync(@fixturesDir)
+        File.unlinkSync("#{@fixturesDir}/#{file}")
+      File.rmdir(@fixturesDir)
+
+
   describe "replaying with POST body", ->
     before ->
       Replay.mode = "replay"
@@ -219,6 +246,32 @@ describe "Replay", ->
 
       it "should return status code", ->
         assert.equal @response.statusCode, 200
+
+
+  describe "replaying with gzipped body", ->
+    before ->
+      Replay.mode = "replay"
+
+    describe "matching", ->
+      before (done)->
+        request = HTTP.get(hostname: "example.com", port: INACTIVE_PORT, path: "/gzip")
+        request.on "response", (@response)=>
+          gunzip = Zlib.createGunzip()
+          buffer = []
+          response.pipe gunzip
+          gunzip.on "error", done
+          gunzip.on "data", (data)->
+            buffer.push data.toString()
+          gunzip.on "end", ->
+            response.body = buffer.join()
+            done null, response.body
+        request.on("error", done)
+
+      it "should return status code", ->
+        assert.equal @response.statusCode, 200
+
+      it "should return gzipped data", ->
+        assert.equal @response.body, "Hello"
 
 
   describe "only specified headers", ->
