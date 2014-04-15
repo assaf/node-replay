@@ -122,11 +122,16 @@ class Catalog
         status = parseInt(status_line.split()[0], 10)
         version = status_line.match(/\d.\d$/)
         headers = parseHeaders(filename, header_lines)
-      return { status: status, version: version, headers: headers, body: body.join("\n\n") }
+      return { status: status, version: version, headers: headers, body: body }
 
-    [request, response, body...] = File.readFileSync(filename, "utf-8").split(/\n\n/)
+    [request, response, body] = readAndInitialParseFile(filename)
     return { request: parse_request(request), response: parse_response(response, body) }
 
+readAndInitialParseFile = (filename)->
+  buffer = File.readFileSync filename
+  parts = buffer.toString('utf8').split('\n\n')
+  body = new Buffer(buffer.slice(parts[0] + '\n\n' + parts[1] + '\n\n').length)
+  return [parts[0], parts[1], body]
 
 # Parse headers from header_lines.  Optional argument `only` is an array of
 # regular expressions; only headers matching one of these expressions are
