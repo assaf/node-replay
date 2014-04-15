@@ -130,7 +130,10 @@ class Catalog
 readAndInitialParseFile = (filename)->
   buffer = File.readFileSync filename
   parts = buffer.toString('utf8').split('\n\n')
-  body = new Buffer(buffer.slice(parts[0] + '\n\n' + parts[1] + '\n\n').length)
+  if parts.length > 2
+    body = new Buffer(buffer.slice((parts[0] + '\n\n' + parts[1] + '\n\n').length))
+  else
+    body = ''
   return [parts[0], parts[1], body]
 
 # Parse headers from header_lines.  Optional argument `only` is an array of
