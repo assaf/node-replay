@@ -5,13 +5,14 @@
 # Port 3443 has a live https server
 
 
-DNS     = require("dns")
-express = require("express")
-HTTP    = require("http")
-HTTPS   = require("https")
-Replay  = require("../src/replay")
-File    = require("fs")
-Async   = require("async")
+DNS         = require("dns")
+express     = require("express")
+bodyParser  = require("body-parser")
+HTTP        = require("http")
+HTTPS       = require("https")
+Replay      = require("../src/replay")
+File        = require("fs")
+Async       = require("async")
 
 
 HTTP_PORT     = 3004
@@ -39,7 +40,7 @@ DNS.lookup = (domain, callback)->
 
 # Serve pages from localhost.
 server = express()
-server.use(express.bodyParser())
+server.use(bodyParser())
 # Success page.
 server.get "/", (req, res)->
   res.send "Success!"
