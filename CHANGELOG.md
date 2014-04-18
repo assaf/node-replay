@@ -10,6 +10,8 @@ FIXED compatibility with superagent and supertest (Jerome Touffe-Blin)
 
 FIXED support http.get([string]) 
 
+FIXED request headers are stringified before processing
+
 
 ## Version 1.9.1 2013-12-05
 
