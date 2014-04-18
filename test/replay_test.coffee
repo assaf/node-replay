@@ -93,6 +93,40 @@ describe "Replay", ->
     it "should match a fixture", ->
       assert.equal @body, "Aregexp2"
 
+  describe "matching when changing fixtures dir", ->
+    before ->
+      Replay.mode = "replay"
+
+    it "should match response before switch", (done)->
+      doAsserts = ()=>
+        assert.equal @response.headers.date, "Tue, 29 Nov 2011 03:12:15 GMT"
+        assert.equal @body, "Nice and warm\n"
+        done()
+
+      HTTP.get(hostname: "example.com", port: INACTIVE_PORT, path: "/weather?c=94606", (@response)=>
+        @body = ""
+        @response.on "data", (chunk)=>
+          @body += chunk
+        @response.on "end", doAsserts
+      ).on("error", done)
+
+    it "should match response after switch", (done)->
+      Replay.setFixturesDir("#{__dirname}/fixtures/other-fixtures-dir")
+
+      doAsserts = ()=>
+        assert.equal @response.headers.date, "Tue, 30 Nov 2011 03:12:15 GMT"
+        assert.equal @body, "Sweet and cold\n"
+        done()
+
+      HTTP.get(hostname: "example.com", port: INACTIVE_PORT, path: "/weather?c=94606", (@response)=>
+        @body = ""
+        @response.on "data", (chunk)=>
+          @body += chunk
+        @response.on "end", doAsserts
+      ).on("error", done)
+
+    after ->
+      Replay.setFixturesDir("#{__dirname}/fixtures")
 
   describe "recording multiple of the same header", ->
 
