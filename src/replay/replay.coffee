@@ -59,7 +59,6 @@ class Replay extends EventEmitter
       throw new Error("Unsupported mode '#{mode}', must be one of #{MODES.join(", ")}.")
     @chain = new Chain()
     @debug = !!process.env.DEBUG
-    @fixtures = null
     @logger =
       log:    (message)=>
         if @debug
@@ -96,10 +95,6 @@ class Replay extends EventEmitter
       delete @_ignored[host]
       delete @_localhosts[host]
 
-  # Clears loaded fixtures, and updates to new dir
-  setFixturesDir: (dir)->
-    @catalog.setFixturesDir(dir)
-
   # True if this host is allowed network access.
   isAllowed: (host)->
     return !!@_allowed[host]
@@ -129,6 +124,13 @@ class Replay extends EventEmitter
   # True if this host should be treated as localhost.
   isLocalhost: (host)->
     return !!@_localhosts[host]
+
+  @prototype.__defineGetter__ "fixtures", ->
+    @catalog.getFixturesDir()
+
+  @prototype.__defineSetter__ "fixtures", (dir)->
+    # Clears loaded fixtures, and updates to new dir
+    @catalog.setFixturesDir(dir)
 
 
 replay = new Replay(process.env.REPLAY || "replay")

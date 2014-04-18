@@ -1,5 +1,9 @@
 ## Version 1.10.0 2013-12-05
 
+Support dynamic switching of fixtures (Pål Ruud):
+
+  Replay.fixtures = "fixture-directory-2"
+
 Fix compatibility with superagent and supertest (Jerome Touffe-Blin)
 
 

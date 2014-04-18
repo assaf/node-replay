@@ -29,11 +29,15 @@ class Catalog
   constructor: (@settings)->
     # We use this to cache host/host:port mapped to array of matchers.
     @matchers = {}
+    @_basedir = Path.resolve("fixtures")
+
+  getFixturesDir: ->
+    return @_basedir
 
   setFixturesDir: (dir)->
-    @settings.fixtures = dir;
-    @_basedir = null;
+    @_basedir = Path.resolve(dir)
     @matchers = {}
+    return
 
   find: (host)->
     # Return result from cache.
@@ -43,9 +47,9 @@ class Catalog
 
     # Start by looking for directory and loading each of the files.
     # Look for host-port (windows friendly) or host:port (legacy)
-    pathname = "#{@basedir}/#{host.replace(":", "-")}"
+    pathname = "#{@getFixturesDir()}/#{host.replace(":", "-")}"
     unless existsSync(pathname)
-      pathname = "#{@basedir}/#{host}"
+      pathname = "#{@getFixturesDir()}/#{host}"
     unless existsSync(pathname)
       return
     stat = File.statSync(pathname)
@@ -69,8 +73,8 @@ class Catalog
     request_headers = @settings.headers
 
     uid = +new Date + "" + Math.floor(Math.random() * 100000)
-    tmpfile = "#{@basedir}/node-replay.#{uid}"
-    pathname = "#{@basedir}/#{host.replace(":", "-")}"
+    tmpfile = "#{@getFixturesDir()}/node-replay.#{uid}"
+    pathname = "#{@getFixturesDir()}/#{host.replace(":", "-")}"
     logger = request.replay.logger
     logger.log "Creating #{pathname}"
     mkdir pathname, (error)->
@@ -98,10 +102,6 @@ class Catalog
           callback null
       catch error
         callback error
-
-  @prototype.__defineGetter__ "basedir", ->
-    @_basedir ?= Path.resolve(@settings.fixtures || "fixtures")
-    return @_basedir
 
   _read: (filename)->
     request_headers = @settings.headers

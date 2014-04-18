@@ -111,7 +111,7 @@ describe "Replay", ->
       ).on("error", done)
 
     it "should match response after switch", (done)->
-      Replay.setFixturesDir("#{__dirname}/fixtures/other-fixtures-dir")
+      Replay.fixtures = "#{__dirname}/fixtures/other-fixtures-dir"
 
       doAsserts = ()=>
         assert.equal @response.headers.date, "Tue, 30 Nov 2011 03:12:15 GMT"
@@ -126,7 +126,7 @@ describe "Replay", ->
       ).on("error", done)
 
     after ->
-      Replay.setFixturesDir("#{__dirname}/fixtures")
+      Replay.fixtures = "#{__dirname}/fixtures"
 
   describe "recording multiple of the same header", ->
 
