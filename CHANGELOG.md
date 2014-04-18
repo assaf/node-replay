@@ -1,3 +1,8 @@
+## Version 1.10.0 2013-12-05
+
+Fix compatibility with superagent and supertest (Jerome Touffe-Blin)
+
+
 ## Version 1.9.1 2013-12-05
 
 Fix "Recursive nextTick" warning (Drew Stokes)
