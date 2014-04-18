@@ -1,5 +1,7 @@
 ## Version 1.10.0 2013-12-05
 
+Support recording and serving images (Rajit).
+
 Support dynamic switching of fixtures (Pål Ruud):
 
   Replay.fixtures = "fixture-directory-2"
