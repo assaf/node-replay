@@ -1,12 +1,14 @@
 ## Version 1.10.0 2013-12-05
 
-Support recording and serving images (Rajit).
+CHANGED Support recording and serving images (Rajit).
 
-Support dynamic switching of fixtures (Pål Ruud):
+CHANGED Support dynamic switching of fixtures (Pål Ruud):
 
   Replay.fixtures = "fixture-directory-2"
 
-Fix compatibility with superagent and supertest (Jerome Touffe-Blin)
+FIXED compatibility with superagent and supertest (Jerome Touffe-Blin)
+
+FIXED support http.get([string]) 
 
 
 ## Version 1.9.1 2013-12-05

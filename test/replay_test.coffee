@@ -18,7 +18,7 @@ describe "Replay", ->
       
     describe "listeners", ->
       before (done)->
-        HTTP.get(hostname: "example.com", port: INACTIVE_PORT, path: "/weather?c=94606", (@response)=>
+        HTTP.get("http://example.com:#{INACTIVE_PORT}/weather?c=94606", (@response)=>
           done()
         ).on("error", done)
 
