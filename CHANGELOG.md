@@ -1,4 +1,4 @@
-## Version 1.10.0 2013-12-05
+## Version 1.10.0 2014-04-18
 
 CHANGED Support recording and serving images (Rajit).
 
