@@ -133,13 +133,11 @@ class Catalog
     return { request: parse_request(request), response: parse_response(response, body) }
 
 readAndInitialParseFile = (filename)->
-  buffer = File.readFileSync filename
+  buffer = File.readFileSync(filename)
   parts = buffer.toString('utf8').split('\n\n')
   if parts.length > 2
-    body = new Buffer(buffer.slice((parts[0] + '\n\n' + parts[1] + '\n\n').length))
-  else
-    body = ''
-  return [parts[0], parts[1], body]
+    body = buffer.slice(parts[0].length + parts[1].length + 4)
+  return [parts[0], parts[1], body || '']
 
 # Parse headers from header_lines.  Optional argument `only` is an array of
 # regular expressions; only headers matching one of these expressions are
