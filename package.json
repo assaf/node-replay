@@ -1,7 +1,7 @@
 {
   "name": "replay",
   "description": "When API testing slows you down: record and replay HTTP responses like a boss",
-  "version": "1.10.0",
+  "version": "1.10.1",
   "author": "Assaf Arkin <assaf@labnotes.org> (http://labnotes.org/)",
   "keywords": [
     "test",
