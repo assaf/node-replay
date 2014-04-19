@@ -1,5 +1,7 @@
 ## Version 1.10.1 2014-04-19
 
+FIXED bug with header stringifying
+
 CHANGED run with DEBUG=replay or DEBUG=all
 
 
