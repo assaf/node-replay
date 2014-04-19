@@ -1,3 +1,8 @@
+## Version 1.10.1 2014-04-19
+
+CHANGED run with DEBUG=replay or DEBUG=all
+
+
 ## Version 1.10.0 2014-04-18
 
 CHANGED Support recording and serving images (Rajit).

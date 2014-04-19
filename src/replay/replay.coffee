@@ -31,7 +31,7 @@ MATCH_HEADERS = [/^accept/, /^authorization/, /^body/, /^content-type/, /^host/,
 #             proxy to the chain.
 #
 # debug     - Set this to true to dump more information to the console, or run
-#             with DEBUG=true
+#             with DEBUG=replay
 #
 # headers   - Only these headers are matched when recording/replaying.  A list
 #             of regular expressions.
@@ -58,7 +58,7 @@ class Replay extends EventEmitter
     unless ~MODES.indexOf(mode)
       throw new Error("Unsupported mode '#{mode}', must be one of #{MODES.join(", ")}.")
     @chain = new Chain()
-    @debug = !!process.env.DEBUG
+    @debug = /\b(all|replay)\b/.test(process.env.DEBUG)
     @logger =
       log:    (message)=>
         if @debug
