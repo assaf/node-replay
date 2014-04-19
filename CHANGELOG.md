@@ -1,3 +1,8 @@
+## Version 1.10.2 2014-04-19
+
+FIXED bug with header stringifying (for realz now)
+
+
 ## Version 1.10.1 2014-04-19
 
 FIXED bug with header stringifying
