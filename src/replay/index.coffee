@@ -3,6 +3,7 @@ HTTP          = require("http")
 HTTPS         = require("https")
 ProxyRequest  = require("./proxy")
 Replay        = require("./replay")
+URL           = require("url")
 
 
 httpRequest = HTTP.request
@@ -10,6 +11,9 @@ httpRequest = HTTP.request
 
 # Route HTTP requests to our little helper.
 HTTP.request = (options, callback)->
+  if typeof(options) == "string" || options instanceof String
+    options = URL.parse(options)
+
   # WebSocket request: pass through to Node.js library
   if options && options.headers && options.headers["Upgrade"] == "websocket"
     return httpRequest(options, callback)

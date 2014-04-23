@@ -1,3 +1,30 @@
+## Version 1.10.2 2014-04-19
+
+FIXED bug with header stringifying (for realz now)
+
+
+## Version 1.10.1 2014-04-19
+
+FIXED bug with header stringifying
+
+CHANGED run with DEBUG=replay or DEBUG=all
+
+
+## Version 1.10.0 2014-04-18
+
+CHANGED Support recording and serving images (Rajit).
+
+CHANGED Support dynamic switching of fixtures (Pål Ruud):
+
+  Replay.fixtures = "fixture-directory-2"
+
+FIXED compatibility with superagent and supertest (Jerome Touffe-Blin)
+
+FIXED support http.get([string]) 
+
+FIXED request headers are stringified before processing
+
+
 ## Version 1.9.1 2013-12-05
 
 Fix "Recursive nextTick" warning (Drew Stokes)

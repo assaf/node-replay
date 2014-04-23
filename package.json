@@ -1,7 +1,7 @@
 {
   "name": "replay",
   "description": "When API testing slows you down: record and replay HTTP responses like a boss",
-  "version": "1.9.2",
+  "version": "1.10.2",
   "author": "Assaf Arkin <assaf@labnotes.org> (http://labnotes.org/)",
   "keywords": [
     "test",
@@ -28,11 +28,12 @@
     "js-string-escape": "~1.0.0"
   },
   "devDependencies": {
-    "coffee-script":  "~1.6.3",
-    "express":        "~3.4.4",
-    "mocha":          "~1.14.0",
-    "async":          "~0.2.9",
-    "request":        "~2.27.0"
+    "body-parser":    "1.0.2",
+    "coffee-script":  "1.6.3",
+    "express":        "4.0.0",
+    "mocha":          "1.18.2",
+    "async":          "0.7.0",
+    "request":        "2.34.0"
   },
   "repository": {
     "type": "git",

@@ -250,7 +250,7 @@ If you're running into trouble, try turning debugging mode on.  It helps.
 Sometimes.
 
 ```
-$ DEBUG=true node test.js
+$ DEBUG=replay node test.js
 Requesting http://www.iheartquotes.com:80/api/v1/random
 Woot!
 ```

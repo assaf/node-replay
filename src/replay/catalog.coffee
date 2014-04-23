@@ -29,6 +29,15 @@ class Catalog
   constructor: (@settings)->
     # We use this to cache host/host:port mapped to array of matchers.
     @matchers = {}
+    @_basedir = Path.resolve("fixtures")
+
+  getFixturesDir: ->
+    return @_basedir
+
+  setFixturesDir: (dir)->
+    @_basedir = Path.resolve(dir)
+    @matchers = {}
+    return
 
   find: (host)->
     # Return result from cache.
@@ -38,9 +47,9 @@ class Catalog
 
     # Start by looking for directory and loading each of the files.
     # Look for host-port (windows friendly) or host:port (legacy)
-    pathname = "#{@basedir}/#{host.replace(":", "-")}"
+    pathname = "#{@getFixturesDir()}/#{host.replace(":", "-")}"
     unless existsSync(pathname)
-      pathname = "#{@basedir}/#{host}"
+      pathname = "#{@getFixturesDir()}/#{host}"
     unless existsSync(pathname)
       return
     stat = File.statSync(pathname)
@@ -64,8 +73,8 @@ class Catalog
     request_headers = @settings.headers
 
     uid = +new Date + "" + Math.floor(Math.random() * 100000)
-    tmpfile = "#{@basedir}/node-replay.#{uid}"
-    pathname = "#{@basedir}/#{host.replace(":", "-")}"
+    tmpfile = "#{@getFixturesDir()}/node-replay.#{uid}"
+    pathname = "#{@getFixturesDir()}/#{host.replace(":", "-")}"
     logger = request.replay.logger
     logger.log "Creating #{pathname}"
     mkdir pathname, (error)->
@@ -93,10 +102,6 @@ class Catalog
           callback null
       catch error
         callback error
-
-  @prototype.__defineGetter__ "basedir", ->
-    @_basedir ?= Path.resolve(@settings.fixtures || "fixtures")
-    return @_basedir
 
   _read: (filename)->
     request_headers = @settings.headers
@@ -128,13 +133,11 @@ class Catalog
     return { request: parse_request(request), response: parse_response(response, body) }
 
 readAndInitialParseFile = (filename)->
-  buffer = File.readFileSync filename
+  buffer = File.readFileSync(filename)
   parts = buffer.toString('utf8').split('\n\n')
   if parts.length > 2
-    body = new Buffer(buffer.slice((parts[0] + '\n\n' + parts[1] + '\n\n').length))
-  else
-    body = ''
-  return [parts[0], parts[1], body]
+    body = buffer.slice(parts[0].length + parts[1].length + 4)
+  return [parts[0], parts[1], body || '']
 
 # Parse headers from header_lines.  Optional argument `only` is an array of
 # regular expressions; only headers matching one of these expressions are
