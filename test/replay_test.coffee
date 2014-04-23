@@ -134,6 +134,7 @@ describe "Replay", ->
 
     before ->
       Replay.mode = "record"
+      Replay.allow "127.0.0.1"
       @fixturesDir = "#{__dirname}/fixtures/127.0.0.1-#{HTTP_PORT}"
 
     before (done)->
@@ -161,6 +162,7 @@ describe "Replay", ->
         assert.equal @headers["set-cookie"][1], "c2=v2; Path=/"
 
     after ->
+      Replay.localhost "127.0.0.1"
       for file in File.readdirSync(@fixturesDir)
         File.unlinkSync("#{@fixturesDir}/#{file}")
       File.rmdir(@fixturesDir)
@@ -171,6 +173,7 @@ describe "Replay", ->
 
     before ->
       Replay.mode = "record"
+      Replay.allow "127.0.0.1"
       @fixturesDir = "#{__dirname}/fixtures/127.0.0.1-#{HTTP_PORT}"
 
     before (done)->
@@ -189,6 +192,7 @@ describe "Replay", ->
       assert has_data
 
     after ->
+      Replay.localhost "127.0.0.1"
       for file in File.readdirSync(@fixturesDir)
         File.unlinkSync("#{@fixturesDir}/#{file}")
       File.rmdir(@fixturesDir)
@@ -199,6 +203,7 @@ describe "Replay", ->
 
     before ->
       Replay.mode = "record"
+      Replay.allow "127.0.0.1"
       @fixturesDir = "#{__dirname}/fixtures/127.0.0.1-#{HTTP_PORT}"
 
     before (done)->
@@ -214,6 +219,7 @@ describe "Replay", ->
       assert fixture.split("\n")[1] == "body: line1\\nline2\\nline3"
 
     after ->
+      Replay.localhost "127.0.0.1"
       for file in File.readdirSync(@fixturesDir)
         File.unlinkSync("#{@fixturesDir}/#{file}")
       File.rmdir(@fixturesDir)
@@ -261,6 +267,7 @@ describe "Replay", ->
 
     before ->
       Replay.mode = "record"
+      Replay.allow "127.0.0.1"
       # Drop the /accept/ header
       Replay.headers = Replay.headers.filter((header)-> !header.test('accept'))
       @fixturesDir = "#{__dirname}/fixtures/127.0.0.1-#{HTTP_PORT}"
@@ -276,6 +283,7 @@ describe "Replay", ->
       assert !/accept/.test fixture
 
     after ->
+      Replay.localhost "127.0.0.1"
       for file in File.readdirSync(@fixturesDir)
         File.unlinkSync("#{@fixturesDir}/#{file}")
       File.rmdir(@fixturesDir)

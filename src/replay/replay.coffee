@@ -68,7 +68,7 @@ class Replay extends EventEmitter
           console.error message
     @mode = mode
     # localhost servers. pass requests directly to host, and route to 127.0.0.1.
-    @_localhosts = { localhost: true }
+    @_localhosts = { localhost: true, '127.0.0.1': true }
     # allowed servers. allow network access to any servers listed here.
     @_allowed = { }
     # ignored servers. do not contact or record.
