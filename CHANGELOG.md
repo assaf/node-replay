@@ -1,3 +1,10 @@
+## Version 1.10.3 2014-04-19
+
+ADDED 127.0.0.1 to default localhost addresses (Rajit Singh)
+
+FIXED double callback issue on catalog save (Itay Adler)
+
+
 ## Version 1.10.2 2014-04-19
 
 FIXED bug with header stringifying (for realz now)
