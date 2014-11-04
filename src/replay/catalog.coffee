@@ -83,7 +83,7 @@ class Catalog
 
       try
         file = File.createWriteStream(tmpfile, encoding: "utf-8")
-        file.write "#{request.method.toUpperCase()} #{request.url.path || "/"}\n"
+        file.write "#{request.method.toUpperCase()} #{request.path || "/"}\n"
         writeHeaders file, request.headers, request_headers
         if request.body
           body = ""
