@@ -50,6 +50,9 @@ server.get "/404", (req, res)->
 # Internal error
 server.get "/500", (req, res)->
   res.send 500, "Boom!"
+# Query string
+server.get "/query", (req, res)->
+  res.send 200, {name: req.param('name'), extra: req.param('extra')}
 # Multiple set-cookie headers
 server.get "/set-cookie", (req, res)->
   res.cookie "c1", "v1"
