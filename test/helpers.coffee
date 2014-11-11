@@ -54,10 +54,10 @@ server.get "/500", (req, res)->
 server.get "/set-cookie", (req, res)->
   res.cookie "c1", "v1"
   res.cookie "c2", "v2"
-  res.send 200
+  res.sendStatus 200
 # POST data
 server.post "/post-data", (req, res)->
-  res.send 200
+  res.sendStatus 200
 
 
 # Setup environment for running tests.
