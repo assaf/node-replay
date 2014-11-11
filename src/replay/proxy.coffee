@@ -41,8 +41,8 @@ class ProxyRequest extends HTTP.ClientRequest
     [host, port] = (options.host || options.hostname).split(":")
     protocol = options.protocol || "http:"
     port = options.port || port || (if protocol == "https:" then 443 else 80)
-    @url = URL.parse("#{protocol}//#{host || "localhost"}:#{port}#{options.path || "/"}")
-    @path = @url.path
+    @url = URL.parse("#{protocol}//#{host || "localhost"}:#{port}#{options.path || "/"}", true)
+    @path = options.path || "/"
     @headers = {}
     if options.headers
       for n,v of options.headers
