@@ -1,4 +1,4 @@
-## Version 1.10.4 2014-11-10
+## Version 1.11.0 2014-11-10
 
 ADDED now saving query string as part of request URL
 
