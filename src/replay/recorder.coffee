@@ -19,7 +19,10 @@ recorded = (settings)->
 
     # Do not record this host.
     if settings.isIgnored(request.url.hostname)
-      callback null
+      refused = new Error("Error: connect ECONNREFUSED")
+      refused.code = refused.errno = "ECONNREFUSED"
+      refused.syscall = "connect"
+      callback refused
       return
 
     # In recording mode capture the response and store it.
@@ -29,7 +32,7 @@ recorded = (settings)->
         catalog.save host, request, response, (error)->
           callback error, response
       return
-   
+
     # Not in recording mode, pass control to the next proxy.
     callback null
 

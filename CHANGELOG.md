@@ -1,3 +1,8 @@
+## Version 1.10.4 2014-11-10
+
+FIXED when ignoring request, throw ECONNREFUSED error
+
+
 ## Version 1.10.3 2014-04-19
 
 ADDED 127.0.0.1 to default localhost addresses (Rajit Singh)
