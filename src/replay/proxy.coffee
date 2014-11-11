@@ -46,7 +46,10 @@ class ProxyRequest extends HTTP.ClientRequest
     @headers = {}
     if options.headers
       for n,v of options.headers
-        @headers[n.toLowerCase()] = if v && v.toString then v.toString() else ""
+        vStr = ''
+        if v != undefined && v != null
+          vStr = v.toString()
+        @headers[n.toLowerCase()] = vStr
 
   setHeader: (name, value)->
     assert !@ended, "Already called end"
