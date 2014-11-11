@@ -1,5 +1,7 @@
 ## Version 1.10.4 2014-11-10
 
+ADDED now saving query string as part of request URL
+
 FIXED when ignoring request, throw ECONNREFUSED error
 
 
