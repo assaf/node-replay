@@ -40,19 +40,19 @@ DNS.lookup = (domain, callback)->
 
 # Serve pages from localhost.
 server = express()
-server.use(bodyParser())
+server.use(bodyParser.urlencoded(extended: false))
 # Success page.
 server.get "/", (req, res)->
   res.send "Success!"
 # Not found
 server.get "/404", (req, res)->
-  res.send 404, "Not found"
+  res.status(404).send("Not found")
 # Internal error
 server.get "/500", (req, res)->
-  res.send 500, "Boom!"
+  res.status(500).send("Boom!")
 # Query string
 server.get "/query", (req, res)->
-  res.send 200, {name: req.param('name'), extra: req.param('extra')}
+  res.send {name: req.param('name'), extra: req.param('extra')}
 # Multiple set-cookie headers
 server.get "/set-cookie", (req, res)->
   res.cookie "c1", "v1"
