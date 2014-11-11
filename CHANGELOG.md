@@ -4,6 +4,8 @@ ADDED now saving query string as part of request URL
 
 FIXED when ignoring request, throw ECONNREFUSED error
 
+FIXED handle case where header value is zero (number)
+
 
 ## Version 1.10.3 2014-04-19
 
