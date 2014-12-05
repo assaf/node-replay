@@ -1,3 +1,12 @@
+## Version 1.12.0 2014-12-04
+
+ADDED you can now allow, ignore and localhost multiple domains
+
+```
+Replay.localhos('*.example.com');
+```
+
+
 ## Version 1.11.0 2014-11-10
 
 ADDED now saving query string as part of request URL

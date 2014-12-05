@@ -97,7 +97,8 @@ class Replay extends EventEmitter
 
   # True if this host is allowed network access.
   isAllowed: (host)->
-    return !!@_allowed[host]
+    domain = host.replace(/^[^.]+/, '*')
+    return !!(@_allowed[host] || @_allowed[domain] || @_allowed["*.#{host}"])
 
   # Ignore network access to this host.
   ignore: (hosts...)->
@@ -108,7 +109,8 @@ class Replay extends EventEmitter
 
   # True if this host is on the ignored list.
   isIgnored: (host)->
-    return !!@_ignored[host]
+    domain = host.replace(/^[^.]+/, '*')
+    return !!(@_ignored[host] || @_ignored[domain] || @_ignored['*.#{host}'])
 
   # Treats this host as localhost: requests are routed directory to 127.0.0.1, no replay.  Useful when you want to send
   # requests to the test server using its production host name.
@@ -123,7 +125,8 @@ class Replay extends EventEmitter
 
   # True if this host should be treated as localhost.
   isLocalhost: (host)->
-    return !!@_localhosts[host]
+    domain = host.replace(/^[^.]+/, '*')
+    return !!(@_localhosts[host] || @_localhosts[domain] || @_localhosts["*.#{host}"])
 
   @prototype.__defineGetter__ "fixtures", ->
     @catalog.getFixturesDir()
