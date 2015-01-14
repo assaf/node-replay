@@ -9,13 +9,20 @@ recorded = (settings)->
     if request.url.port && request.url.port != "80"
       host += ":#{request.url.port}"
     # Look for a matching response and replay it.
-    matchers = catalog.find(host)
-    if matchers
-      for matcher in matchers
-        response = matcher(request)
-        if response
-          callback null, response
-          return
+    try
+      matchers = catalog.find(host)
+      if matchers
+        for matcher in matchers
+          response = matcher(request)
+          if response
+            callback null, response
+            return
+    catch error
+      error.code = "CORRUPT FIXTURE"
+      error.syscall = "connect"
+      callback error
+      return
+
 
     # Do not record this host.
     if settings.isIgnored(request.url.hostname)

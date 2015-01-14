@@ -18,6 +18,7 @@ Async       = require("async")
 HTTP_PORT     = 3004
 HTTPS_PORT    = 3443
 INACTIVE_PORT = 3002
+CORRUPT_PORT  = 3555
 SSL =
   key:  File.readFileSync("#{__dirname}/ssl/privatekey.pem")
   cert: File.readFileSync("#{__dirname}/ssl/certificate.pem")
@@ -86,3 +87,4 @@ module.exports =
   HTTP_PORT:      HTTP_PORT
   HTTPS_PORT:     HTTPS_PORT
   INACTIVE_PORT:  INACTIVE_PORT
+  CORRUPT_PORT:   CORRUPT_PORT

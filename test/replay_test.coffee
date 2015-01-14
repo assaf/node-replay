@@ -1,4 +1,4 @@
-{  setup, HTTP_PORT, HTTPS_PORT, INACTIVE_PORT } = require("./helpers")
+{  setup, HTTP_PORT, HTTPS_PORT, INACTIVE_PORT, CORRUPT_PORT } = require("./helpers")
 assert  = require("assert")
 File    = require("fs")
 HTTP    = require("http")
@@ -445,6 +445,19 @@ describe "Replay", ->
       it "should fail to connnect", ->
         assert @error instanceof Error
 
+
+  describe "corrupt replay file", ->
+    before ->
+      Replay.mode = "default"
+
+    before (done)->
+      HTTP.get(hostname: "example.com", port: CORRUPT_PORT, path: "/minimal", done)
+        .on "error", (@error)=>
+          done()
+
+    it "should callback with error", ->
+      assert @error instanceof Error
+      assert.equal @error.code, "CORRUPT FIXTURE"
 
   describe "minimal response", ->
     before ->
