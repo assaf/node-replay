@@ -114,6 +114,7 @@ class Catalog
       else
         [method, path] = method_and_path.split(/\s/)
       assert method && (path || regexp), "#{filename}: first line must be <method> <path>"
+      assert /^[a-zA-Z]+$/.test(method), "#{filename}: method not valid"
       headers = parseHeaders(filename, header_lines, request_headers)
       body = headers["body"]
       delete headers["body"]
