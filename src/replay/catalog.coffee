@@ -136,7 +136,7 @@ readAndInitialParseFile = (filename)->
   buffer = File.readFileSync(filename)
   parts = buffer.toString('utf8').split('\n\n')
   if parts.length > 2
-    parts0 = new Buffer(parts[0], 'utf8'),
+    parts0 = new Buffer(parts[0], 'utf8')
     parts1 = new Buffer(parts[1], 'utf8')
     body = buffer.slice(parts0.length + parts1.length + 4)
   return [parts[0], parts[1], body || '']
