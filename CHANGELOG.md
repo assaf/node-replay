@@ -4,6 +4,11 @@ ADDED Supports streaming API v2 (0.12/iojs)
 
 ADDED Supports new additions to HTTP API (0.12/iojs)
 
+CHANGED New way for writing HTTP response line:
+
+  HTTP/1.1 200 OK
+  HTTP/1.1 404 Not Found
+
 CHANGED To enable debugging, run with environment variable DEBUG=replay
 
 FIXED HTTPS requests looping forvever

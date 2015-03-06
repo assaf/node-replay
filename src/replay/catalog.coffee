@@ -92,7 +92,7 @@ class Catalog
           writeHeaders file, body: jsStringEscape(body)
         file.write "\n"
         # Response part
-        file.write "#{response.statusCode || 200} HTTP/#{response.version || "1.1"}\n"
+        file.write "HTTP/#{response.version || "1.1"} #{response.statusCode || 200} #{response.statusMessage}"
         writeHeaders file, response.headers
         file.write "\n"
         for part in response.body
@@ -125,8 +125,14 @@ class Catalog
     parse_response = (response, body)->
       if response
         [status_line, header_lines...] = response.split(/\n/)
-        statusCode    = parseInt(status_line.split()[0], 10)
-        [ version ]   = status_line.match(/\d.\d$/)
+        new_format = status_line.match(/HTTP\/(\d\.\d)\s+(\d{3})\s*(.*)/)
+        if new_format
+          version       = new_format[1]
+          statusCode    = parseInt(new_format[2], 10)
+          statusMessage = new_format[3].trim()
+        else
+          version       = '1.1'
+          statusCode    = parseInt(status_line, 10)
         headers       = parseHeaders(filename, header_lines)
         rawHeaders    = header_lines.reduce((raw, header)->
           [name, value] = header.split(/:\s+/)
@@ -136,6 +142,7 @@ class Catalog
         , [])
       return {
         statusCode:     statusCode
+        statusMessage:  statusMessage
         version:        version
         headers:        headers
         rawHeaders:     rawHeaders

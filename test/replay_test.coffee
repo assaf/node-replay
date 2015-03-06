@@ -99,7 +99,7 @@ describe "Replay", ->
       ).on("error", done)
 
     it "should match the right fixture", ->
-      assert.equal @body, "regexp"
+      assert.equal @body.trim(), "regexp"
 
 
   describe "matching a regexp url with flags", ->
@@ -115,7 +115,7 @@ describe "Replay", ->
       ).on("error", done)
 
     it "should match a fixture", ->
-      assert.equal @body, "Aregexp2"
+      assert.equal @body.trim(), "Aregexp2"
 
   describe "matching when changing fixtures dir", ->
     before ->

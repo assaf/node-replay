@@ -147,7 +147,7 @@ class ProxyResponse extends Stream.Readable
     @httpVersion      = captured.version || "1.1"
     @httpVersionMajor = @httpVersion.split(".")[0]
     @httpVersionMinor = @httpVersion.split(".")[1]
-    @statusCode       = captured.statusCode || 200
+    @statusCode       = parseInt(captured.statusCode || 200, 10)
     @statusMessage    = captured.statusMessage || HTTP.STATUS_CODES[@statusCode] || ""
     @headers          = clone(captured.headers)
     @rawHeaders       = (captured.rawHeaders || [].slice(0))
