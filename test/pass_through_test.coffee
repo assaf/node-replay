@@ -82,7 +82,6 @@ describe "Pass through", ->
         rejectUnauthorized: false
       request = HTTPS.request(options, (_)->
         response = _
-        console.log response
         response.body = ""
         response.on "data", (chunk)->
           response.body += chunk

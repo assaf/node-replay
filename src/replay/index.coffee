@@ -44,7 +44,8 @@ HTTPS.request = (options, callback)->
 original_lookup = DNS.lookup
 DNS.lookup = (domain, options, callback)->
   if typeof(options) == "function"
-    [family, callback] = [0, options]
+    [family, callback] = [4, options]
+    options = family
   else if typeof(options) == "object"
     family = options.family
   else

@@ -8,11 +8,11 @@ URL   = require("url")
 #   replay.use replay.logger(exports)
 logger = (settings)->
   return (request, callback)->
-    debug "Replay: Requesting #{request.method} #{URL.format(request.url)}"
+    debug "Requesting #{request.method} #{URL.format(request.url)}"
     request.on "response", (response)->
-      debug "Replay: Received #{response.statusCode} #{URL.format(request.url)}"
+      debug "Received #{response.statusCode} #{URL.format(request.url)}"
     request.on "error", (error)->
-      debug "Replay: Error #{error}"
+      debug "Error #{error}"
 
     callback()
     return

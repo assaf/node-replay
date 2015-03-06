@@ -152,7 +152,7 @@ describe "Replay", ->
     after ->
       Replay.fixtures = "#{__dirname}/fixtures"
 
-  describe "recording query paramters", ->
+  describe "recording query parameters", ->
     before setup
 
     before ->
@@ -161,7 +161,6 @@ describe "Replay", ->
       @fixturesDir = "#{__dirname}/fixtures/127.0.0.1-#{HTTP_PORT}"
 
     after ->
-      Replay.localhost "127.0.0.1"
       for file in File.readdirSync(@fixturesDir)
         File.unlinkSync("#{@fixturesDir}/#{file}")
       File.rmdirSync @fixturesDir
@@ -171,20 +170,22 @@ describe "Replay", ->
         {name: 'Lorem', extra: 'Ipsum'}
         {name: 'Dolor', extra: 'Sit'}
       ].map (query) -> (callback) ->
-        Request {
+        Request({
           method: 'get', url: "http://127.0.0.1:#{HTTP_PORT}/query", qs: query, json: true
-        }, (err, res, body) ->
-          return callback(err) if err?
+        }, (error, response, body) ->
+          if error
+            callback(error)
+            return
           try
             assert.deepEqual body, query
           catch error
             return callback(error)
           callback null, query
+        )
 
       Async.series requests, (err, results) ->
         return done(err) if err?
         # fixtures should be written now
-        Replay.localhost "127.0.0.1"
         Replay.mode = "replay"
         Async.series requests, (err, results) ->
           done(err)
@@ -223,7 +224,6 @@ describe "Replay", ->
         assert.equal @headers["set-cookie"][1], "c2=v2; Path=/"
 
     after ->
-      Replay.localhost "127.0.0.1"
       for file in File.readdirSync(@fixturesDir)
         File.unlinkSync("#{@fixturesDir}/#{file}")
       File.rmdirSync(@fixturesDir)
@@ -253,7 +253,6 @@ describe "Replay", ->
       assert has_data
 
     after ->
-      Replay.localhost "127.0.0.1"
       for file in File.readdirSync(@fixturesDir)
         File.unlinkSync("#{@fixturesDir}/#{file}")
       File.rmdir(@fixturesDir)
@@ -280,7 +279,6 @@ describe "Replay", ->
       assert fixture.split("\n")[1] == "body: line1\\nline2\\nline3"
 
     after ->
-      Replay.localhost "127.0.0.1"
       for file in File.readdirSync(@fixturesDir)
         File.unlinkSync("#{@fixturesDir}/#{file}")
       File.rmdir(@fixturesDir)
@@ -344,7 +342,6 @@ describe "Replay", ->
       assert !/accept/.test fixture
 
     after ->
-      Replay.localhost "127.0.0.1"
       for file in File.readdirSync(@fixturesDir)
         File.unlinkSync("#{@fixturesDir}/#{file}")
       File.rmdir(@fixturesDir)
@@ -467,11 +464,12 @@ describe "Replay", ->
       before (done)->
         request = HTTP.get(hostname: "example.com", port: INACTIVE_PORT, path: "/minimal")
         request.on "response", (@response)=>
-          @response.body = null
+          @response.body = ""
           @response.on "data", (chunk)=>
-            # This will fail, no response.body
-            @response.body += chunk
-          @response.on "end", done
+            console.log "chunk", chunk
+            @response.body = @reponse.body + chunk
+          @response.on("end", done)
+          @response.on("error", done)
         request.on "error", done
 
       it "should return HTTP version", ->
@@ -483,4 +481,4 @@ describe "Replay", ->
       it "should return no response trailers", ->
         assert.deepEqual @response.trailers, { }
       it "should return no response body", ->
-        assert !@response.body
+        assert @response.body == ""

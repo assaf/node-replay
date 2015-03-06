@@ -111,9 +111,12 @@ class ProxyRequest extends HTTP.ClientRequest
           response = new ProxyResponse(captured)
           @emit("response", response)
           response.resume()
+          # This is not a type, Node 0.10 requires that we call resume() twice
+          if process.version < "v0.11"
+            response.resume()
         else
           error = new Error("#{@method} #{URL.format(@url)} refused: not recording and no network access")
-          error.code = "ECONNREFUSED"
+          error.code  = "ECONNREFUSED"
           error.errno = "ECONNREFUSED"
           @emit "error", error
     return
@@ -135,7 +138,12 @@ clone = (object)->
 # HTTP client response that plays back a captured response.
 class ProxyResponse extends Stream.Readable
   constructor: (captured)->
-    Stream.Readable.call(this);
+    super()
+    if process.version < "v0.11"
+      @pause()
+    @once "end", =>
+      @emit("close")
+
     @httpVersion      = captured.version || "1.1"
     @httpVersionMajor = @httpVersion.split(".")[0]
     @httpVersionMinor = @httpVersion.split(".")[1]
@@ -143,14 +151,12 @@ class ProxyResponse extends Stream.Readable
     @statusMessage    = captured.statusMessage || HTTP.STATUS_CODES[@statusCode] || ""
     @headers          = clone(captured.headers)
     @rawHeaders       = (captured.rawHeaders || [].slice(0))
+    @trailers         = clone(captured.trailers)
+    @rawTrailers      = (captured.rawTrailers || []).slice(0)
     # Not a documented property, but request seems to use this to look for HTTP parsing errors
     @connection       = new EventEmitter()
 
     @_body            = captured.body.slice(0)
-    @once "end", =>
-      @trailers    = clone(captured.trailers)
-      @rawTrailers = (captured.rawTrailers || []).slice(0)
-      @emit("close")
 
   _read: (size)->
     part = @_body.shift()
