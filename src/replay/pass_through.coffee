@@ -20,30 +20,35 @@ passThrough = (allow)->
         protocol: request.url.protocol
         hostname: request.url.hostname
         port:     request.url.port
-        path:     request.path
+        path:     request.url.path
         method:   request.method
         headers:  request.headers
+        agent:    request.agent
+        auth:     request.auth
 
-      if request.url.protocol == "https:"
-        http = httpsRequest(options)
-      else
-        http = httpRequest(options)
+      http = httpRequest(options)
+      if (request.trailers)
+        http.addTrailers(request.trailers)
       http.on "error", (error)->
         callback error
       http.on "response", (response)->
         captured =
-          version: response.httpVersion
-          status:  response.statusCode
-          headers: response.headers
+          version:        response.httpVersion
+          statusCode:     response.statusCode
+          statusMessage:  response.statusMessage
+          headers:        response.headers
+          rawHeaders:     response.rawHeaders
           body:    []
-        response.on "data", (chunk)->
-          captured.body.push chunk
+        response.on "data", (chunk, encoding)->
+          captured.body.push([chunk, encoding])
         response.on "end", ->
-          captured.trailers = response.trailers
+          captured.trailers     = response.trailers
+          captured.rawTrailers  = response.rawTrailers
           callback null, captured
+
       if request.body
-        for part in request.body
-          http.write part[0], part[1]
+        for part of request.body
+          http.write(part[0], part[1])
       http.end()
     else
       callback null

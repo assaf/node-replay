@@ -1,7 +1,10 @@
 {
   "name": "replay",
   "description": "When API testing slows you down: record and replay HTTP responses like a boss",
-  "version": "1.12.0",
+  "version": "2.0.0-0",
+  "publishConfig": {
+    "tag": "next"
+  },
   "author": "Assaf Arkin <assaf@labnotes.org> (http://labnotes.org/)",
   "keywords": [
     "test",
@@ -19,21 +22,22 @@
     "lib": "./lib"
   },
   "scripts": {
-    "build":        "coffee --bare --compile --output lib/replay src/replay/*.coffee",
-    "prepublish":   "coffee --bare --compile --output lib/replay src/replay/*.coffee",
-    "postpublish":  "rm -rf lib",
-    "test":         "./node_modules/.bin/mocha"
+    "build": "coffee --bare --compile --output lib/replay src/replay/*.coffee",
+    "prepublish": "coffee --bare --compile --output lib/replay src/replay/*.coffee",
+    "postpublish": "rm -rf lib",
+    "test": "./node_modules/.bin/mocha"
   },
   "dependencies": {
+    "debug": "^2.1.2",
     "js-string-escape": "~1.0.0"
   },
   "devDependencies": {
-    "body-parser":    "^1.9.2",
-    "coffee-script":  "1.8.0",
-    "express":        "^4.10.2",
-    "mocha":          "^2.0.1",
-    "async":          "^0.9.0",
-    "request":        "^2.47.0"
+    "body-parser": "^1.9.2",
+    "coffee-script": "1.9.1",
+    "express": "^4.10.2",
+    "mocha": "^2.0.1",
+    "async": "^0.9.0",
+    "request": "^2.47.0"
   },
   "repository": {
     "type": "git",

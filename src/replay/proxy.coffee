@@ -26,32 +26,35 @@
 assert            = require("assert")
 { EventEmitter }  = require("events")
 HTTP              = require("http")
+HTTPS             = require("https")
 Stream            = require("stream")
 URL               = require("url")
 
-if typeof setImmediate is 'function'
-  nextTick = setImmediate
-else
-  nextTick = process.nextTick
 
 # HTTP client request that captures the request and sends it down the processing chain.
 class ProxyRequest extends HTTP.ClientRequest
-  constructor: (options = {}, @replay, @proxy)->
-    @method = (options.method || "GET").toUpperCase()
-    [host, port] = (options.host || options.hostname).split(":")
-    protocol = options.protocol || "http:"
-    port = options.port || port || (if protocol == "https:" then 443 else 80)
-    @url = URL.parse("#{protocol}//#{host || "localhost"}:#{port}#{options.path || "/"}", true)
-    @path = options.path || "/"
-    @headers = {}
+  constructor: (options = {}, @proxy)->
+    HTTP.IncomingMessage.call(this)
+    @method       = (options.method || "GET").toUpperCase()
+    protocol      = options.protocol || "http:"
+    [host, port]  = (options.host || options.hostname).split(":")
+    port          = options.port || port || (if protocol == "https:" then 443 else 80)
+    @url          = URL.parse("#{protocol}//#{host || "localhost"}:#{port}#{options.path || "/"}", true)
+    @auth         = options.auth
+    @agent        = options.agent || (if protocol == "https:" then HTTPS.globalAgent else HTTP.globalAgent)
+    @headers      = {}
     if options.headers
       for n,v of options.headers
         @headers[n.toLowerCase()] = if (v == null || v == undefined) then "" else v.toString()
+
+  flushHeaders: ()->
+    return
 
   setHeader: (name, value)->
     assert !@ended, "Already called end"
     assert !@body, "Already wrote body parts"
     @headers[name.toLowerCase()] = value
+    return
 
   getHeader: (name)->
     return @headers[name.toLowerCase()]
@@ -60,39 +63,53 @@ class ProxyRequest extends HTTP.ClientRequest
     assert !@ended, "Already called end"
     assert !@body, "Already wrote body parts"
     delete @headers[name.toLowerCase()]
+    return
+
+  addTrailers: (trailers)->
+    @trailers = trailers
+    return
 
   setTimeout: (timeout, callback)->
-    @timeout = [timeout, callback]
+    if (callback)
+      setImmediate(callback)
     return
 
   setNoDelay: (nodelay = true)->
-    @nodelay = [nodelay]
     return
 
   setSocketKeepAlive: (enable = false, initial)->
-    @keepAlive = [enable, initial]
     return
 
-  write: (chunk, encoding)->
+  write: (chunk, encoding, callback)->
     assert !@ended, "Already called end"
     @body ||= []
     @body.push [chunk, encoding]
-    return
+    if callback
+      setImmediate(callback)
 
-  end: (data, encoding)->
+  end: (data, encoding, callback)->
     assert !@ended, "Already called end"
+
+    if (typeof data == 'function')
+      [callback, data] = [data, null]
+    else if (typeof encoding == 'function')
+      [callback, encoding] = [encoding, null]
     if data
-      @write data, encoding
+      @body ||= []
+      @body.push [data, encoding]
     @ended = true
+
+    if (callback)
+      setImmediate(callback)
 
     @proxy this, (error, captured)=>
       # We're not asynchronous, but clients expect us to callback later on
-      process.nextTick =>
+      setImmediate =>
         if error
           @emit "error", error
         else if captured
           response = new ProxyResponse(captured)
-          @emit "response", response
+          @emit("response", response)
           response.resume()
         else
           error = new Error("#{@method} #{URL.format(@url)} refused: not recording and no network access")
@@ -101,7 +118,11 @@ class ProxyRequest extends HTTP.ClientRequest
           @emit "error", error
     return
 
+  flush: ->
+    return
+
   abort: ->
+    return
 
 
 clone = (object)->
@@ -112,39 +133,37 @@ clone = (object)->
 
 
 # HTTP client response that plays back a captured response.
-class ProxyResponse extends Stream
+class ProxyResponse extends Stream.Readable
   constructor: (captured)->
-    @httpVersion = captured.version || "1.1"
-    @statusCode  = captured.status || 200
-    @headers     = clone(captured.headers)
-    @trailers    = clone(captured.trailers)
-    @_body       = captured.body.slice(0)
-    @readable    = true
+    Stream.Readable.call(this);
+    @httpVersion      = captured.version || "1.1"
+    @httpVersionMajor = @httpVersion.split(".")[0]
+    @httpVersionMinor = @httpVersion.split(".")[1]
+    @statusCode       = captured.statusCode || 200
+    @statusMessage    = captured.statusMessage || HTTP.STATUS_CODES[@statusCode] || ""
+    @headers          = clone(captured.headers)
+    @rawHeaders       = (captured.rawHeaders || [].slice(0))
     # Not a documented property, but request seems to use this to look for HTTP parsing errors
-    @connection  = new EventEmitter()
+    @connection       = new EventEmitter()
 
-  pause: ->
-    @_paused = true
+    @_body            = captured.body.slice(0)
+    @once "end", =>
+      @trailers    = clone(captured.trailers)
+      @rawTrailers = (captured.rawTrailers || []).slice(0)
+      @emit("close")
 
-  resume: ->
-    @_paused = false
-    nextTick =>
-      return if @_paused || !@_body
-      part = @_body.shift()
-      if part
-        if @_encoding
-          chunk = new Buffer(part).toString(@_encoding)
-        else
-          chunk = part
-        @emit "data", chunk
-        @resume()
-      else
-        @_body = null
-        @readable = false
-        @_done = true
-        @emit "end"
+  _read: (size)->
+    part = @_body.shift()
+    if part
+      @push(part[0], part[1])
+    else
+      @push(null)
+    return
 
-  setEncoding: (@_encoding)->
+  setTimeout: (msec, callback)->
+    if (callback)
+      setImmediate(callback)
+    return
 
   @notFound: (url)->
     return new ProxyResponse(status: 404, body: ["No recorded request/response that matches #{URL.format(url)}"])

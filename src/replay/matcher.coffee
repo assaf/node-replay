@@ -45,21 +45,17 @@ class Matcher
 
     # Create a normalized response object that we return.
     @response =
-      version:  response.version || "1.1"
-      status:   response.status && parseInt(response.status, 10) || 200
-      headers:  {}
-      body:     []
-      trailers: {}
+      version:        response.version || "1.1"
+      statusCode:     response.statusCode && parseInt(response.statusCode, 10) || 200
+      statusMessage:  response.statusMessage || ""
+      headers:        {}
+      body:           response.body.slice(0)
+      trailers:       {}
     # Copy over header to response, downcase header names.
     if response.headers
       headers = @response.headers
       for name, value of response.headers
         headers[name.toLowerCase()] = value
-    # Copy over body (string) or multiple body parts (strings or content/encoding pairs)
-    if Array.isArray(response.body)
-      @response.body = response.body.slice(0)
-    else if response.body
-      @response.body = [response.body]
     # Copy over trailers to response, downcase trailers names.
     if response.trailers
       trailers = @response.trailers
@@ -68,13 +64,13 @@ class Matcher
 
   # Quick and effective matching.
   match: (request)->
-    { url, path, method, headers, body } = request
+    { url, method, headers, body } = request
     return false if @hostname && @hostname != url.hostname
     if @regexp
-      return false unless @regexp.test(path)
+      return false unless @regexp.test(url.path)
     else
       return false if @port && @port != url.port
-      return false if @path && @path != path
+      return false if @path && @path != url.path
     return false unless @method == method
     for name, value of @headers
       if value != headers[name]

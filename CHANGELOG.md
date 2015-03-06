@@ -1,3 +1,14 @@
+# Version 2.0.0 2015-03-06
+
+ADDED Supports streaming API v2 (0.12/iojs)
+
+ADDED Supports new additions to HTTP API (0.12/iojs)
+
+CHANGED To enable debugging, run with environment variable DEBUG=replay
+
+FIXED HTTPS requests looping forvever
+
+
 ## Version 1.12.0 2014-12-04
 
 ADDED you can now allow, ignore and localhost multiple domains

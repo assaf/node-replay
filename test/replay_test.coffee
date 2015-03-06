@@ -157,7 +157,7 @@ describe "Replay", ->
 
     before ->
       Replay.mode = "record"
-      Replay.allow "127.0.0.1"
+      Replay.reset "127.0.0.1"
       @fixturesDir = "#{__dirname}/fixtures/127.0.0.1-#{HTTP_PORT}"
 
     after ->
@@ -195,7 +195,7 @@ describe "Replay", ->
 
     before ->
       Replay.mode = "record"
-      Replay.allow "127.0.0.1"
+      Replay.reset "127.0.0.1"
       @fixturesDir = "#{__dirname}/fixtures/127.0.0.1-#{HTTP_PORT}"
 
     before (done)->
@@ -234,7 +234,7 @@ describe "Replay", ->
 
     before ->
       Replay.mode = "record"
-      Replay.allow "127.0.0.1"
+      Replay.reset "127.0.0.1"
       @fixturesDir = "#{__dirname}/fixtures/127.0.0.1-#{HTTP_PORT}"
 
     before (done)->
@@ -264,7 +264,7 @@ describe "Replay", ->
 
     before ->
       Replay.mode = "record"
-      Replay.allow "127.0.0.1"
+      Replay.reset "127.0.0.1"
       @fixturesDir = "#{__dirname}/fixtures/127.0.0.1-#{HTTP_PORT}"
 
     before (done)->
@@ -294,7 +294,7 @@ describe "Replay", ->
       before (done)->
         request = HTTP.request(hostname: "example.com", port: INACTIVE_PORT, path: "/post-body", method: "post")
         request.on "response", (@response)=>
-          response.on "end", done
+          @response.on "end", done
         request.on("error", done)
         request.write("request body")
         request.end()
@@ -311,7 +311,7 @@ describe "Replay", ->
       before (done)->
         request = HTTP.request(hostname: "example.com", port: INACTIVE_PORT, path: "/post-body-multi", method: "post")
         request.on "response", (@response)=>
-          response.on "end", done
+          @response.on "end", done
         request.on("error", done)
         request.write """line1
         line2
@@ -328,7 +328,7 @@ describe "Replay", ->
 
     before ->
       Replay.mode = "record"
-      Replay.allow "127.0.0.1"
+      Replay.reset "127.0.0.1"
       # Drop the /accept/ header
       Replay.headers = Replay.headers.filter((header)-> !header.test('accept'))
       @fixturesDir = "#{__dirname}/fixtures/127.0.0.1-#{HTTP_PORT}"

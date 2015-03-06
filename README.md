@@ -293,7 +293,7 @@ pass to the next proxy down the chain.
 
 The proxy chain looks something like this:
 
-- Logger dumps the request URL when running with `DEBUG=true`
+- Logger dumps the request URL when running with `DEBUG=replay`
 - The pass-through proxy will pass the request directly to the server in `bloody` mode, or when talking to `localhost`
 - The recorder proxy will either replay a captured request (if it has one), talk to the server and capture the response
   (in `record` mode), or pass to the next proxy

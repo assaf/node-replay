@@ -32,11 +32,13 @@ Replay.silent = true
 
 # Redirect HTTP requests to pass-through domain
 original_lookup = DNS.lookup
-DNS.lookup = (domain, callback)->
+DNS.lookup = (domain, options, callback)->
   if domain == "pass-through"
+    if typeof(options) == "function"
+      callback = options
     callback null, "127.0.0.1", 4
   else
-    original_lookup domain, callback
+    original_lookup(domain, options, callback)
 
 
 # Serve pages from localhost.
@@ -53,7 +55,7 @@ server.get "/500", (req, res)->
   res.status(500).send("Boom!")
 # Query string
 server.get "/query", (req, res)->
-  res.send {name: req.param('name'), extra: req.param('extra')}
+  res.send { name: req.query.name, extra: req.query.extra }
 # Multiple set-cookie headers
 server.get "/set-cookie", (req, res)->
   res.cookie "c1", "v1"

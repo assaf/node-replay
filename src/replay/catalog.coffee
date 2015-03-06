@@ -1,4 +1,5 @@
 assert         = require("assert")
+debug          = require("./debug")
 File           = require("fs")
 Path           = require("path")
 Matcher        = require("./matcher")
@@ -75,15 +76,14 @@ class Catalog
     uid = +new Date + "" + Math.floor(Math.random() * 100000)
     tmpfile = "#{@getFixturesDir()}/node-replay.#{uid}"
     pathname = "#{@getFixturesDir()}/#{host.replace(":", "-")}"
-    logger = request.replay.logger
-    logger.log "Creating #{pathname}"
+    debug "Creating #{pathname}"
     mkdir pathname, (error)->
       return callback error if error
       filename = "#{pathname}/#{uid}"
 
       try
         file = File.createWriteStream(tmpfile, encoding: "utf-8")
-        file.write "#{request.method.toUpperCase()} #{request.path || "/"}\n"
+        file.write "#{request.method.toUpperCase()} #{request.url.path || "/"}\n"
         writeHeaders file, request.headers, request_headers
         if request.body
           body = ""
@@ -92,11 +92,11 @@ class Catalog
           writeHeaders file, body: jsStringEscape(body)
         file.write "\n"
         # Response part
-        file.write "#{response.status || 200} HTTP/#{response.version || "1.1"}\n"
+        file.write "#{response.statusCode || 200} HTTP/#{response.version || "1.1"}\n"
         writeHeaders file, response.headers
         file.write "\n"
         for part in response.body
-          file.write part
+          file.write(part[0], part[1])
         file.end ->
           File.rename tmpfile, filename, callback
       catch error
@@ -104,6 +104,7 @@ class Catalog
 
   _read: (filename)->
     request_headers = @settings.headers
+
     parse_request = (request)->
       assert request, "#{filename} missing request section"
       [method_and_path, header_lines...] = request.split(/\n/)
@@ -124,13 +125,29 @@ class Catalog
     parse_response = (response, body)->
       if response
         [status_line, header_lines...] = response.split(/\n/)
-        status = parseInt(status_line.split()[0], 10)
-        version = status_line.match(/\d.\d$/)
-        headers = parseHeaders(filename, header_lines)
-      return { status: status, version: version, headers: headers, body: body }
+        statusCode    = parseInt(status_line.split()[0], 10)
+        [ version ]   = status_line.match(/\d.\d$/)
+        headers       = parseHeaders(filename, header_lines)
+        rawHeaders    = header_lines.reduce((raw, header)->
+          [name, value] = header.split(/:\s+/)
+          raw.push(name)
+          raw.push(value)
+          return raw
+        , [])
+      return {
+        statusCode:     statusCode
+        version:        version
+        headers:        headers
+        rawHeaders:     rawHeaders
+        body:           body
+        trailers:       {}
+        rawTrailers:    []
+      }
 
-    [request, response, body] = readAndInitialParseFile(filename)
+    [request, response, part] = readAndInitialParseFile(filename)
+    body = [[part, undefined]]
     return { request: parse_request(request), response: parse_response(response, body) }
+
 
 readAndInitialParseFile = (filename)->
   buffer = File.readFileSync(filename)
