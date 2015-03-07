@@ -466,7 +466,6 @@ describe "Replay", ->
         request.on "response", (@response)=>
           @response.body = ""
           @response.on "data", (chunk)=>
-            console.log "chunk", chunk
             @response.body = @reponse.body + chunk
           @response.on("end", done)
           @response.on("error", done)
