@@ -27,6 +27,7 @@ HTTP.request = (options, callback)->
     request.once("response", callback)
   return request
 
+
 # HTTP.get is shortcut for HTTP.request
 HTTP.get = (options, callback)->
   request = HTTP.request(options, callback)

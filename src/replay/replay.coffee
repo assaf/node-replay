@@ -57,8 +57,8 @@ class Replay extends EventEmitter
     @_localhosts = { localhost: true, '127.0.0.1': true }
     # allowed servers. allow network access to any servers listed here.
     @_allowed = { }
-    # ignored servers. do not contact or record.
-    @_ignored = { }
+    # dropped servers: do not allow requests
+    @_dropped = { }
     @catalog = new Catalog(this)
     @headers = MATCH_HEADERS
 
@@ -85,16 +85,16 @@ class Replay extends EventEmitter
     domain = host.replace(/^[^.]+/, '*')
     return !!(@_allowed[host] || @_allowed[domain] || @_allowed["*.#{host}"])
 
-  # Ignore network access to this host.
-  ignore: (hosts...)->
+  # Do not allow network access to these hosts (drop connection)
+  drop: (hosts...)->
     @reset(hosts...)
     for host in hosts
-      @_ignored[host] = true
+      @_dropped[host] = true
 
-  # True if this host is on the ignored list.
-  isIgnored: (host)->
+  # True if this host is on the dropped list
+  isDropped: (host)->
     domain = host.replace(/^[^.]+/, '*')
-    return !!(@_ignored[host] || @_ignored[domain] || @_ignored['*.#{host}'])
+    return !!(@_dropped[host] || @_dropped[domain] || @_dropped['*.#{host}'])
 
   # Treats this host as localhost: requests are routed directory to 127.0.0.1, no replay.  Useful when you want to send
   # requests to the test server using its production host name.
@@ -115,7 +115,7 @@ class Replay extends EventEmitter
     for host in hosts
       delete @_localhosts[host]
       delete @_allowed[host]
-      delete @_ignored[host]
+      delete @_dropped[host]
 
   @prototype.__defineGetter__ "fixtures", ->
     @catalog.getFixturesDir()
@@ -135,7 +135,7 @@ replay = new Replay(process.env.REPLAY || "replay")
 # - Pass through requests in bloody and cheat modes
 passWhenBloodyOrCheat = (request)->
   return replay.isAllowed(request.url.hostname) ||
-         (replay.mode == "cheat" && !replay.isIgnored(request.url.hostname))
+         (replay.mode == "cheat" && !replay.isDropped(request.url.hostname))
 passToLocalhost = (request)->
   return replay.isLocalhost(request.url.hostname) ||
          replay.mode == "bloody"

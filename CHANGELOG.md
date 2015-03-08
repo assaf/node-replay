@@ -4,6 +4,9 @@ ADDED Supports streaming API v2 (0.12/iojs)
 
 ADDED Supports new additions to HTTP API (0.12/iojs)
 
+CHANGED Replay.ignore is now Replay.drop, a better name since the behavior is to
+drop the connection (you'll get ECONNREFUSED).
+
 CHANGED New way for writing HTTP response line:
 
   HTTP/1.1 200 OK

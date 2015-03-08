@@ -25,7 +25,7 @@ recorded = (settings)->
 
 
     # Do not record this host.
-    if settings.isIgnored(request.url.hostname)
+    if settings.isDropped(request.url.hostname)
       refused = new Error("Error: connect ECONNREFUSED")
       refused.code = refused.errno = "ECONNREFUSED"
       refused.syscall = "connect"
