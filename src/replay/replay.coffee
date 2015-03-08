@@ -53,8 +53,8 @@ class Replay extends EventEmitter
       throw new Error("Unsupported mode '#{mode}', must be one of #{MODES.join(", ")}.")
     @chain  = new Chain()
     @mode   = mode
-    # localhost servers. pass requests directly to host, and route to 127.0.0.1.
-    @_localhosts = { localhost: true, '127.0.0.1': true }
+    # Localhost servers: pass request to localhost
+    @_localhosts = { "localhost": true, '127.0.0.1': true }
     # Pass through requests to these servers
     @_passThrough = { }
     # Dropp connections to these servers
@@ -96,11 +96,9 @@ class Replay extends EventEmitter
     domain = host.replace(/^[^.]+/, '*')
     return !!(@_dropped[host] || @_dropped[domain] || @_dropped['*.#{host}'])
 
-  # Treats this host as localhost: requests are routed directory to 127.0.0.1, no replay.  Useful when you want to send
-  # requests to the test server using its production host name.
-  #
-  # Example
-  #     replay.localhost "www.example.com"
+  # Treats this host as localhost: requests are routed directly to 127.0.0.1, no
+  # replay.  Useful when you want to send requests to the test server using its
+  # production host name.
   localhost: (hosts...)->
     @reset(hosts...)
     for host in hosts
@@ -111,6 +109,7 @@ class Replay extends EventEmitter
     domain = host.replace(/^[^.]+/, '*')
     return !!(@_localhosts[host] || @_localhosts[domain] || @_localhosts["*.#{host}"])
 
+  # Use this when you want to exclude host from dropped/pass-through/localhost
   reset: (hosts...)->
     for host in hosts
       delete @_localhosts[host]
