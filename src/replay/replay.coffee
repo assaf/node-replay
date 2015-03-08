@@ -55,9 +55,9 @@ class Replay extends EventEmitter
     @mode   = mode
     # localhost servers. pass requests directly to host, and route to 127.0.0.1.
     @_localhosts = { localhost: true, '127.0.0.1': true }
-    # allowed servers. allow network access to any servers listed here.
-    @_allowed = { }
-    # dropped servers: do not allow requests
+    # Pass through requests to these servers
+    @_passThrough = { }
+    # Dropp connections to these servers
     @_dropped = { }
     @catalog = new Catalog(this)
     @headers = MATCH_HEADERS
@@ -74,16 +74,16 @@ class Replay extends EventEmitter
   use: (proxy)->
     @chain.prepend(proxy)
 
-  # Allow network access to this host.
-  allow: (hosts...)->
+  # Pass through all requests to these hosts
+  passThrough: (hosts...)->
     @reset(hosts...)
     for host in hosts
-      @_allowed[host] = true
+      @_passThrough[host] = true
 
-  # True if this host is allowed network access.
-  isAllowed: (host)->
+  # True to pass through requests to this host
+  isPassThrough: (host)->
     domain = host.replace(/^[^.]+/, '*')
-    return !!(@_allowed[host] || @_allowed[domain] || @_allowed["*.#{host}"])
+    return !!(@_passThrough[host] || @_passThrough[domain] || @_passThrough["*.#{host}"])
 
   # Do not allow network access to these hosts (drop connection)
   drop: (hosts...)->
@@ -114,7 +114,7 @@ class Replay extends EventEmitter
   reset: (hosts...)->
     for host in hosts
       delete @_localhosts[host]
-      delete @_allowed[host]
+      delete @_passThrough[host]
       delete @_dropped[host]
 
   @prototype.__defineGetter__ "fixtures", ->
@@ -134,7 +134,7 @@ replay = new Replay(process.env.REPLAY || "replay")
 # - Replay recorded responses
 # - Pass through requests in bloody and cheat modes
 passWhenBloodyOrCheat = (request)->
-  return replay.isAllowed(request.url.hostname) ||
+  return replay.isPassThrough(request.url.hostname) ||
          (replay.mode == "cheat" && !replay.isDropped(request.url.hostname))
 passToLocalhost = (request)->
   return replay.isLocalhost(request.url.hostname) ||

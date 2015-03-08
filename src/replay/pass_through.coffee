@@ -6,16 +6,16 @@ HTTPS = require("https")
 httpRequest  = HTTP.request
 httpsRequest = HTTPS.request
 
-passThrough = (allow)->
+passThrough = (passThrough)->
   if arguments.length == 0
-    allow = -> true
-  else if typeof allow == "string"
-    [hostname, allow] = [allow, (request)-> request.hostname == hostname]
-  else unless typeof allow == "function"
-    [boolean, allow] = [allow, (request)-> !!boolean]
+    passThrough = -> true
+  else if typeof passThrough == "string"
+    [hostname, passThrough] = [passThrough, (request)-> request.hostname == hostname]
+  else unless typeof passThrough == "function"
+    [boolean, passThrough] = [passThrough, (request)-> !!boolean]
 
   return (request, callback)->
-    if allow(request)
+    if passThrough(request)
       options =
         protocol: request.url.protocol
         hostname: request.url.hostname

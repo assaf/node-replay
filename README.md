@@ -236,10 +236,10 @@ go through, and you don't want to record it.
 Replay.drop('www.google-analytics.com', 'rollbar.com');
 ```
 
-Likewise, you can tell **node-reply** to allow network access to specific hosts:
+Likewise, you can tell **node-reply** to pass through requests to specific hosts:
 
 ```javascript
-Replay.allow('logger.example.com');
+Replay.passThrough('s3.amazonaws.com');
 ```
 
 If you're running into trouble, try turning debugging mode on.  It helps.
