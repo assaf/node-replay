@@ -1,4 +1,4 @@
-# Version 2.0.0 2015-03-06
+# Version 2.0.1 2015-03-07
 
 ADDED Supports streaming API v2 (0.12/iojs)
 
