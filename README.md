@@ -23,31 +23,31 @@ Things **node-replay** can do to make these problems go away:
 
 Like this:
 
-```
-$ npm install replay
+```bash
+npm install replay
 ```
 
 Now write some simple test case:
 
-```
-assert = require("assert")
-http = require("http")
-replay = require("replay")
+```javascript
+const assert  = require('assert');
+const HTTP    = require('http');
+const Replay  = require('Replay');
 
-http.get({ hostname: "www.iheartquotes.com", path: "/api/v1/random" }, function(response) {
-  response.body = "";
-  response.on("data", function(chunk) {
+HTTP.get({ hostname: 'www.iheartquotes.com', path: '/api/v1/random' }, function(response) {
+  var body = '';
+  response.on('data', function(chunk) {
     response.body = response.body + chunk;
-  })
-  response.on("end", function() {
+  });
+  response.on('end', function() {
 
     // Now check the request we made to the I <3 Quotes API
     assert.equal(response.statusCode, 200);
-    assert.equal(response.body, "Oxymoron 2. Exact estimate\n\n[codehappy] http://iheartquotes.com/fortune/show/38021\n");
-    console.log("Woot!");
+    assert.equal(response.body, 'Oxymoron 2. Exact estimate\n\n[codehappy] http://iheartquotes.com/fortune/show/38021\n');
+    console.log('Woot!');
 
-  })
-})
+  });
+});
 ```
 
 This, of course, will fail the first time you run it.  You'll see:
@@ -77,8 +77,8 @@ and capture the response.
 
 Let's do that:
 
-```
-$ REPLAY=record node test.js
+```bash
+REPLAY=record node test.js
 ```
 
 That wasn't too hard, but the test is still failing.  "How?" you must be
@@ -94,9 +94,9 @@ message, get the actual quote and make the assertion look for that value.
 
 Now run the test:
 
-```
+```bash
 $ node test.js
-Woot!
+=> Woot!
 ```
 
 Did the test pass?  Of course it did.  Run it again.  Still passing?  Why, yes.
@@ -104,8 +104,8 @@ Did the test pass?  Of course it did.  Run it again.  Still passing?  Why, yes.
 So let's have a look at that captured response.  All the respones recorded for
 'I <3 Quotes>' will be listed here:
 
-```
-$ ls fixtures/www.iheartquotes.com/
+```bash
+ls fixtures/www.iheartquotes.com/
 ```
 
 There should be only one file there, since we only recorded one response.  The
@@ -164,7 +164,7 @@ between the method and path, for example:
 ```
 GET REGEXP /\/Aregexp\d/i
 
-HTTP/1.1
+HTTP/1.1 200 OK
 Content-Type: text/html
 ```
 
@@ -196,15 +196,15 @@ this mode most of the time".
 You can set the mode by setting the environment variable `REPLAY` to one of
 these values:
 
-```
-$ REPLAY=record node test.js
+```bash
+REPLAY=record node test.js
 ```
 
 Of from your code by setting `replay.mode`:
 
-```
-var Replay = require("replay");
-Replay.mode = "record"
+```javascript
+const Replay = require('replay');
+Replay.mode = 'record';
 ```
 
 Of course, **node-replay** needs to store all those captured responses somewhere,
@@ -213,8 +213,8 @@ idea for a better directory name.  Easy to change.
 
 Like this:
 
-```
-Replay.fixtures = __dirname + "/fixtures/replay"
+```javascript
+Replay.fixtures = __dirname + '/fixtures/replay';
 ```
 
 You can tell **node-replay** what hosts to treat as "localhost".  Requests to
@@ -224,31 +224,31 @@ the same URL as production.
 
 For example:
 
-```
-Replay.localhost "www.example.com"
+```javascript
+Replay.localhost('www.example.com');
 ```
 
 If you don't want requests going to specific server, you can add them to the
 drop list.  For example, Google Analytics, where you don't care that the request
 go through, and you don't want to record it.
 
-```
-Replay.drop "www.google-analytics.com", "airbrake.io"
+```javascript
+Replay.drop('www.google-analytics.com', 'rollbar.com');
 ```
 
 Likewise, you can tell **node-reply** to allow network access to specific hosts:
 
-```
-Replay.allow "logger.example.com"
+```javascript
+Replay.allow('logger.example.com');
 ```
 
 If you're running into trouble, try turning debugging mode on.  It helps.
 Sometimes.
 
-```
+```bash
 $ DEBUG=replay node test.js
-Requesting http://www.iheartquotes.com:80/api/v1/random
-Woot!
+=> Requesting http://www.iheartquotes.com:80/api/v1/random
+=> Woot!
 ```
 
 By default, **node-replay** will record the following headers with each request,
@@ -268,8 +268,8 @@ expressions.
 
 For example, to capture `content-length` (useful with file uploads):
 
-```
-Replay.headers.push(/^content-length/)
+```javascript
+Replay.headers.push(/^content-length/);
 ```
 
 Since headers are case insensitive, we always match on the lower case name.
