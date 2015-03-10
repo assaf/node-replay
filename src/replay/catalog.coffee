@@ -92,7 +92,7 @@ class Catalog
           writeHeaders file, body: jsStringEscape(body)
         file.write "\n"
         # Response part
-        file.write "HTTP/#{response.version || "1.1"} #{response.statusCode || 200} #{response.statusMessage}"
+        file.write "HTTP/#{response.version || "1.1"} #{response.statusCode || 200} #{response.statusMessage}\n"
         writeHeaders file, response.headers
         file.write "\n"
         for part in response.body
