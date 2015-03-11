@@ -6,7 +6,8 @@ Replay        = require("./replay")
 URL           = require("url")
 
 
-httpRequest = HTTP.request
+httpRequest   = HTTP.request
+httpsRequest  = HTTPS.request
 
 
 # Route HTTP requests to our little helper.
@@ -37,8 +38,28 @@ HTTP.get = (options, callback)->
 
 # Route HTTPS requests
 HTTPS.request = (options, callback)->
-  options.protocol = "https:"
-  return HTTP.request(options, callback)
+  if typeof(options) == "string" || options instanceof String
+    options = URL.parse(options)
+
+  # WebSocket request: pass through to Node.js library
+  if options.headers && options.headers["Upgrade"] == "websocket"
+    return httpsRequest(options, callback)
+  hostname = options.hostname || (options.host && options.host.split(":")[0]) || "localhost"
+  if Replay.isLocalhost(hostname) || Replay.isPassThrough(hostname)
+    return httpsRequest(options, callback)
+
+  # Proxy request
+  request = new ProxyRequest(options, Replay.chain.start)
+  if callback
+    request.once("response", callback)
+  return request
+
+
+# HTTPS.get is shortcut for HTTPS.request
+HTTPS.get = (options, callback)->
+  request = HTTPS.request(options, callback)
+  request.end()
+  return request
 
 
 # Redirect HTTP requests to 127.0.0.1 for all hosts defined as localhost

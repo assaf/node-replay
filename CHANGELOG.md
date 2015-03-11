@@ -1,3 +1,8 @@
+# Version 2.0.4 2015-03-10
+
+FIXED problem with https support on 0.10
+
+
 # Version 2.0.3 2015-03-10
 
 ADDED Supports streaming API v2 (0.12/iojs)

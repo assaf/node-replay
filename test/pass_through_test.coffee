@@ -29,7 +29,7 @@ describe "Pass through", ->
             response.body += chunk
           response.on "end", done
         request.on "error", done
-        
+
       it "should return HTTP version", ->
         assert.equal response.httpVersion, "1.1"
       it "should return status code", ->
@@ -69,7 +69,7 @@ describe "Pass through", ->
 
   describe.skip "ssl", ->
     before ->
-      Replay.mode = "bloody"
+      Replay.passThrough('pass-through')
 
     response = null
 
@@ -89,7 +89,7 @@ describe "Pass through", ->
       )
       request.on("error", done)
       request.end()
-      
+
     it "should return HTTP version", ->
       assert.equal response.httpVersion, "1.1"
     it "should return status code", ->
