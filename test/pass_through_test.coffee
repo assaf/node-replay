@@ -67,15 +67,16 @@ describe "Pass through", ->
         assert.deepEqual response.body, "Success!"
 
 
-  describe.skip "ssl", ->
-    before ->
-      Replay.passThrough('pass-through')
-
+  describe "ssl", ->
     response = null
 
     before (done)->
+      # Disable cert validation because the cert is expired.
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+
       options =
         method:   "GET"
+        protocol: "https:"
         hostname: "pass-through"
         port:     HTTPS_PORT
         agent:    false
