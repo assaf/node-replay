@@ -1,5 +1,4 @@
 HTTP = require("http")
-HTTPS = require("https")
 
 
 ClientRequest = HTTP.ClientRequest
