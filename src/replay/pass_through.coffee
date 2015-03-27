@@ -2,9 +2,7 @@ HTTP = require("http")
 HTTPS = require("https")
 
 
-# Capture original HTTP request. PassThrough proxy uses that.
-httpRequest  = HTTP.request
-httpsRequest = HTTPS.request
+ClientRequest = HTTP.ClientRequest
 
 passThrough = (passThrough)->
   if arguments.length == 0
@@ -26,7 +24,7 @@ passThrough = (passThrough)->
         agent:    request.agent
         auth:     request.auth
 
-      http = httpRequest(options)
+      http = new ClientRequest(options)
       if (request.trailers)
         http.addTrailers(request.trailers)
       http.on "error", (error)->
