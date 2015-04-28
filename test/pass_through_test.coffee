@@ -85,7 +85,6 @@ describe "Pass through", ->
     before (done)->
       options =
         method:   "GET"
-        protocol: "https:"
         hostname: "pass-through"
         port:     HTTPS_PORT
         agent:    false

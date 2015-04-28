@@ -9,6 +9,13 @@ URL           = require("url")
 httpRequest   = HTTP.request
 httpsRequest  = HTTPS.request
 
+copy = (obj) ->
+  o = {}
+
+  for key of obj
+    o[key] = obj[key]
+
+  return o
 
 # Route HTTP requests to our little helper.
 HTTP.request = (options, callback)->
@@ -49,6 +56,8 @@ HTTPS.request = (options, callback)->
     return httpsRequest(options, callback)
 
   # Proxy request
+  options = copy(options)
+  options.protocol = "https:"
   request = new ProxyRequest(options, Replay.chain.start)
   if callback
     request.once("response", callback)
