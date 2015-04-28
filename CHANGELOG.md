@@ -1,3 +1,8 @@
+# Version 2.0.5 2015-04-28
+
+Fix SSL requests when not providing an explicit `protocol` option.
+
+
 # Version 2.0.4 2015-03-10
 
 FIXED problem with https support on 0.10
