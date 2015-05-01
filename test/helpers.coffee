@@ -64,6 +64,9 @@ server.get "/set-cookie", (req, res)->
 # POST data
 server.post "/post-data", (req, res)->
   res.sendStatus 200
+# Echo POST body
+server.post "/post-echo", (req, res)->
+  res.send(req.body)
 
 
 # Setup environment for running tests.

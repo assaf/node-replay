@@ -44,7 +44,7 @@ passThrough = (passThrough)->
           callback null, captured
 
       if request.body
-        for part of request.body
+        for part in request.body
           http.write(part[0], part[1])
       http.end()
     else
