@@ -1,6 +1,11 @@
+# Version 2.0.6 2015-04-30
+
+FIXED pass through when sending request bodies
+
+
 # Version 2.0.5 2015-04-28
 
-Fix SSL requests when not providing an explicit `protocol` option.
+FIXED SSL requests when not providing an explicit `protocol` option.
 
 
 # Version 2.0.4 2015-03-10
