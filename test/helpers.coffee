@@ -66,8 +66,7 @@ server.post "/post-data", (req, res)->
   res.sendStatus 200
 # Echo POST body
 server.post "/post-echo", (req, res)->
-  console.log 'body', req.body
-  res.sendStatus 200
+  res.send(req.body)
 
 
 # Setup environment for running tests.

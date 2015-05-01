@@ -139,7 +139,7 @@ describe "Pass through", ->
       it "should return status code", ->
         assert.equal response.statusCode, 200
       it "should post the body", ->
-        assert.equal response.body, "foo"
+        assert.equal response.body, JSON.stringify({foo: "bar"})
 
     after ->
       Replay.mode = "replay"
