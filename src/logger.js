@@ -1,11 +1,9 @@
+// Request handler that logs all request to the console when DEBUG=reply
+
 const debug = require('./debug');
 const URL   = require('url');
 
 
-// Simple proxy that spits all request URLs to the console if the debug settings is true.
-//
-// Example
-//   replay.use replay.logger(exports)
 module.exports = function logger() {
   return function(request, callback) {
     debug(`Requesting ${request.method} ${URL.format(request.url)}`);
@@ -18,5 +16,4 @@ module.exports = function logger() {
     callback();
   };
 };
-
 
