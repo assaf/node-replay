@@ -38,7 +38,7 @@ module.exports = class ProxyRequest extends HTTP.IncomingMessage {
     super();
     this.proxy          = proxy;
     this.method         = (options.method || 'GET').toUpperCase();
-    const protocol      = options.protocol || 'http:';
+    const protocol      = options.protocol || (options._defaultAgent && options._defaultAgent.protocol) || 'http:';
     const [host, port]  = (options.host || options.hostname).split(':');
     const realPort      = options.port || port || (protocol === 'https:' ? 443 : 80);
     this.url            = URL.parse(`${protocol}//${host || 'localhost'}:${realPort}${options.path || '/'}`, true);

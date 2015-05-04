@@ -5,12 +5,18 @@ const HTTPS   = require('https');
 const Replay  = require('../src');
 
 
+
 // First batch is testing requests that pass through to the server, no recording/replay.
 //
 // Second batch is testing requests with no replay and no network access.
 describe('Pass through', function() {
 
   before(setup);
+
+  before(function() {
+    Replay.localhost('pass-through');
+  });
+
 
   // Send request to the live server and check the responses.
   describe('bloody', function() {
@@ -184,6 +190,7 @@ describe('Pass through', function() {
   describe('replay', function() {
     before(function() {
       Replay.mode = 'replay';
+      Replay.reset('pass-through');
     });
 
     describe('listeners', function() {

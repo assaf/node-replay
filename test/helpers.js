@@ -5,7 +5,6 @@
 // Port 3443 has a live https server
 
 
-const DNS         = require('dns');
 const Express     = require('express');
 const bodyParser  = require('body-parser');
 const HTTP        = require('http');
@@ -29,18 +28,6 @@ const SSL = {
 Replay.fixtures = `${__dirname}/fixtures`;
 
 Replay.silent = true;
-
-
-// Redirect HTTP requests to pass-through domain
-const originalLookup = DNS.lookup;
-DNS.lookup = function(domain, options, callback) {
-  if (domain === 'pass-through') {
-    if (typeof options === 'function')
-      callback = options;
-    callback(null, '127.0.0.1', 4);
-  } else
-    originalLookup(domain, options, callback);
-};
 
 
 // Serve pages from localhost.

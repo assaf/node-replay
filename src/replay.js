@@ -177,3 +177,7 @@ replay
 
 module.exports = replay;
 
+require('./patch_http_request');
+require('./patch_dns_lookup');
+
+
