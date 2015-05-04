@@ -4,7 +4,7 @@
 
 const HTTP          = require('http');
 const ProxyRequest  = require('./proxy');
-const Replay        = require('./replay');
+const Replay        = require('./');
 const URL           = require('url');
 
 

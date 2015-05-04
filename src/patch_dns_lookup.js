@@ -1,7 +1,7 @@
 // Patch DNS.lookup to resolve all hosts added via Replay.localhost as 127.0.0.1
 
-const DNS           = require('dns');
-const Replay        = require('./replay');
+const DNS    = require('dns');
+const Replay = require('./');
 
 
 const originalLookup = DNS.lookup;

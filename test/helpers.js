@@ -9,7 +9,7 @@ const Express     = require('express');
 const bodyParser  = require('body-parser');
 const HTTP        = require('http');
 const HTTPS       = require('https');
-const Replay      = require('../src/replay');
+const Replay      = require('../src');
 const File        = require('fs');
 const Async       = require('async');
 

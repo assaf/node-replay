@@ -5,7 +5,7 @@ const HTTP    = require('http');
 const HTTPS   = require('https');
 const Async   = require('async');
 const Request = require('request');
-const Replay  = require('../src/replay');
+const Replay  = require('../src');
 
 
 // Test replaying results from fixtures in spec/fixtures.
