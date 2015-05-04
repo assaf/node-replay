@@ -44,14 +44,9 @@ const MATCH_HEADERS = [ /^accept/, /^authorization/, /^body/, /^content-type/, /
 // catalog   - The catalog is responsible for loading pre-recorded responses
 //             into memory, from where they can be replayed, and storing captured responses.
 //
-// chain     - The proxy chain.  Essentially an array of proxies through which
-//             each request goes, from first to last.  You generally don't need
-//             to use this unless you decide to reconstruct your own chain.
-//
-//             When adding new proxies, you probably want those executing ahead
-//             of any existing proxies (certainly the pass-through proxy), so
-//             you'll want to prepend them.  The `use` method will prepend a
-//             proxy to the chain.
+// chain     - The proxy chain.  Essentially an array of handlers through which
+//             each request goes, and concludes when the last handler returns a
+//             response.
 //
 // headers   - Only these headers are matched when recording/replaying.  A list
 //             of regular expressions.
@@ -89,7 +84,7 @@ class Replay extends EventEmitter {
   // Addes a proxy to the beginning of the processing chain, so it executes ahead of any existing proxy.
   //
   // Example
-  //     replay.use replay.logger()
+  //     replay.use(replay.logger())
   use(proxy) {
     this.chain.prepend(proxy);
     return this;
@@ -164,11 +159,6 @@ class Replay extends EventEmitter {
 const replay = new Replay(process.env.REPLAY || DEFAULT_MODE);
 
 
-// The default processing chain (from first to last):
-// - Pass through requests to localhost
-// - Log request to console is `deubg` is true
-// - Replay recorded responses
-// - Pass through requests in bloody and cheat modes
 function passWhenBloodyOrCheat(request) {
   return replay.isPassThrough(request.url.hostname) ||
          (replay.mode === 'cheat' && !replay.isDropped(request.url.hostname));
@@ -179,6 +169,11 @@ function passToLocalhost(request) {
          replay.mode === 'bloody';
 }
 
+// The default processing chain (from first to last):
+// - Pass through requests to localhost
+// - Log request to console is `deubg` is true
+// - Replay recorded responses
+// - Pass through requests in bloody and cheat modes
 replay
   .use(passThrough(passWhenBloodyOrCheat))
   .use(recorder(replay))
