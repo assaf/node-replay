@@ -285,8 +285,7 @@ describe('Replay', function() {
         { name: 'Dolor', extra: 'Sit'}
       ].map(function(query) {
         return function(callback) {
-          Request({
-            method: 'get',
+          Request.get({
             url:    `http://127.0.0.1:${HTTP_PORT}/query`,
             qs:     query,
             json:   true
