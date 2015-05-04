@@ -2,7 +2,7 @@ const { setup, HTTP_PORT, HTTPS_PORT } = require('./helpers');
 const assert  = require('assert');
 const HTTP    = require('http');
 const HTTPS   = require('https');
-const Replay  = require('../src/replay');
+const Replay  = require('../src');
 
 
 // First batch is testing requests that pass through to the server, no recording/replay.
