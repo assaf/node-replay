@@ -1,3 +1,8 @@
+# Version 2.1.0 2015-05-03
+
+CHANGED rewrote in ES6
+
+
 # Version 2.0.6 2015-04-30
 
 FIXED pass through when sending request bodies
