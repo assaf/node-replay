@@ -274,6 +274,18 @@ Replay.headers.push(/^content-length/);
 
 Since headers are case insensitive, we always match on the lower case name.
 
+If you want more control over the responses that you record (for example weeding out error responses for 
+really flaky backends or when you are polling waiting for something to happen), you can use recordReponseControl 
+to excercise fine grain control over the recording process. For example, to only save the responses from myhostame.com port 8080 if the response was successful:
+
+```javascript
+Replay.recordResponseControl = {
+  "myhostname.com:8080" : function(request, response) {
+    return response.statusCode < 400;
+  }
+};
+```
+
 
 ## Geeking
 
