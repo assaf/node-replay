@@ -43,6 +43,14 @@ module.exports = function recorded(settings) {
         if (error)
           callback(error);
         else
+          if (settings.needsRetryMatchers && settings.needsRetryMatchers[host]) {
+            if (settings.needsRetryMatchers[host](request, response)) {
+              // if responseNeedsRetryMatchers matches, just return response,
+              // and do not record it. This weeds out responses that need to be retried.
+              callback(null, response);
+              return;
+            }
+          }
           catalog.save(host, request, response, function(saveError) {
             callback(saveError, response);
           });
