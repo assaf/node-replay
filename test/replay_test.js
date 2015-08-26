@@ -425,7 +425,7 @@ describe('Replay', function() {
       context('that indicates response should be recorded', function() {
         before(function() {
           Replay.recordResponseControl = {
-            ['127.0.0.1:' + HTTP_PORT] : function(req, res) {
+            ['127.0.0.1:' + HTTP_PORT] : function() {
               return true;
             }
           };
@@ -440,7 +440,7 @@ describe('Replay', function() {
       context('that indicates response should not be recorded', function() {
         before(function() {
           Replay.recordResponseControl = {
-            ['127.0.0.1:' + HTTP_PORT] : function(req, res) {
+            ['127.0.0.1:' + HTTP_PORT] : function() {
               return false;
             }
           };
