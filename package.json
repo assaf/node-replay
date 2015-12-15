@@ -33,6 +33,7 @@
     "babel": "^5.2.9",
     "babel-eslint": "^3.0.1",
     "body-parser": "^1.12.3",
+    "compression": "^1.6.0",
     "del": "^1.1.1",
     "eslint": "^0.20.0",
     "express": "^4.12.3",

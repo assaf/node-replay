@@ -7,6 +7,7 @@
 
 const Express     = require('express');
 const bodyParser  = require('body-parser');
+const compression = require('compression');
 const HTTP        = require('http');
 const HTTPS       = require('https');
 const Replay      = require('../src');
@@ -32,7 +33,14 @@ Replay.silent = true;
 
 // Serve pages from localhost.
 const server = new Express();
+server.use(compression({
+  filter: function(req) {
+    return req.headers['accept-encoding'] != null;
+  },
+  threshold: 1
+}));
 server.use( bodyParser.urlencoded({ extended: false }) );
+
 // Success page.
 server.get('/', function(req, res) {
   res.send('Success!');
