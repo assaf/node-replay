@@ -9,7 +9,7 @@ Things that will ruin your day when tests make HTTP requests to other services:
 - Network late ............ ncy
 - Being-rate limited and having to wait an hour for the next test run
 - Same request returns different result each time
-- Everyone else on the network is deep in BitTorrent terittory
+- Everyone else on the network is deep in BitTorrent territory
 
 Things **node-replay** can do to make these problems go away:
 
@@ -81,7 +81,7 @@ Let's do that:
 REPLAY=record node test.js
 ```
 
-That wasn't too hard, but the test is still failing.  "How?" you must be
+That wasn't too hard, but the test is still failing.  "How?"  You must be
 wondering and scratching your head in total disbelief.  It's actually quite
 simple.
 
