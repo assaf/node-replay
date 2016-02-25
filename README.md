@@ -32,7 +32,7 @@ Now write some simple test case:
 ```javascript
 const assert  = require('assert');
 const HTTP    = require('http');
-const Replay  = require('Replay');
+const Replay  = require('replay');
 
 HTTP.get({ hostname: 'www.iheartquotes.com', path: '/api/v1/random' }, function(response) {
   var body = '';
