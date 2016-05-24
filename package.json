@@ -43,7 +43,7 @@
     "gulp-notify": "^2.2.0",
     "gulp-sourcemaps": "^1.5.2",
     "gulp-util": "^3.0.4",
-    "mocha": "^2.2.4",
+    "mocha": "^2.5.2",
     "request": "^2.55.0"
   },
   "repository": {
