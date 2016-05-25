@@ -44,6 +44,8 @@ module.exports = class ProxyRequest extends HTTP.IncomingMessage {
     this.url            = URL.parse(`${protocol}//${host || 'localhost'}:${realPort}${options.path || '/'}`, true);
     this.auth           = options.auth;
     this.agent          = options.agent || (protocol === 'https:' ? HTTPS.globalAgent : HTTP.globalAgent);
+    this.cert           = options.cert;
+    this.key            = options.key;
     this.headers        = {};
     if (options.headers)
       for (let name in options.headers) {
