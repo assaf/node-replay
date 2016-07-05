@@ -1,3 +1,4 @@
 node_modules
 lib/**/*.js
 lib/**/*.map
+.DS_Store
