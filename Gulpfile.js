@@ -40,9 +40,7 @@ gulp.task('build', ['clean', 'lint'], function() {
 
 // gulp clean -> clean generated files
 gulp.task('clean', function(done) {
-  del([
-    'lib'
-  ], done);
+  return del(['lib']);
 });
 
 
