@@ -1,3 +1,8 @@
+# Version 2.1.1 2016-09-12
+
+FIXED compatibility with Node LTS and Current
+
+
 # Version 2.1.0 2015-05-03
 
 CHANGED rewrote in ES6
@@ -87,7 +92,7 @@ CHANGED Support dynamic switching of fixtures (Pål Ruud):
 
 FIXED compatibility with superagent and supertest (Jerome Touffe-Blin)
 
-FIXED support http.get([string]) 
+FIXED support http.get([string])
 
 FIXED request headers are stringified before processing
 
@@ -219,7 +224,7 @@ don't care to manage their recorded file.  You can just add those to the ignore 
 
     Replay.ignore "www.google-analytics.com", "airbrake.io"
 
-The `allow`, `ignore` and `localhost` methods now accept multiple arguments. 
+The `allow`, `ignore` and `localhost` methods now accept multiple arguments.
 
 
 ## Version 1.2.1 2011-12-27
@@ -251,7 +256,7 @@ Only store specific request headers (e.g. `Accept` but not `User-Agent`).
 ## Version 1.1.0 2011-12-05
 
 Recorded response now starts with <method> <path>.
-    
+
 Examples:
     GET /weather?c=94606
     POST /posts
