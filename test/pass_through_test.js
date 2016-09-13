@@ -209,6 +209,26 @@ describe('Pass through', function() {
         assert.equal(error.code, 'ECONNREFUSED');
       });
     });
+
+    describe('localhost', function() {
+      let response = null;
+
+      before(function(done) {
+        const request = HTTP.get({ hostname: 'localhost', port: HTTP_PORT }, function(_) {
+          response = _;
+          response.body = '';
+          response.on('data', function(chunk) {
+            response.body += chunk;
+          });
+          response.on('end', done);
+        });
+        request.on('error', done);
+      });
+
+      it('should pass through by default', function() {
+        assert.equal(response.statusCode, 200);
+      });
+    });
   });
 
 });
