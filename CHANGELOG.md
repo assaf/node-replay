@@ -1,3 +1,8 @@
+# Version 2.1.2 2016-09-13
+
+FIXED localhosts not passed through
+
+
 # Version 2.1.1 2016-09-12
 
 FIXED compatibility with Node LTS and Current
