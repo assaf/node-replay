@@ -171,7 +171,7 @@ function passToLocalhost(request) {
 
 // The default processing chain (from first to last):
 // - Pass through requests to localhost
-// - Log request to console is `deubg` is true
+// - Log request to console is `debug` is true
 // - Replay recorded responses
 // - Pass through requests in bloody and cheat modes
 replay
