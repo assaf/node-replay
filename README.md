@@ -174,7 +174,7 @@ Content-Type: text/html
 We've got them.  Just enough to make you happy and not enough to take all day to
 explain.
 
-The first and most obvious is the mode you run **node-reply** in:
+The first and most obvious is the mode you run **node-replay** in:
 
 **bloody** -- All requests go out, none get replayed.  Use this if you want to
 remember what life was before you started using **node-replay**.  Also, to test
@@ -236,7 +236,7 @@ go through, and you don't want to record it.
 Replay.drop('www.google-analytics.com', 'rollbar.com');
 ```
 
-Likewise, you can tell **node-reply** to pass through requests to specific hosts:
+Likewise, you can tell **node-replay** to pass through requests to specific hosts:
 
 ```javascript
 Replay.passThrough('s3.amazonaws.com');
