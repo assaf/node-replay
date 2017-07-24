@@ -5,6 +5,8 @@ const Path           = require('path');
 const Matcher        = require('./matcher');
 const jsStringEscape = require('js-string-escape');
 
+const NEW_RESPONSE_FORMAT = /HTTP\/(\d\.\d)\s+(\d{3})\s*(.*)/;
+const OLD_RESPONSE_FORMAT = /(\d{3})\s+HTTP\/(\d\.\d)/;
 
 function mkpathSync(pathname) {
   if (File.existsSync(pathname))
@@ -66,16 +68,12 @@ function parseRequest(filename, request, requestHeaders) {
   return { url, method, headers, body };
 }
 
-
 function parseResponse(filename, response, body) {
   if (response) {
     const [ statusLine, ...headerLines ] = response.split(/\n/);
-    const newFormat     = statusLine.match(/HTTP\/(\d\.\d)\s+(\d{3})\s*(.*)/);
-    const version       = newFormat[1];
-    const statusCode    = parseInt(newFormat[2], 10);
-    const statusMessage = newFormat[3].trim();
-    const headers       = parseHeaders(filename, headerLines);
-    const rawHeaders    = headerLines.reduce(function(raw, header) {
+    const { version, statusCode, statusMessage } = statusComponents(statusLine)
+    const headers         = parseHeaders(filename, headerLines);
+    const rawHeaders      = headerLines.reduce(function(raw, header) {
       const [name, value] = header.split(/:\s+/);
       raw.push(name);
       raw.push(value);
@@ -85,6 +83,24 @@ function parseResponse(filename, response, body) {
   }
 }
 
+function statusComponents(statusLine) {
+  let response = {};
+  if ( isResponseFormatNew(statusLine) ) {
+    const formattedStatus = statusLine.match(NEW_RESPONSE_FORMAT);
+    response.version       = formattedStatus[1];
+    response.statusCode    = parseInt(formattedStatus[2], 10);
+    response.statusMessage = formattedStatus[3].trim();
+  } else {
+    const formattedStatus = statusLine.match(OLD_RESPONSE_FORMAT);
+    response.version       = formattedStatus[2];
+    response.statusCode    = parseInt(formattedStatus[0], 10);
+  }
+  return response;
+}
+
+function isResponseFormatNew(statusLine) {
+  return /^HTTP/.test(statusLine)
+}
 
 function readAndInitialParseFile(filename) {
   const buffer  = File.readFileSync(filename);
