@@ -182,7 +182,7 @@ your code against changes to 3rd party API, because these do happen.  Too often.
 
 **cheat** -- Replays recorded responses, and allow HTTP outbound requests.  This
 is mighty convenient when you're writing new tests or changing code to make new,
-un-recorded HTTP requests, but you haven't quite settled on which requets to
+un-recorded HTTP requests, but you haven't quite settled on which requests to
 make, so you don't want any responses recorded quite yet.
 
 **record** -- Replays recorded responses, or captures responses for future
