@@ -505,7 +505,7 @@ describe('Replay', function() {
           response.on('end', done);
         })
         .on('error', done);
-        request.write(`line1\nline2\nline3`);
+        request.write('line1\nline2\nline3');
         request.end();
       });
 
