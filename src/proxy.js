@@ -79,8 +79,8 @@ module.exports = class ProxyRequest extends HTTP.IncomingMessage {
   }
 
   setTimeout(timeout, callback) {
-    if (callback)
-      setImmediate(callback);
+    // if (callback)
+    //   setImmediate(callback);
   }
 
   setNoDelay(/*nodelay = true*/) {
