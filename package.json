@@ -16,7 +16,7 @@
     "vcr",
     "api"
   ],
-  "main": "./lib",
+  "main": "./src",
   "scripts": {
     "build": "gulp build",
     "test": "mocha",
