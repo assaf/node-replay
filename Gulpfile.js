@@ -32,7 +32,7 @@ gulp.task('build', ['clean', 'lint'], function() {
     .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest('lib'))
     .pipe(notify({
-      message: 'Zombie: built!',
+      message: 'node-replay: built!',
       onLast:  true
     }));
 });

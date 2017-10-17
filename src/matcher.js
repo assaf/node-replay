@@ -93,10 +93,10 @@ module.exports = class Matcher {
     if (this.method !== method)
       return false;
 
-    for (let name in this.headers) {
+    for (let name in this.headers)
       if (this.headers[name] !== headers[name])
         return false;
-    }
+
     if (body) {
       let data = '';
       for (let chunks of body)
