@@ -161,6 +161,7 @@ class ProxyResponse extends Stream.Readable {
     // Not a documented property, but request seems to use this to look for HTTP parsing errors
     this.connection       = new EventEmitter();
     this._body            = captured.body.slice(0);
+    this.client           = { authorized: true }
   }
 
   _read() {
