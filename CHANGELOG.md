@@ -1,34 +1,41 @@
-# Version 2.1.2 2016-09-13
+## Version 2.1.3 2017-10-17
+
+FIXED for request library SSL authorization check
+
+Updated dependencies
+
+
+## Version 2.1.2 2016-09-13
 
 FIXED localhosts not passed through
 
 
-# Version 2.1.1 2016-09-12
+## Version 2.1.1 2016-09-12
 
 FIXED compatibility with Node LTS and Current
 
 
-# Version 2.1.0 2015-05-03
+## Version 2.1.0 2015-05-03
 
 CHANGED rewrote in ES6
 
 
-# Version 2.0.6 2015-04-30
+## Version 2.0.6 2015-04-30
 
 FIXED pass through when sending request bodies
 
 
-# Version 2.0.5 2015-04-28
+## Version 2.0.5 2015-04-28
 
 FIXED SSL requests when not providing an explicit `protocol` option.
 
 
-# Version 2.0.4 2015-03-10
+## Version 2.0.4 2015-03-10
 
 FIXED problem with https support on 0.10
 
 
-# Version 2.0.3 2015-03-10
+## Version 2.0.3 2015-03-10
 
 ADDED Supports streaming API v2 (0.12/iojs)
 
