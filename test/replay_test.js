@@ -431,16 +431,10 @@ describe('Replay', function() {
 
 
   describe('recording POST data', function() {
+
     const fixturesDir = `${__dirname}/fixtures/127.0.0.1-${HTTP_PORT}`;
 
-    before(setup);
-
-    before(function() {
-      Replay.mode = 'record';
-      Replay.reset('127.0.0.1');
-    });
-
-    before(function(done) {
+    function setupPostRequest(done) {
       const request = HTTP.request({
         hostname: '127.0.0.1',
         port:     HTTP_PORT,
@@ -451,22 +445,80 @@ describe('Replay', function() {
       });
       request.write('request data');
       request.end();
+    }
+
+    function hasSavedPostRequestData() {
+      if (File.existsSync(fixturesDir)) {
+        let hasData   = false;
+        const files   = File.readdirSync(fixturesDir);
+        const fixture = File.readFileSync(`${fixturesDir}/${files[0]}`, 'utf8');
+        for (let line of fixture.split('\n'))
+          if (line === 'body: request data')
+            hasData = true;
+        return hasData;
+      }
+    }
+
+    before(setup);
+
+    before(function() {
+      Replay.mode = 'record';
+      Replay.reset('127.0.0.1');
     });
 
-    it('should save POST request data', function() {
-      let hasData   = false;
-      const files   = File.readdirSync(fixturesDir);
-      const fixture = File.readFileSync(`${fixturesDir}/${files[0]}`, 'utf8');
-      for (let line of fixture.split('\n'))
-        if (line === 'body: request data')
-          hasData = true;
-      assert(hasData);
+    context('without record response control', function() {
+      before(setupPostRequest);
+
+      it('should save POST request data', function() {
+        assert(hasSavedPostRequestData());
+      });
     });
 
-    after(function() {
-      for (let file of File.readdirSync(fixturesDir))
-        File.unlinkSync(`${fixturesDir}/${file}`);
-      File.rmdirSync(fixturesDir);
+    describe('with record response control', function() {
+      context('that indicates response should be recorded', function() {
+        before(function() {
+          Replay.recordResponseControl = {
+            ['127.0.0.1:' + HTTP_PORT] : function() {
+              return true;
+            }
+          };
+        });
+
+        before(setupPostRequest);
+
+        it('should save POST request data', function() {
+          assert(hasSavedPostRequestData());
+        });
+      });
+      context('that indicates response should not be recorded', function() {
+        before(function() {
+          Replay.recordResponseControl = {
+            ['127.0.0.1:' + HTTP_PORT] : function() {
+              return false;
+            }
+          };
+        });
+
+        before(setupPostRequest);
+
+        it('should not save POST request data', function() {
+          assert(!hasSavedPostRequestData());
+        });
+      });
+
+      after(function() {
+        Replay.recordResponseControl = null;
+      });
+    });
+
+
+
+    afterEach(function() {
+      if (File.existsSync(fixturesDir)) {
+        for (let file of File.readdirSync(fixturesDir))
+          File.unlinkSync(`${fixturesDir}/${file}`);
+        File.rmdirSync(fixturesDir);
+      }
     });
   });
 

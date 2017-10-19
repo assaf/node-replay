@@ -42,10 +42,18 @@ module.exports = function recorded(settings) {
       capture(request, function(error, response) {
         if (error)
           callback(error);
-        else
+        else {
+          if (settings.recordResponseControl && settings.recordResponseControl[host]) {
+            if (!settings.recordResponseControl[host](request, response)) {
+              // don't save responses we don't like, eg. errors,
+              callback(null, response);
+              return;
+            }
+          }
           catalog.save(host, request, response, function(saveError) {
             callback(saveError, response);
           });
+        };
       });
       return;
     }
