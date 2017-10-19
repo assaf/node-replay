@@ -2,6 +2,8 @@
 
 ADDED record unzipped reply #72
 
+ADDED support for passing-through client cert and key #99
+
 
 ## Version 2.1.3 2017-10-17
 
