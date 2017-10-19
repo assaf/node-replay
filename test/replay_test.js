@@ -48,6 +48,35 @@ describe('Replay', function() {
       });
     });
 
+    describe('Old http status line format', function() {
+      let response;
+
+      before(function(done) {
+        HTTP
+          .get(`http://example.com:${INACTIVE_PORT}/weather?c=94606&statusLineFormat=old`, function(_) {
+            response = _;
+            done();
+          })
+          .on('error', done);
+      });
+
+      it('should return HTTP version', function() {
+        assert.equal(response.httpVersion, '1.1');
+      });
+      it('should return status code', function() {
+        assert.equal(response.statusCode, 200);
+      });
+      it('should return response headers', function() {
+        assert.deepEqual(response.headers, {
+          'content-type': 'text/html',
+          'date':         'Tue, 29 Nov 2011 03:12:15 GMT'
+        });
+      });
+      it('should return response trailers', function() {
+        assert.deepEqual(response.trailers, { });
+      });
+    });
+
 
     describe('callback', function() {
       let response;
