@@ -1,5 +1,13 @@
 ## Version 2.1.4 2017-10-19
 
+ADDED control over which responses are recorded #68
+
+  Replay.recordResponseControl = {
+    "myhostname.com:8080" : function(request, response) {
+      return response.statusCode < 400;
+    }
+  };
+
 ADDED record unzipped reply #72
 
 ADDED support for passing-through client cert and key #99
