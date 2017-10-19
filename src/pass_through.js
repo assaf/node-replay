@@ -24,7 +24,9 @@ module.exports = function passThrough(passThroughFunction) {
         method:   request.method,
         headers:  request.headers,
         agent:    request.agent,
-        auth:     request.auth
+        auth:     request.auth,
+        key:      request.key,
+        cert:     request.cert
       };
 
       const http = new ClientRequest(options);
