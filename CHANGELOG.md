@@ -1,3 +1,8 @@
+## Version 2.1.4 2017-10-19
+
+ADDED record unzipped reply #72
+
+
 ## Version 2.1.3 2017-10-17
 
 FIXED for request library SSL authorization check

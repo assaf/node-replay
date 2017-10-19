@@ -323,6 +323,59 @@ describe('Replay', function() {
   });
 
 
+  describe('recording gzipped replay', function() {
+    const fixturesDir = `${__dirname}/fixtures/127.0.0.1-${HTTP_PORT}`;
+
+    before(setup);
+
+    before(function() {
+      Replay.mode = 'record';
+      Replay.reset('127.0.0.1');
+    });
+
+    it('should create unzipped fixture for gzipped reply', function(done) {
+      const query = { name: 'Amet', extra: 'consectetur'};
+      const request = function(callback) {
+        Request.get({
+          url:    `http://127.0.0.1:${HTTP_PORT}/query`,
+          qs:     query,
+          headers: {
+            'accept-encoding': 'gzip'
+          },
+          json:   true
+        }, function(error, response, body) {
+          if (error)
+            callback(error);
+          else
+            try {
+              assert.deepEqual(body, query);
+              callback(null, query);
+            } catch (error) {
+              callback(error);
+            }
+        });
+      };
+
+      request(function(error) {
+        if (error)
+          done(error);
+        else {
+          // fixtures should be written now
+          Replay.mode = 'replay';
+          request(done);
+        }
+      });
+    });
+
+    after(function() {
+      for(let file of File.readdirSync(fixturesDir))
+        File.unlinkSync(`${fixturesDir}/${file}`);
+      File.rmdirSync(fixturesDir);
+    });
+
+  });
+
+
   describe('recording multiple of the same header', function() {
     const fixturesDir = `${__dirname}/fixtures/127.0.0.1-${HTTP_PORT}`;
 
