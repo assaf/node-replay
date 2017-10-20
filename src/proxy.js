@@ -122,7 +122,6 @@ module.exports = class ProxyRequest extends HTTP.IncomingMessage {
         else if (captured) {
           const response = new ProxyResponse(captured);
           this.emit('response', response);
-          response.resume();
         } else {
           const error = new Error(`${this.method} ${URL.format(this.url)} refused: not recording and no network access`);
           error.code  = 'ECONNREFUSED';
