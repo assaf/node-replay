@@ -163,6 +163,7 @@ class ProxyResponse extends Stream.Readable {
     this.connection       = new EventEmitter();
     this._body            = captured.body.slice(0);
     this.client           = { authorized: true }
+    this.socket           = { authorized: true };
   }
 
   _read() {
