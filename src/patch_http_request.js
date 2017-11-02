@@ -3,10 +3,10 @@
 // Patch based on io.js, may not work with Node.js
 
 const HTTP          = require('http');
+const HTTPS         = require('https');
 const ProxyRequest  = require('./proxy');
 const Replay        = require('./');
 const URL           = require('url');
-
 
 // Route HTTP requests to our little helper.
 HTTP.request = function(options, callback) {
@@ -35,3 +35,6 @@ HTTP.request = function(options, callback) {
   return request;
 };
 
+HTTPS.request = function(options, callback) {
+  return HTTP.request(options, callback);
+};
