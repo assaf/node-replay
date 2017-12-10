@@ -28,3 +28,9 @@ HTTP.request = function(options, callback) {
   return request;
 };
 
+// Patch .get method otherwise it calls original HTTP.request
+HTTP.get = function(options, cb) {
+  const req = HTTP.request(options, cb);
+  req.end();
+  return req;
+}
