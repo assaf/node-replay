@@ -20,7 +20,7 @@
   "scripts": {
     "build": "gulp build",
     "test": "mocha",
-    "prepublish": "gulp build",
+    "prepare": "gulp build",
     "postpublish": "gulp tag"
   },
   "dependencies": {
