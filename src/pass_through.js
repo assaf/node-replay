@@ -48,6 +48,7 @@ module.exports = function passThrough(passThroughFunction) {
           unzip.rawTrailers = response.rawTrailers;
           response = response.pipe(unzip);
           delete captured.headers['content-encoding'];
+          delete captured.headers['content-length'];
         }
         response.on('data', function(chunk, encoding) {
           captured.body.push([chunk, encoding]);
