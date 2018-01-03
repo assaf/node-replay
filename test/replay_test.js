@@ -650,6 +650,64 @@ describe('Replay', function() {
   });
 
 
+  describe('replaying with POST body regular expression', function() {
+    before(function() {
+      Replay.mode = 'replay';
+    });
+
+    describe('matching', function() {
+      let response;
+
+      before(function(done) {
+        const request = HTTP.request({
+          hostname: 'example.com',
+          port:     INACTIVE_PORT,
+          method:   'post',
+          path:     '/post-body-regexp'
+        }, function(_) {
+          response = _;
+          response.on('end', done);
+        })
+        .on('error', done);
+        request.write('request body 17');
+        request.end();
+      });
+
+      it('should return status code', function() {
+        assert.equal(response.statusCode, 200);
+      });
+    });
+
+    describe('not matching', function() {
+      let error;
+
+      before(function(done) {
+        const request = HTTP.request({
+          hostname: 'example.com',
+          port:     INACTIVE_PORT,
+          method:   'post',
+          path:     '/post-body-regexp'
+        }, function(_) {
+          response = _;
+          response.on('end', done);
+        })
+        .on('error', function(_) {
+          error = _;
+          done();
+        });
+        request.write('request body ABC');
+        request.end();
+      });
+
+      it('should callback with error', function() {
+        assert(error instanceof Error);
+        assert.equal(error.code, 'ECONNREFUSED');
+      });
+    });
+
+  });
+
+
   describe('only specified headers', function() {
     const fixturesDir = `${__dirname}/fixtures/127.0.0.1-${HTTP_PORT}`;
 
