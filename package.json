@@ -44,7 +44,6 @@
     "gulp-babel": "^7.0.0",
     "gulp-eslint": "^4.0.0",
     "gulp-exec": "^2.1.2",
-    "gulp-notify": "^3.0.0",
     "gulp-sourcemaps": "^2.6.1",
     "gulp-util": "^3.0.7",
     "mocha": "^4.0.1",
