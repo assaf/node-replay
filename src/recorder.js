@@ -12,7 +12,7 @@ module.exports = function recorded(settings) {
 
     // Look for a matching response and replay it.
     try {
-      const matchers = catalog.find(host);
+      const matchers = catalog.find(host,request);
       if (matchers)
         for (let matcher of matchers) {
           let response = matcher(request);

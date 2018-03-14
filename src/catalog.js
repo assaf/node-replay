@@ -4,6 +4,8 @@ const File           = require('fs');
 const Path           = require('path');
 const Matcher        = require('./matcher');
 const jsStringEscape = require('js-string-escape');
+const Crypto         = require('crypto');
+
 
 const NEW_RESPONSE_FORMAT = /HTTP\/(\d\.\d)\s+(\d{3})\s*(.*)/;
 const OLD_RESPONSE_FORMAT = /(\d{3})\s+HTTP\/(\d\.\d)/;
@@ -158,22 +160,37 @@ module.exports = class Catalog {
     this.matchers = {};
   }
 
-  find(host) {
+  getFileUidFromRequest(request) {
+    const arrayToHash = [
+      request.url,
+      request.headers,
+      request.rawHeaders,
+      request.method,
+      // TODO add other props here to do better hashing
+    ];
+
+    const stringToHash = JSON.stringify(arrayToHash);
+
+    return Crypto.createHash('sha256').update(stringToHash).digest('hex');
+  }
+  find(host, request) {
+    const requestUID = this.getFileUidFromRequest(request);
+
     // Return result from cache.
-    const matchers = this.matchers[host];
+    const matchers = this.matchers[requestUID];
     if (matchers)
       return matchers;
 
     // Start by looking for directory and loading each of the files.
     // Look for host-port (windows friendly) or host:port (legacy)
-    let pathname = `${this.getFixturesDir()}/${host.replace(':', '-')}`;
+    let pathname = `${this.getFixturesDir()}/${host.replace(':', '-')}/${requestUID}`;
     if (!File.existsSync(pathname))
-      pathname = `${this.getFixturesDir()}/${host}`;
+      pathname = `${this.getFixturesDir()}/${host}/${requestUID}`;
     if (!File.existsSync(pathname))
       return null;
 
-    const newMatchers = this.matchers[host] || [];
-    this.matchers[host] = newMatchers;
+    const newMatchers = this.matchers[requestUID] || [];
+    this.matchers[requestUID] = newMatchers;
 
     const stat = File.statSync(pathname);
     if (stat.isDirectory()) {
@@ -193,13 +210,14 @@ module.exports = class Catalog {
   }
 
   save(host, request, response, callback) {
+    const requestUID = this.getFileUidFromRequest(request);
+
     const matcher = Matcher.fromMapping(host, { request, response });
-    const matchers = this.matchers[host] || [];
+    const matchers = this.matchers[requestUID] || [];
     matchers.push(matcher);
     const requestHeaders = this.settings.headers;
 
-    const uid       = `${Date.now()}${Math.floor(Math.random() * 100000)}`;
-    const tmpfile   = `${this.getFixturesDir()}/node-replay.${uid}`;
+    const tmpfile   = `${this.getFixturesDir()}/node-replay.${requestUID}`;
     const pathname  = `${this.getFixturesDir()}/${host.replace(':', '-')}`;
 
     debug(`Creating ${pathname}`);
@@ -212,7 +230,7 @@ module.exports = class Catalog {
       return;
     }
 
-    const filename = `${pathname}/${uid}`;
+    const filename = `${pathname}/${requestUID}`;
     try {
       const file = File.createWriteStream(tmpfile, { encoding: 'utf-8' });
       file.write(`${request.method.toUpperCase()} ${request.url.path || '/'}\n`);
