@@ -1,3 +1,12 @@
+## Version 2.2.0 2018-04-02
+
+Remove Content-Length after unzipping data #143
+
+Ignore dot files #140
+
+Fix for request library SSL authorization check #135
+
+
 ## Version 2.1.4 2017-10-19
 
 ADDED control over which responses are recorded #68
