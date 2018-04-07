@@ -1,7 +1,7 @@
 {
   "name": "replay",
   "description": "When API testing slows you down: record and replay HTTP responses like a boss",
-  "version": "2.1.4",
+  "version": "2.2.0",
   "config": {
     "tag": "next"
   },
@@ -29,26 +29,25 @@
     "js-string-escape": "^1.0.1"
   },
   "devDependencies": {
-    "async": "^2.0.1",
+    "async": "^2.6.0",
     "babel": "^6.5.2",
-    "babel-eslint": "^8.0.1",
-    "babel-preset-es2015-node4": "^2.1.0",
-    "babel-preset-stage-2": "^6.13.0",
+    "babel-eslint": "^8.2.2",
+    "babel-preset-es2016": "^6.24.1",
     "babel-register": "^6.14.0",
     "body-parser": "^1.15.2",
-    "compression": "^1.6.0",
+    "compression": "^1.7.2",
     "del": "^3.0.0",
-    "eslint": "^4.9.0",
-    "express": "^4.14.0",
+    "eslint": "^4.19.1",
+    "express": "^4.16.3",
     "gulp": "^3.9.1",
-    "gulp-babel": "^7.0.0",
-    "gulp-eslint": "^4.0.0",
-    "gulp-exec": "^2.1.2",
-    "gulp-notify": "^3.0.0",
-    "gulp-sourcemaps": "^2.6.1",
+    "gulp-babel": "^7.0.1",
+    "gulp-eslint": "^4.0.2",
+    "gulp-exec": "^3.0.1",
+    "gulp-notify": "^3.2.0",
+    "gulp-sourcemaps": "^2.6.4",
     "gulp-util": "^3.0.7",
-    "mocha": "^4.0.1",
-    "request": "^2.74.0"
+    "mocha": "^5.0.5",
+    "request": "^2.85.0"
   },
   "repository": {
     "type": "git",

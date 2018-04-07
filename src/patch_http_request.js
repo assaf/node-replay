@@ -38,3 +38,11 @@ HTTP.request = function(options, callback) {
 HTTPS.request = function(options, callback) {
   return HTTP.request(options, callback);
 };
+
+// Patch .get method otherwise it calls original HTTP.request
+HTTP.get = function(options, cb) {
+  const req = HTTP.request(options, cb);
+  req.end();
+  return req;
+}
+

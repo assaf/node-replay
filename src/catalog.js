@@ -177,7 +177,9 @@ module.exports = class Catalog {
 
     const stat = File.statSync(pathname);
     if (stat.isDirectory()) {
-      const files = File.readdirSync(pathname);
+      let files = File.readdirSync(pathname);
+      // remove dot files from the list
+      files = files.filter(f => !/^\./.test(f));
       for (let file of files) {
         let mapping = this._read(`${pathname}/${file}`);
         newMatchers.push(Matcher.fromMapping(host, mapping));
