@@ -24,16 +24,17 @@
     "postpublish": "gulp tag"
   },
   "dependencies": {
-    "babel-runtime": "^6.11.6",
+    "babel-runtime": "^6.26.0",
     "debug": "^3.1.0",
     "js-string-escape": "^1.0.1"
   },
   "devDependencies": {
     "async": "^2.6.0",
-    "babel": "^6.5.2",
+    "babel-cli": "^6.26.0",
     "babel-eslint": "^8.2.3",
-    "babel-preset-es2016": "^6.24.1",
-    "babel-register": "^6.14.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-register": "^6.26.0",
     "body-parser": "^1.15.2",
     "compression": "^1.7.2",
     "del": "^3.0.0",
