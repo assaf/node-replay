@@ -1,3 +1,10 @@
+## Version 2.3.0 2018-04-29
+
+Tested with Node 10.
+
+add support for matching body with regular expression #145
+
+
 ## Version 2.2.0 2018-04-02
 
 Remove Content-Length after unzipping data #143
