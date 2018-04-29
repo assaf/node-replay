@@ -97,14 +97,17 @@ module.exports = class Matcher {
       if (this.headers[name] !== headers[name])
         return false;
 
-    if (body) {
+    if (this.body && body) {
       let data = '';
       for (let chunks of body)
         data += chunks[0];
       data = jsStringEscape(data);
-      if (this.body && this.body !== data)
-        return false;
+
+      return this.body instanceof RegExp ?
+        this.body.test(data) :
+        this.body === data;
     }
+
     return true;
   }
 
