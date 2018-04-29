@@ -3,6 +3,7 @@
 // Patch based on io.js, may not work with Node.js
 
 const HTTP          = require('http');
+const HTTPS         = require('https');
 const ProxyRequest  = require('./proxy');
 const Replay        = require('./');
 const URL           = require('url');
@@ -28,9 +29,14 @@ HTTP.request = function(options, callback) {
   return request;
 };
 
+
 // Patch .get method otherwise it calls original HTTP.request
 HTTP.get = function(options, cb) {
   const req = HTTP.request(options, cb);
   req.end();
   return req;
 }
+
+
+HTTPS.get = HTTP.get;
+
