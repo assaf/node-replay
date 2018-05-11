@@ -115,11 +115,11 @@ function isResponseFormatNew(statusLine) {
 
 function readAndInitialParseFile(filename) {
   const buffer  = File.readFileSync(filename);
-  const parts   = buffer.toString('utf8').split('\n\n');
+  const parts   = buffer.toString('utf8').replace(/\r/g, '').split('\n\n');
   if (parts.length > 2) {
     const parts0  = new Buffer(parts[0], 'utf8');
     const parts1  = new Buffer(parts[1], 'utf8');
-    const body    = buffer.slice(parts0.length + parts1.length + 4);
+    const body    = new Buffer(parts[2], 'utf8');
     return [ parts[0], parts[1], body ];
   } else
     return [ parts[0], parts[1], '' ];
