@@ -20,7 +20,7 @@ module.exports = function passThrough(passThroughFunction) {
         protocol: request.url.protocol,
         hostname: request.url.hostname,
         port:     request.url.port,
-        path:     request.url.path,
+        path:     request.path,
         method:   request.method,
         headers:  request.headers,
         agent:    request.agent,
