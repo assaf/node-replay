@@ -43,13 +43,13 @@ module.exports = function recorded(settings) {
         if (error)
           callback(error);
         else {
-          if (settings.recordResponseControl && settings.recordResponseControl[host]) {
+          if (settings.recordResponseControl && settings.recordResponseControl[host])
             if (!settings.recordResponseControl[host](request, response)) {
               // don't save responses we don't like, eg. errors,
               callback(null, response);
               return;
             }
-          }
+
           catalog.save(host, request, response, function(saveError) {
             callback(saveError, response);
           });

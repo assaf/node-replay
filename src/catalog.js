@@ -47,6 +47,11 @@ function parseHeaders(filename, headerLines, only = null) {
 
 
 function parseRequest(filename, request, requestHeaders) {
+  function parseRegexp(rawRegexp) {
+    const [ inRegexp, flags ] = rawRegexp.match(/^\/(.+)\/(i|m|g)?$/).slice(1);
+    return new RegExp(inRegexp, flags || '');
+  }
+
   assert(request, `${filename} missing request section`);
   const [ methodAndPath, ...headerLines ] = request.split(/\n/);
   let method;
@@ -55,15 +60,21 @@ function parseRequest(filename, request, requestHeaders) {
   let regexp;
   if (/\sREGEXP\s/.test(methodAndPath)) {
     [ method, rawRegexp ]  = methodAndPath.split(' REGEXP ');
-    const [ inRegexp, flags ] = rawRegexp.match(/^\/(.+)\/(i|m|g)?$/).slice(1);
-    regexp = new RegExp(inRegexp, flags || '');
+    regexp = parseRegexp(rawRegexp);
   } else
     [ method, path ] = methodAndPath.split(/\s/);
   assert(method && (path || regexp), `${filename}: first line must be <method> <path>`);
   assert(/^[a-zA-Z]+$/.test(method), `${filename}: method not valid`);
+
   const headers = parseHeaders(filename, headerLines, requestHeaders);
-  const body    = headers.body;
+  let body      = headers.body;
   delete headers.body;
+
+  if (body && /^REGEXP\s+/.test(body)) {
+    rawRegexp = body.split(/REGEXP\s+/)[1];
+    body = parseRegexp(rawRegexp);
+  }
+
   const url = path || regexp;
   return { url, method, headers, body };
 }
