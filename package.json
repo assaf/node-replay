@@ -50,7 +50,6 @@
     "gulp-babel": "^7.0.1",
     "gulp-eslint": "^4.0.2",
     "gulp-exec": "^3.0.1",
-    "gulp-notify": "^3.2.0",
     "gulp-sourcemaps": "^2.6.4",
     "gulp-util": "^3.0.7",
     "mocha": "^5.1.1",
