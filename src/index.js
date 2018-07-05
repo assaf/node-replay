@@ -153,6 +153,9 @@ class Replay extends EventEmitter {
     this.catalog.setFixturesDir(dir);
   }
 
+  get unmatchedFixtures() {
+    return this.catalog.getUnmatchedFixtures();
+  }
 }
 
 

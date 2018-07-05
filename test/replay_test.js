@@ -21,11 +21,13 @@ describe('Replay', function() {
 
     describe('listeners', function() {
       let response;
+      let unmatchedFixtures;
 
       before(function(done) {
         HTTP
           .get(`http://example.com:${INACTIVE_PORT}/weather?c=94606`, function(_) {
             response = _;
+            unmatchedFixtures = Replay.unmatchedFixtures
             done();
           })
           .on('error', done);
@@ -46,6 +48,9 @@ describe('Replay', function() {
       it('should return response trailers', function() {
         assert.deepEqual(response.trailers, { });
       });
+      it('should have matched', function() {
+        assert.equal(unmatchedFixtures.filter(matcher => matcher.path === '/weather?c=94606').length, 0);
+      })
     });
 
     describe('Old http status line format', function() {

@@ -15,7 +15,7 @@ module.exports = function recorded(settings) {
       const matchers = catalog.find(host);
       if (matchers)
         for (let matcher of matchers) {
-          let response = matcher(request);
+          let response = matcher.match(request);
           if (response) {
             callback(null, response);
             return;
