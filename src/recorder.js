@@ -52,7 +52,6 @@ module.exports = function recorded(settings) {
             
             let uid = settings.uidFn ? setting.uidFn(request) : null;
             catalog.save(host, request, response, function(saveError) {
-              !saveError && updateMatcher();
               callback(saveError, response);
             }, uid);
         };
