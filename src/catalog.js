@@ -203,13 +203,13 @@ module.exports = class Catalog {
     return newMatchers;
   }
 
-  save(host, request, response, callback) {
+  save(host, request, response, callback, _uid) {
     const matcher = Matcher.fromMapping(host, { request, response });
     const matchers = this.matchers[host] || [];
     matchers.push(matcher);
     const requestHeaders = this.settings.headers;
 
-    const uid       = `${Date.now()}${Math.floor(Math.random() * 100000)}`;
+    const uid       = _uid || `${Date.now()}${Math.floor(Math.random() * 100000)}`;
     const tmpfile   = `${this.getFixturesDir()}/node-replay.${uid}`;
     const pathname  = `${this.getFixturesDir()}/${host.replace(':', '-')}`;
 

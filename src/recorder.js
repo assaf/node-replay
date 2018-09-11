@@ -49,10 +49,12 @@ module.exports = function recorded(settings) {
               callback(null, response);
               return;
             }
-
-          catalog.save(host, request, response, function(saveError) {
-            callback(saveError, response);
-          });
+            
+            let uid = settings.uidFn ? setting.uidFn(request) : null;
+            catalog.save(host, request, response, function(saveError) {
+              !saveError && updateMatcher();
+              callback(saveError, response);
+            }, uid);
         };
       });
       return;
