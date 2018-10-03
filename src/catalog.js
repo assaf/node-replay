@@ -243,8 +243,12 @@ module.exports = class Catalog {
       let contentType = response.headers['content-type'] || '',
         isJson = !!contentType.match('json'),
         jsonBody = isJson && (response.body.join('') || '').replace(/,\s*$/, ''),
-        prettyJson = JSON.stringify(JSON.parse(jsonBody), true, '\t');
-      
+		prettyJson;
+		try {
+			prettyJson = (0, _stringify2.default)(JSON.parse(jsonBody), true, '\t');
+		} catch (e){
+			console.log('REPLAY ERROR', e);
+		} finally {}
       if (prettyJson) {
 		  file.write(prettyJson);
 	  } else {
