@@ -250,10 +250,10 @@ module.exports = class Catalog {
 	  } else {
         for (let part of response.body)
           file.write(part[0], part[1]);
-        file.end(function() {
-          File.rename(tmpfile, filename, callback);
-        });
       }
+      file.end(function() {
+        File.rename(tmpfile, filename, callback);
+      });
      
     } catch (error) {
       callback(error);
