@@ -239,11 +239,26 @@ module.exports = class Catalog {
       file.write(`HTTP/${response.version || '1.1'} ${response.statusCode || 200} ${response.statusMessage}\n`);
       writeHeaders(file, response.headers);
       file.write('\n');
-      for (let part of response.body)
-        file.write(part[0], part[1]);
-      file.end(function() {
-        File.rename(tmpfile, filename, callback);
-      });
+	
+      var contentType = response.headers['content-type'] || "",
+          isJson = !!contentType.match('json'),
+          jsonBody = isJson && (response.body.join("") || "").replace(/,\s*$/, ""),
+          prettyJson;
+  
+      try {
+          prettyJson = JSON.stringify(JSON.parse(jsonBody), true, '\t');
+      } catch (e) {}
+      
+      if (prettyJson) {
+		  file.write(prettyJson);
+      } else {
+        for (let part of response.body)
+          file.write(part[0], part[1]);
+        file.end(function() {
+          File.rename(tmpfile, filename, callback);
+        });
+      }
+     
     } catch (error) {
       callback(error);
     }
