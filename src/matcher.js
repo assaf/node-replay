@@ -99,18 +99,17 @@ module.exports = class Matcher {
 
     if (this.body && body) {
       let data = '',
-	    contentType = headers['content-type'] || "",
+	    contentType = headers['content-type'] || '',
 		isJson = !!contentType.match('json'),
-		jsonBody = isJson && (body.join("") || "").replace(/,\s*$/, ""),
-		prettyJson = "";
+		jsonBody = isJson && (body.join('') || '').replace(/,\s*$/, ''),
+		prettyJson = '';
 	
       try {
-          prettyJson = JSON.stringify(JSON.parse(jsonBody), true, '\t');
+        prettyJson = JSON.stringify(JSON.parse(jsonBody), true, '\t');
       } catch (e) {}
 	
-      if (prettyJson) {
-          data = prettyJson;
-      }
+      if (prettyJson)
+        data = prettyJson;
 
       return this.body instanceof RegExp ?
         this.body.test(data) :

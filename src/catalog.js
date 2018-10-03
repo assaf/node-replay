@@ -240,18 +240,14 @@ module.exports = class Catalog {
       writeHeaders(file, response.headers);
       file.write('\n');
 	
-      var contentType = response.headers['content-type'] || "",
-          isJson = !!contentType.match('json'),
-          jsonBody = isJson && (response.body.join("") || "").replace(/,\s*$/, ""),
-          prettyJson;
-  
-      try {
-          prettyJson = JSON.stringify(JSON.parse(jsonBody), true, '\t');
-      } catch (e) {}
+      let contentType = response.headers['content-type'] || '',
+        isJson = !!contentType.match('json'),
+        jsonBody = isJson && (response.body.join('') || '').replace(/,\s*$/, ''),
+        prettyJson = JSON.stringify(JSON.parse(jsonBody), true, '\t');
       
       if (prettyJson) {
 		  file.write(prettyJson);
-      } else {
+	  } else {
         for (let part of response.body)
           file.write(part[0], part[1]);
         file.end(function() {
