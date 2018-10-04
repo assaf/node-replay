@@ -105,7 +105,7 @@ module.exports = class Matcher {
 		prettyJson = '';
 	
 		if (isJson) {
-			for (let part of response.body) {
+			for (let part of body) {
 				jsonBody += (part[0] || '') + (part[1] || '')
 			}
 		}
