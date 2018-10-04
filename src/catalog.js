@@ -245,7 +245,7 @@ module.exports = class Catalog {
         jsonBody = isJson && (response.body.join('') || '').replace(/,\s*$/, ''),
 		prettyJson;
 		try {
-			prettyJson = (0, _stringify2.default)(JSON.parse(jsonBody), true, '\t');
+			prettyJson = JSON.stringify(JSON.parse(jsonBody), true, '\t');
 		} catch (e){
 			console.log('REPLAY ERROR', e);
 		} finally {}
