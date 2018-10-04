@@ -101,8 +101,14 @@ module.exports = class Matcher {
       let data = '',
 	    contentType = headers['content-type'] || '',
 		isJson = !!contentType.match('json'),
-		jsonBody = isJson && (body.join('') || '').replace(/,\s*$/, ''),
+		jsonBody = '',
 		prettyJson = '';
+	
+		if (isJson) {
+			for (let part of response.body) {
+				jsonBody += (part[0] || '') + (part[1] || '')
+			}
+		}
 	
       try {
         prettyJson = JSON.stringify(JSON.parse(jsonBody), true, '\t');

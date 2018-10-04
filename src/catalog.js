@@ -242,8 +242,15 @@ module.exports = class Catalog {
 	
       let contentType = response.headers['content-type'] || '',
         isJson = !!contentType.match('json'),
-        jsonBody = isJson && (response.body.join('') || '').replace(/,\s*$/, ''),
-		prettyJson;
+        jsonBody = '',
+		prettyJson = '';
+	
+        if (isJson) {
+			for (let part of response.body) {
+				jsonBody += (part[0] || '') + (part[1] || '')
+			}
+		}
+		
 		try {
 			prettyJson = JSON.stringify(JSON.parse(jsonBody), true, '\t');
 		} catch (e){
