@@ -110,7 +110,7 @@ ls fixtures/www.iheartquotes.com/
 
 There should be only one file there, since we only recorded one response.  The
 file name is a timestamp, but feel free to rename it to something more
-rescriptive.
+descriptive.
 
 The name of a response file doesn't matter, it can be whatever you want.  The
 name of the directory does, though, it matches the service hostname (and port
