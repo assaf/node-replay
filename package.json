@@ -1,7 +1,7 @@
 {
   "name": "replay",
   "description": "When API testing slows you down: record and replay HTTP responses like a boss",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "engines": {
     "node": ">=6.0.0"
   },

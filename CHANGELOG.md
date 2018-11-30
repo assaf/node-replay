@@ -1,3 +1,10 @@
+## Version 2.4.0 2018-11-30
+
+Actually fix Node 10.
+
+Minor bump because we changed the way we patch the HTTP/HTTPS modules.
+
+
 ## Version 2.3.0 2018-04-29
 
 Tested with Node 10.
