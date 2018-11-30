@@ -179,6 +179,27 @@ describe('Replay', function() {
   });
 
 
+  describe('not matching hostname, using Request', function() {
+    let error;
+
+    before(function() {
+      Replay.mode = 'replay';
+    });
+
+    before(function(done) {
+      Request.get('https://www.nytimes.com', function(_, res) {
+        error = _;
+        done();
+      });
+    });
+
+    it('should callback with error', function() {
+      assert(error instanceof Error);
+      assert.equal(error.code, 'ECONNREFUSED');
+    });
+  });
+
+
   describe('matching a regexp', function() {
     let response;
 

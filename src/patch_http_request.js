@@ -38,5 +38,5 @@ HTTP.get = function(options, cb) {
 }
 
 
-HTTPS.get = HTTP.get;
-
+HTTPS.get     = HTTP.get;
+HTTPS.request = HTTP.request;
