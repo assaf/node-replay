@@ -144,6 +144,44 @@ describe('Pass through', function() {
       });
     });
 
+    describe('get using HTTPS.get()', function() {
+      before(function(done) {
+        const options = {
+          method:             'GET',
+          hostname:           'pass-through',
+          port:               HTTPS_PORT,
+          agent:              false,
+          rejectUnauthorized: false
+        };
+        const request = HTTPS.get(options, function(_) {
+          response = _;
+          response.body = '';
+          response.on('data', function(chunk) {
+            response.body += chunk;
+          });
+          response.on('end', done);
+        });
+        request.on('error', done);
+        request.end();
+      });
+
+      it('should return HTTP version', function() {
+        assert.equal(response.httpVersion, '1.1');
+      });
+      it('should return status code', function() {
+        assert.equal(response.statusCode, 200);
+      });
+      it('should return response headers', function() {
+        assert.equal(response.headers['content-type'], 'text/html; charset=utf-8');
+      });
+      it('should return response trailers', function() {
+        assert.deepEqual(response.trailers, { });
+      });
+      it('should return response body', function() {
+        assert.deepEqual(response.body, 'Success!');
+      });
+    });
+
     describe('post', function() {
       before(function(done) {
         const body = new Buffer('foo=bar');
