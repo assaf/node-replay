@@ -193,20 +193,23 @@ module.exports = class Catalog {
       files = files.filter(f => !/^\./.test(f));
       for (let file of files) {
         let mapping = this._read(`${pathname}/${file}`);
-        newMatchers.push(Matcher.fromMapping(host, mapping));
+        newMatchers.push(Matcher.fromMapping(`${pathname}/${file}`, host, mapping));
       }
     } else {
       const mapping = this._read(pathname);
-      newMatchers.push(Matcher.fromMapping(host, mapping));
+      newMatchers.push(Matcher.fromMapping(`${pathname}`, host, mapping));
     }
 
     return newMatchers;
   }
 
+  getUnmatchedFixtures() {
+    return Object.keys(this.matchers).map(host => {
+      return this.matchers[host].filter(matcher => !matcher.isMatched)
+    }).reduce((a, b) => a.concat(b), []);
+  }
+
   save(host, request, response, callback) {
-    const matcher = Matcher.fromMapping(host, { request, response });
-    const matchers = this.matchers[host] || [];
-    matchers.push(matcher);
     const requestHeaders = this.settings.headers;
 
     const uid       = `${Date.now()}${Math.floor(Math.random() * 100000)}`;
@@ -224,6 +227,10 @@ module.exports = class Catalog {
     }
 
     const filename = `${pathname}/${uid}`;
+    const matcher = Matcher.fromMapping(filename, host, { request, response });
+    const matchers = this.matchers[host] || [];
+    matchers.push(matcher);
+
     try {
       const file = File.createWriteStream(tmpfile, { encoding: 'utf-8' });
       file.write(`${request.method.toUpperCase()} ${request.url.path || '/'}\n`);

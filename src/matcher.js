@@ -1,6 +1,6 @@
 // A matcher is a function that, given a request, returns an appropriate response or nothing.
 //
-// The most common use case is to calling `Matcher.fromMapping(mapping)`.
+// The most common use case is to calling `Matcher.fromMapping(filename, host, mapping)`.
 //
 // The request consists of:
 // url     - URL object
@@ -25,7 +25,7 @@ const jsStringEscape = require('js-string-escape');
 // To create a matcher from request/response mapping use `fromMapping`.
 module.exports = class Matcher {
 
-  constructor(request, response) {
+  constructor(fixturePath, request, response) {
     // Map requests to object properties.  We do this for quick matching.
     assert(request.url || request.regexp, 'I need at least a URL to match request to response');
     if (request.regexp) {
@@ -37,6 +37,9 @@ module.exports = class Matcher {
       this.port     = url.port;
       this.path     = url.path;
     }
+
+    this.fixturePath = fixturePath;
+    this.isMatched = false;
 
     this.method   = (request.method && request.method.toUpperCase()) || 'GET';
     this.headers  = {};
@@ -103,12 +106,19 @@ module.exports = class Matcher {
         data += chunks[0];
       data = jsStringEscape(data);
 
-      return this.body instanceof RegExp ?
-        this.body.test(data) :
-        this.body === data;
+      if (this.body instanceof RegExp && this.body.test(data)) {
+        this.isMatched = true;
+        return this.response;
+      } else if(this.body === data) {
+        this.isMatched = true;
+        return this.response;
+      }
+      return false
     }
 
-    return true;
+    this.isMatched = true;
+
+    return this.response;
   }
 
 
@@ -116,7 +126,7 @@ module.exports = class Matcher {
   //
   // Mapping can contain `request` and `response` object.  As shortcut, mapping can specify `path` and `method` (optional)
   // directly, and also any of the response properties.
-  static fromMapping(host, mapping) {
+  static fromMapping(fileName, host, mapping) {
     assert(!!mapping.path ^ !!mapping.request, 'Mapping must specify path or request object');
 
     let matchingRequest;
@@ -141,11 +151,7 @@ module.exports = class Matcher {
         body:     mapping.request.body
       };
 
-    const matcher = new Matcher(matchingRequest, mapping.response || {});
-    return function(request) {
-      if (matcher.match(request))
-        return matcher.response;
-    };
+    return new Matcher(fileName, matchingRequest, mapping.response || {});
   }
 
 };
