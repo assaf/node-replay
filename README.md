@@ -286,6 +286,24 @@ Replay.recordResponseControl = {
 };
 ```
 
+## Removing unused fixtures
+`replay` automatically records which fixtures have not been used during the test run. To auto-delete those, access `Replay.unmatchedFixtures` and remove them.
+
+Example:
+
+```javascript
+const unlink = util.promisify(fs.unlink)
+
+afterAll(async () => {
+  const unlinkPromises = []
+  Replay.unmatchedFixtures.map(matcher => {
+    unlinkPromises.push(unlink(matcher.fixturePath))
+  })
+  await Promise.all(unlinkPromises)
+  console.log(`Removed ${unlinkPromises.length} unused fixtures.`)
+})
+```
+
 
 ## Geeking
 
