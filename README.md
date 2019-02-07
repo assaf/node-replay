@@ -286,6 +286,18 @@ Replay.recordResponseControl = {
 };
 ```
 
+The generated fixtures by default are named using a uid generator function and it's reasonably safe for them to be unique.
+However because they're only a bunch of numbers, it can be sometimes painful to find which fixture belongs to what request.
+
+You can supply a custom filename generator function if you wish to change that:
+
+```javascript
+Replay.filenameGenerator = function(request) {
+  // just an example, you may want to improve that
+  return `${slugify(`${request.method.toUpperCase()}_${request.url.path}`)}_${Date.now()}${Math.floor(Math.random() * 100000)}`;
+};
+```
+
 
 ## Geeking
 
