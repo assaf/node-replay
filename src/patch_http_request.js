@@ -23,7 +23,7 @@ HTTP.request = function(options, callback) {
     return new HTTP.ClientRequest(options, callback);
 
   // Proxy request
-  const request = new ProxyRequest(options, Replay.chain.start);
+  const request = new ProxyRequest(options, Replay.chain.start, Replay.stream === 'paused');
   if (callback)
     request.once('response', callback);
   return request;

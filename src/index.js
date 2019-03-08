@@ -54,6 +54,10 @@ const MATCH_HEADERS = [ /^accept/, /^authorization/, /^body/, /^content-type/, /
 // fixtures  - Main directory for replay fixtures.
 //
 // mode      - The mode we're running in, see MODES.
+//
+// stream    - The mode we're using for response streams ('flowing' or 'paused').
+//             See: https://nodejs.org/docs/latest-v8.x/api/stream.html#stream_two_modes
+//
 class Replay extends EventEmitter {
 
   constructor(mode) {
@@ -63,6 +67,9 @@ class Replay extends EventEmitter {
     super();
     this.mode   = mode;
     this.chain  = new Chain();
+
+    // Response stream mode
+    this.stream = 'flowing';
 
     // Localhost servers: pass request to localhost
     this._localhosts  = new Set([ 'localhost', '127.0.0.1', '::1' ]);
@@ -152,7 +159,6 @@ class Replay extends EventEmitter {
     // Clears loaded fixtures, and updates to new dir
     this.catalog.setFixturesDir(dir);
   }
-
 }
 
 
@@ -186,4 +192,3 @@ module.exports = replay;
 // These must come last since they need module.exports to exist
 require('./patch_http_request');
 require('./patch_dns_lookup');
-
