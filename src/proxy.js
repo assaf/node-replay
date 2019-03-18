@@ -34,9 +34,10 @@ const URL               = require('url');
 // HTTP client request that captures the request and sends it down the processing chain.
 module.exports = class ProxyRequest extends HTTP.IncomingMessage {
 
-  constructor(options = {}, proxy) {
+  constructor(options = {}, proxy, pauseResponse) {
     super();
     this.proxy          = proxy;
+    this.pauseResponse  = pauseResponse;
     this.method         = (options.method || 'GET').toUpperCase();
     const protocol      = options.protocol || (options._defaultAgent && options._defaultAgent.protocol) || 'http:';
     const [host, port]  = (options.host || options.hostname).split(':');
@@ -98,6 +99,8 @@ module.exports = class ProxyRequest extends HTTP.IncomingMessage {
   }
 
   end(data, encoding, callback) {
+    const request = this;
+
     assert(!this.ended, 'Already called end');
 
     if (typeof data === 'function')
@@ -122,7 +125,7 @@ module.exports = class ProxyRequest extends HTTP.IncomingMessage {
         else if (captured) {
           const response = new ProxyResponse(captured);
           this.emit('response', response);
-          response.resume();
+          if (!request.pauseResponse) response.resume();
         } else {
           const error = new Error(`${this.method} ${URL.format(this.url)} refused: not recording and no network access`);
           error.code  = 'ECONNREFUSED';
@@ -187,4 +190,3 @@ class ProxyResponse extends Stream.Readable {
   }
 
 }
-
