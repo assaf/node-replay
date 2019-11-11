@@ -8,10 +8,10 @@ const gutil       = require('gulp-util');
 const sourcemaps  = require('gulp-sourcemaps');
 const babel       = require('gulp-babel');
 
-
-// gulp -> gulp watch
-gulp.task('default', ['watch']);
-
+// gulp clean -> clean generated files
+gulp.task('clean', function(done) {
+  return del(['lib']);
+});
 
 // gulp lint -> errors if code dirty
 gulp.task('lint', function () {
@@ -21,9 +21,7 @@ gulp.task('lint', function () {
     .pipe(eslint.failOnError());
 });
 
-
-// gulp build -> compile coffee script
-gulp.task('build', ['clean', 'lint'], function() {
+gulp.task('compile', function() {
   return gulp
     .src('src/**/*.js')
     .pipe(sourcemaps.init())
@@ -32,32 +30,17 @@ gulp.task('build', ['clean', 'lint'], function() {
     .pipe(gulp.dest('lib'));
 });
 
-
-// gulp clean -> clean generated files
-gulp.task('clean', function(done) {
-  return del(['lib']);
-});
+// gulp build -> compile coffee script
+gulp.task('build', gulp.series('clean', 'lint', 'compile'));
 
 
 // gulp watch -> watch for changes and compile
-gulp.task('watch', ['build'], function() {
-  return gulp.watch('src/*.js', ['clean', 'build']);
-});
+gulp.task('watch', gulp.series('build', function() {
+  return gulp.watch('src/*.js', gulp.series('clean', 'build'));
+}));
 
-
-// gulp tag -> Tag this release
-gulp.task('tag', ['changes'], function() {
-  const version = require('./package.json').version;
-  const tag     = 'v' + version;
-
-  gutil.log('Tagging this release', tag);
-  return gulp.src('.changes')
-    .pipe( exec('git add package.json CHANGELOG.md') )
-    .pipe( exec('git commit --allow-empty -m "Version ' + version + '"') )
-    .pipe( exec('git tag ' + tag + ' --file .changes') )
-    .pipe( exec('git push origin ' + tag) )
-    .pipe( exec('git push origin master') );
-});
+// gulp -> gulp watch
+gulp.task('default', gulp.series('watch'));
 
 // Generate a change log summary for this release
 // git tag uses the generated .changes file
@@ -73,5 +56,20 @@ gulp.task('changes', function() {
   assert(changes, 'CHANGELOG.md empty entry for version ' + version);
   File.writeFileSync('.changes', changes);
 });
+
+// gulp tag -> Tag this release
+gulp.task('tag', gulp.series('changes', function() {
+  const version = require('./package.json').version;
+  const tag     = 'v' + version;
+
+  gutil.log('Tagging this release', tag);
+  return gulp.src('.changes')
+    .pipe( exec('git add package.json CHANGELOG.md') )
+    .pipe( exec('git commit --allow-empty -m "Version ' + version + '"') )
+    .pipe( exec('git tag ' + tag + ' --file .changes') )
+    .pipe( exec('git push origin ' + tag) )
+    .pipe( exec('git push origin master') );
+}));
+
 
 
