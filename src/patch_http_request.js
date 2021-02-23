@@ -8,53 +8,58 @@ const ProxyRequest  = require('./proxy');
 const Replay        = require('./');
 const URL           = require('url');
 
+const patchedByReplay = '__patched_by_replay__';
 
-// Route HTTP requests to our little helper.
-HTTP.request = function(options, callback) {
-  if (typeof options === 'string' || options instanceof String)
-    options = URL.parse(options);
+if (!HTTP[patchedByReplay]) {
+  HTTP[patchedByReplay] = true;
 
-  // WebSocket request: pass through to Node.js library
-  if (options.headers && options.headers.Upgrade === 'websocket')
-    return new HTTP.ClientRequest(options, callback);
+  // Route HTTP requests to our little helper.
+  HTTP.request = function(options, callback) {
+    if (typeof options === 'string' || options instanceof String)
+      options = URL.parse(options);
 
-  const hostname = options.hostname || (options.host && options.host.split(':')[0]) || 'localhost';
-  if (Replay.isLocalhost(hostname) || Replay.isPassThrough(hostname))
-    return new HTTP.ClientRequest(options, callback);
+    // WebSocket request: pass through to Node.js library
+    if (options.headers && options.headers.Upgrade === 'websocket')
+      return new HTTP.ClientRequest(options, callback);
 
-  // Proxy request
-  const request = new ProxyRequest(options, Replay.chain.start, Replay.stream === 'paused');
-  if (callback)
-    request.once('response', callback);
-  return request;
-};
+    const hostname = options.hostname || (options.host && options.host.split(':')[0]) || 'localhost';
+    if (Replay.isLocalhost(hostname) || Replay.isPassThrough(hostname))
+      return new HTTP.ClientRequest(options, callback);
 
+    // Proxy request
+    const request = new ProxyRequest(options, Replay.chain.start, Replay.stream === 'paused');
+    if (callback)
+      request.once('response', callback);
+    return request;
+  };
 
-HTTPS.request = function(options, callback) {
-  if (typeof options === 'string' || options instanceof String)
-    options = URL.parse(options);
-
-  const httpsOptions = Object.assign({
-    protocol:      'https:',
-    port:          443,
-    // Allows agent: false to opt-out of connection pooling.
-    _defaultAgent: HTTPS.globalAgent
-  }, options);
-
-  return HTTP.request(httpsOptions, callback);
+  // Patch .get method otherwise it calls original HTTP.request
+  HTTP.get = function(options, cb) {
+    const req = HTTP.request(options, cb);
+    req.end();
+    return req;
+  }
 }
 
+if (!HTTPS[patchedByReplay]) {
+  HTTPS[patchedByReplay] = true;
+  HTTPS.request = function(options, callback) {
+    if (typeof options === 'string' || options instanceof String)
+      options = URL.parse(options);
 
-// Patch .get method otherwise it calls original HTTP.request
-HTTP.get = function(options, cb) {
-  const req = HTTP.request(options, cb);
-  req.end();
-  return req;
-}
+    const httpsOptions = Object.assign({
+      protocol:      'https:',
+      port:          443,
+      // Allows agent: false to opt-out of connection pooling.
+      _defaultAgent: HTTPS.globalAgent
+    }, options);
 
+    return HTTP.request(httpsOptions, callback);
+  }
 
-HTTPS.get = function(options, cb) {
-  const req = HTTPS.request(options, cb);
-  req.end();
-  return req;
+  HTTPS.get = function(options, cb) {
+    const req = HTTPS.request(options, cb);
+    req.end();
+    return req;
+  }
 }
