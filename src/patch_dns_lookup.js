@@ -10,7 +10,10 @@ DNS.lookup = function(domain, options, callback) {
       typeof callback === 'function' && Replay.isLocalhost(domain)) {
     const family = options.family || 4;
     const ip = (family === 6) ? '::1' : '127.0.0.1';
-    callback(null, ip, family);
+    if (options.all)
+      callback(null, [ip], family);
+    else
+      callback(null, ip, family);
   } else
     originalLookup(domain, options, callback);
 };
