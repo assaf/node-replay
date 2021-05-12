@@ -995,5 +995,52 @@ describe('Replay', function() {
 
   });
 
+  describe('monkeypatching', function() {
+    function reload(path) {
+      delete require.cache[require.resolve(path)];
+      require(path);
+    }
+
+
+    it('shouldn\'t patch HTTPS.request twice', function() {
+      const patchedRequest = HTTPS.request;
+      reload('../src/patch_http_request');
+      assert.equal(patchedRequest, HTTPS.request);
+      assert.equal(true, HTTPS['__patched_by_replay__']);
+    })
+
+    it('shouldn\'t patch HTTP.request twice', function() {
+      const patchedRequest = HTTP.request;
+      reload('../src/patch_http_request');
+      assert.equal(patchedRequest, HTTP.request);
+      assert.equal(true, HTTP['__patched_by_replay__']);
+    })
+
+    it('shouldn\'t patch HTTPS.get twice', function() {
+      const patchedGet = HTTPS.get;
+      reload('../src/patch_http_request');
+
+      assert.equal(patchedGet, HTTPS.get);
+      assert.equal(true, HTTPS['__patched_by_replay__']);
+    })
+
+    it('shouldn\'t patch HTTP.get twice', function() {
+      const patchedGet = HTTP.get;
+      reload('../src/patch_http_request');
+
+      assert.equal(patchedGet, HTTP.get);
+      assert.equal(true, HTTP['__patched_by_replay__']);
+    });
+
+    it('shouldn\'t patch DNS.lookup twice', function() {
+      const DNS = require('dns');
+      const patchedLookup = DNS.lookup;
+      reload('../src/patch_dns_lookup');
+
+      assert.equal(patchedLookup, DNS.lookup);
+      assert.equal(true, DNS['__patched_by_replay__']);
+    });
+  })
+
 });
 
