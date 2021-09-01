@@ -209,7 +209,7 @@ module.exports = class Catalog {
     matchers.push(matcher);
     const requestHeaders = this.settings.headers;
 
-    const uid       = `${Date.now()}${Math.floor(Math.random() * 100000)}`;
+    const uid       = this.settings.filenameGenerator(request);
     const tmpfile   = `${this.getFixturesDir()}/node-replay.${uid}`;
     const pathname  = `${this.getFixturesDir()}/${host.replace(':', '-')}`;
 

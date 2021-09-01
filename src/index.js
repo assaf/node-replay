@@ -78,6 +78,9 @@ class Replay extends EventEmitter {
     // Dropp connections to these servers
     this._dropped     = new Set();
 
+    this.filenameGenerator = function() {
+      return `${Date.now()}${Math.floor(Math.random() * 100000)}`
+    };
     this.catalog = new Catalog(this);
     this.headers = MATCH_HEADERS;
 

@@ -5,6 +5,7 @@ const HTTP    = require('http');
 const HTTPS   = require('https');
 const Async   = require('async');
 const Request = require('request');
+const slugify = require('slugify');
 const Replay  = require('../src');
 
 
@@ -372,6 +373,65 @@ describe('Replay', function() {
 
   });
 
+  describe('custom filenameGenerator', function() {
+    const fixturesDir = `${__dirname}/fixtures/127.0.0.1-${HTTP_PORT}`;
+
+    before(setup);
+
+    before(function() {
+      Replay.mode = 'record';
+      Replay.reset('127.0.0.1');
+      Replay.filenameGenerator = function(request) {
+        return slugify(`${request.method.toUpperCase()}_${request.url.path}`);
+      };
+    });
+
+    it('should create fixture files with custom names', function(done) {
+      const requests = [
+        { name: 'Lorem', extra: 'Ipsum'},
+        { name: 'Dolor', extra: 'Sit'}
+      ].map(function(query) {
+        return function(callback) {
+          Request.get({
+            url:    `http://127.0.0.1:${HTTP_PORT}/query`,
+            qs:     query,
+            headers: {
+              'X-Some-Header': 'Test'
+            },
+            json:   true
+          }, function(error, response, body) {
+            if (error)
+              callback(error);
+            else
+              try {
+                assert.deepEqual(body, query);
+                callback(null, query);
+              } catch (error) {
+                callback(error);
+              }
+          });
+        };
+      });
+
+      Async.series(requests, function(error) {
+        if (error)
+          done(error);
+        else {
+          // fixtures should be written now
+          Replay.mode = 'replay';
+          Async.series(requests, done);
+        }
+      });
+    });
+
+    after(function() {
+      if (File.existsSync(fixturesDir)) {
+        for (let file of File.readdirSync(fixturesDir))
+          File.unlinkSync(`${fixturesDir}/${file}`);
+        File.rmdirSync(fixturesDir);
+      }
+    });
+  });
 
   describe('recording gzipped replay', function() {
     const fixturesDir = `${__dirname}/fixtures/127.0.0.1-${HTTP_PORT}`;
