@@ -32,7 +32,7 @@
     "js-string-escape": "^1.0.1"
   },
   "devDependencies": {
-    "async": "^2.6.1",
+    "async": "^3.2.2",
     "babel-cli": "^6.26.0",
     "babel-eslint": "^10.0.1",
     "babel-plugin-transform-runtime": "^6.23.0",
